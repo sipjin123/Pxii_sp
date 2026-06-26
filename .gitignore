@@ -1,0 +1,13 @@
+Intermediate/
+DerivedDataCache/
+Saved/
+Binaries/
+Build/
+.vs/
+.plastic/
+.idea/
+Plugins/
+Content/AssetPacks/
+Content/Audio/
+Content/Widgets/Images/
+Content/MetaHumans/
