@@ -21,7 +21,10 @@ public class PXII : ModuleRules
 			"SlateCore",
 			"EnhancedInput",
 			"Niagara",
-			"PhysicsCore" });
+			"PhysicsCore",
+			"GameplayTags",
+			"GameplayAbilities",
+			"GameplayTasks" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
