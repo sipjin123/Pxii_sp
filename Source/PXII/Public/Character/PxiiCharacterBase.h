@@ -39,6 +39,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	TObjectPtr<UPxiiCombatComponent> CombatComponent;
-protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsAttacking;
+	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+protected:
 };

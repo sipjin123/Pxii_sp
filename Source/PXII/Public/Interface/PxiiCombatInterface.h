@@ -60,4 +60,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void Revive();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	float OnGetCurrentDamage();
 };

@@ -32,3 +32,14 @@ enum class EPxiiDamageType:uint8
 
 	MAX=255 UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class EDamageSource:uint8
+{
+	None=0 UMETA(DisplayName="None"),
+
+	// Physical
+	Melee=1 UMETA(DisplayName="Melee"),
+	Range=2 UMETA(DisplayName="Range"),
+	Magic=3 UMETA(DisplayName="Magic"),
+};
