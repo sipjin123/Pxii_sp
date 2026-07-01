@@ -199,6 +199,22 @@
 		{
 			"Name": "LiveLinkUnrealDevice",
 			"Enabled": true
+		},
+		{
+			"Name": "MeshPartition",
+			"Enabled": true
+		},
+		{
+			"Name": "MeshPartitionWater",
+			"Enabled": true
+		},
+		{
+			"Name": "MeshTerrainMode",
+			"Enabled": true
+		},
+		{
+			"Name": "PCGPrimitives_MeshPartitionInterop",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "1673045636"
