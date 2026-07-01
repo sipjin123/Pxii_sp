@@ -24,7 +24,8 @@ public class PXII : ModuleRules
 			"PhysicsCore",
 			"GameplayTags",
 			"GameplayAbilities",
-			"GameplayTasks" });
+			"GameplayTasks",
+			"DeveloperSettings" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

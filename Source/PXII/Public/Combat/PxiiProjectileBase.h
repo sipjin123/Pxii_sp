@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "PxiiProjectileBase.generated.h"
 
 UCLASS()
@@ -20,7 +21,24 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// Setter and Getter
+	FORCEINLINE bool GetIsInUse() { return bIsInUse; }
+	void SetIsInUse(bool InIsInUse);
 
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void OnProjectileHit();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
+	float Lifetime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
+	bool bIsDestroyAfterHit { false };
+
+	bool bIsInUse { false };
+
+	FTimerHandle LifetimeTimerHandle;
 };
