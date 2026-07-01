@@ -217,10 +217,14 @@ void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector H
 		{
 			//PlayerDamage = UPxiiCombatInterface::Execute_OnGetCurrentDamage(GetOwner());
 		}
+		/*
 		const bool IsHeavyAttack = AbilitySystemComponent->HasMatchingGameplayTag(
 				FGameplayTag::RequestGameplayTag(FName("Player.State.HeavyAttack")));
 		const bool IsAbilityAttacking = AbilitySystemComponent->HasMatchingGameplayTag(
 				FGameplayTag::RequestGameplayTag(FName("Player.State.IsAbilityAttacking")));
+		*/
+		const bool IsHeavyAttack = false;
+		const bool IsAbilityAttacking = false;
 
 	
 		const float TotalDamage = PlayerDamage * (IsHeavyAttack ? 2 : 1);
