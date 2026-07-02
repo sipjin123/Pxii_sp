@@ -1,0 +1,62 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GAS/GECalculations/GEEC_DynamicDamage.h"
+
+#include "GAS/PxiiAttributeSet.h"
+
+struct CombatStatCapture
+{
+	// Declares the relevant variable that will be captured from attribute of a target
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
+
+	CombatStatCapture()
+	{
+		// Defines the relevant variable that will be captured from attribute of a target
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UPxiiAttributeSet, Health, Target, false);
+		//sDEFINE_ATTRIBUTE_CAPTUREDEF(UPxiiAttributeSet, DamageReceived, Target, false);
+		//DEFINE_ATTRIBUTE_CAPTUREDEF(UPxiiAttributeSet, WasCriticalHit, Target, false);
+		//DEFINE_ATTRIBUTE_CAPTUREDEF(UPxiiAttributeSet, RagePoints, Target, false);
+	}
+};
+
+static CombatStatCapture& GetCombatStatCapture()
+{
+	static CombatStatCapture StatCapture;
+	return StatCapture;
+}
+
+UGEEC_DynamicDamage::UGEEC_DynamicDamage()
+{
+}
+
+void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+                                                 FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+{
+	//Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
+
+	// Handle Tags
+	const FGameplayEffectSpec& GESpec = ExecutionParams.GetOwningSpec();
+	const FGameplayTagContainer* SourceTags = GESpec.CapturedSourceTags.GetAggregatedTags();
+	const FGameplayTagContainer* TargetTags = GESpec.CapturedTargetTags.GetAggregatedTags();
+
+	// Generate Parameters using tags fetched
+	FAggregatorEvaluateParameters EvalParams;
+	EvalParams.SourceTags = SourceTags;
+	EvalParams.TargetTags = TargetTags;
+
+	// Capture relevant attributes
+	float CurrentHealth = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetCombatStatCapture().HealthDef, EvalParams, CurrentHealth);
+
+	bool bIsCritical = false;
+	float IncomingDamage = 5.f;
+	//-------------------------------------------------------------
+
+	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));
+	if (bIsCritical)
+	{
+		//ExecutionParams.GetOwningSpecForPreExecuteMod()->DynamicGrantedTags.AddTag(TAG_Damage_Crit);
+	}
+}

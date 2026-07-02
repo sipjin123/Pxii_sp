@@ -8,6 +8,7 @@
 #include "Interface/PxiiCombatInterface.h"
 #include "PxiiCharacterBase.generated.h"
 
+class UPxiiAttributeSet;
 class UPxiiAbilitySystemComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTempBaseCharacter, Log, All);
@@ -44,5 +45,11 @@ public:
 	bool IsAttacking;
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	const UPxiiAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
 protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
+	const class UPxiiAttributeSet* AttributeSet;
 };

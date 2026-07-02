@@ -5,6 +5,7 @@
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Components/PxiiCombatComponent.h"
+#include "GAS/PxiiAttributeSet.h"
 
 DEFINE_LOG_CATEGORY(LogTempBaseCharacter);
 // Sets default values
@@ -13,6 +14,7 @@ APxiiCharacterBase::APxiiCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent=CreateDefaultSubobject<UPxiiAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AttributeSet = CreateDefaultSubobject<UPxiiAttributeSet>(TEXT("AttributeSet"));
 }
 
 // Called when the game starts or when spawned
@@ -30,7 +32,8 @@ void APxiiCharacterBase::BeginPlay()
 	}
 	if(CombatComponentClass)
 	{
-		if(CombatComponent=NewObject<UPxiiCombatComponent>(this,CombatComponentClass))
+		CombatComponent=NewObject<UPxiiCombatComponent>(this,CombatComponentClass);
+		if(CombatComponent)
 		{
 			CombatComponent->RegisterComponent();
 		}
