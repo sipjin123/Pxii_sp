@@ -9,6 +9,8 @@
 /**
  * 
  */
+
+DECLARE_LOG_CATEGORY_EXTERN(LogGEECDamage, Log, All);
 UCLASS()
 class PXII_API UGEEC_DynamicDamage : public UGameplayEffectExecutionCalculation
 {

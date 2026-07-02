@@ -5,6 +5,7 @@
 
 #include "GAS/PxiiAttributeSet.h"
 
+DEFINE_LOG_CATEGORY(LogGEECDamage);
 struct CombatStatCapture
 {
 	// Declares the relevant variable that will be captured from attribute of a target
@@ -45,6 +46,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	EvalParams.SourceTags = SourceTags;
 	EvalParams.TargetTags = TargetTags;
 
+	UE_LOG(LogGEECDamage, Warning, TEXT("GEEC Start"));
 	// Capture relevant attributes
 	float CurrentHealth = 0.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetCombatStatCapture().HealthDef, EvalParams, CurrentHealth);
