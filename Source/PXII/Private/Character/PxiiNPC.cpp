@@ -3,6 +3,9 @@
 
 #include "Character/PxiiNPC.h"
 
+#include "GAS/PxiiAbilitySystemComponent.h"
+#include "GAS/PxiiAttributeSet.h"
+
 // Sets default values
 APxiiNPC::APxiiNPC()
 {
@@ -15,7 +18,7 @@ APxiiNPC::APxiiNPC()
 void APxiiNPC::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	AttributeSet = AbilitySystemComponent->GetSet<UPxiiAttributeSet>();
 }
 
 // Called every frame

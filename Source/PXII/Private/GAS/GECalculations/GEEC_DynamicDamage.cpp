@@ -52,7 +52,12 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetCombatStatCapture().HealthDef, EvalParams, CurrentHealth);
 
 	bool bIsCritical = false;
-	float IncomingDamage = 5.f;
+	float IncomingDamage = GESpec.GetSetByCallerMagnitude(
+		FGameplayTag::RequestGameplayTag(FName("Combat.Damage")), // Must match GE tag
+		false,
+		0.0f // Default value if not found
+	);
+	//float IncomingDamage = 5.f;
 	//-------------------------------------------------------------
 
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));

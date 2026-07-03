@@ -22,6 +22,7 @@ void APxiiCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTempBaseCharacter, Warning, TEXT("Char Init 5-Cpp"));
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlay AttributeSet = %s"), *GetNameSafe(AttributeSet));
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GrantAllAbilities();
