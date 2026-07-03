@@ -43,3 +43,13 @@ enum class EDamageSource:uint8
 	Range=2 UMETA(DisplayName="Range"),
 	Magic=3 UMETA(DisplayName="Magic"),
 };
+
+
+UENUM(BlueprintType)
+enum class EHitEffectType : uint8 {
+	Default = 0			UMETA(DisplayName = "Default"),
+	Flinch = 1		UMETA(DisplayName = "Flinch"),
+	Knockback = 2		UMETA(DisplayName = "Knockback"),
+	Knockdown = 3	UMETA(DisplayName = "Knockdown"),
+	Knockbackdown = 4	UMETA(DisplayName = "Knockbackdown"),
+};
