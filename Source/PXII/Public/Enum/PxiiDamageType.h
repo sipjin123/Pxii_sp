@@ -7,7 +7,7 @@
 #include "PxiiDamageType.generated.h"
 
 UENUM(BlueprintType)
-enum class EPxiiDamageType:uint8
+enum class EDamageType:uint8
 {
 	None=0 UMETA(DisplayName="None"),
 
