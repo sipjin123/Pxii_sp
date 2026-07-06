@@ -8,9 +8,13 @@
 #include "GameplayTagContainer.h"
 #include "NativeGameplayTags.h"
 #include "Engine/DeveloperSettings.h"
+#include "Data/PxiiTags.h"
 #include "ProjectileSubsystem.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogProjectileSubsystem, Log, All);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoCountUpdate, int32, CurrentAmmoCount, int32, CurrentTotalAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileReturnPool);
 
 USTRUCT(BlueprintType)
 struct FProjectilePool
@@ -51,6 +55,21 @@ public:
 
 		return bIsUsedUp;
 	}
+
+	int32 UnusedProjectileCount() 
+	{
+		int32 Count = 0;
+
+		for (APxiiProjectileBase* Projectile : AvailableProjectiles)
+		{
+			if (!Projectile->GetIsInUse()) 
+			{
+				Count++;
+			}
+		}
+
+		return Count;
+	}
 };
 
 /**
@@ -62,7 +81,10 @@ class PXII_API UProjectileSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 	
 protected:
+	// ~Begin UWorldSubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
+	// ~End UWorldSubsystem interface
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -79,6 +101,20 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Projectile Subsystem")
 	APxiiProjectileBase* SpawnProjectileFromPool(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ProjectileTag, FTransform SpawnTransform);
+
+// Debug
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile Subsystem | Debug")
+	TSubclassOf<UUserWidget> HUDClass;
+
+	UPROPERTY(BlueprintAssignable, Category = "Projectile Subsystem | Debug")
+	FOnAmmoCountUpdate OnAmmoCountUpdate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Projectile Subsystem | Debug")
+	FOnProjectileReturnPool OnProjectileReturnPool;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile Subsystem | Debug")
+	bool bPrintDebugLog { false };
+// Debug
 
 private:
 	TMap<FGameplayTag, FProjectilePool> ProjectilesMap;
@@ -102,19 +138,11 @@ public:
 #pragma endregion
 
 
-#pragma region GameplayTags
-// Gameplay tags section
-namespace Projectiles
-{
-	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Projectiles_Basic);
-}
-#pragma endregion
-
-
 #pragma region Debug
 // For debug
 namespace Debug 
 {
+	bool bPrintDebugLog { false };
 	void Print(UClass* InClass, const FString& InMsg, FColor InColor);
 	void Print(const FString& InMsg, FColor InColor);
 }

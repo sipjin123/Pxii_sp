@@ -14,7 +14,7 @@ bool UPxiiInputMappingManager::AddMappingContext(const UInputMappingContext* Map
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = GetInputSubsystem())
 	{
-		Subsystem->AddMappingContext(const_cast<UInputMappingContext*>(MappingContext), Priority);
+		Subsystem->AddMappingContext(MappingContext, Priority);
 
 		FMappingContextEntry MapEntry;
 		MapEntry.MappingContext = MappingContext;
@@ -59,8 +59,7 @@ void UPxiiInputMappingManager::ClearAllMappings()
 	ActiveMappings.Empty();
 }
 
-bool UPxiiInputMappingManager::HasMappingContext(
-	const UInputMappingContext* MappingContext) const
+bool UPxiiInputMappingManager::HasMappingContext(const UInputMappingContext* MappingContext) const
 {
 	return ActiveMappings.ContainsByPredicate([MappingContext](const FMappingContextEntry& Entry)
 	{

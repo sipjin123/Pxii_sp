@@ -9,3 +9,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Damage_Ice,  "Damage.Ice");
 UE_DEFINE_GAMEPLAY_TAG(TAG_HitType,  "Combat.HitType");
 UE_DEFINE_GAMEPLAY_TAG(TAG_DamageSource,  "Combat.DamageSource")
 
+namespace Projectiles
+{
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_Projectiles_Basic, "Pxii.Projectiles.Basic");
+}

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/DataTable.h"
+#include "Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 #include "PxiiAbilityData.generated.h"
 
 class UGameplayAbility;
@@ -20,11 +21,14 @@ struct FPxiiAbilityData:public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	FName Name;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(MultiLine=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,meta=(MultiLine=true))
 	FText Description;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TSubclassOf<UGameplayAbility> AbilityClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FGameplayTag InputTag;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	int32 Level=1;

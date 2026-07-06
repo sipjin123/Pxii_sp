@@ -3,6 +3,7 @@
 
 #include "Character/PxiiCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "TimerManager.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -12,6 +13,19 @@ void APxiiCharacter::BeginPlay()
 {
 	UE_LOG(LogTempCharacter, Warning, TEXT("Char Init 4-Cpp"));
 	Super::BeginPlay();
+
+	if (GetAbilitySystemComponent())
+	{
+		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: ASC INITIALIZED"));
+		GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
+	}
+}
+
+void APxiiCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Possessed By"));
+	GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 }
 
 void APxiiCharacter::Tick(float DeltaSeconds)

@@ -4,11 +4,42 @@
 #include "Subsystem/ProjectileSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "Engine/AssetManager.h" 
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+
 
 DEFINE_LOG_CATEGORY(LogProjectileSubsystem);
 void UProjectileSubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
 	Super::Initialize(collection);
+}
+
+void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
+{
+	Super::OnWorldBeginPlay(InWorld);
+
+	/////////////////
+	// For debug purpose only
+	Debug::bPrintDebugLog = bPrintDebugLog;
+
+	InitializePool(GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	if (HUDClass && PC)
+	{
+		UUserWidget* HUD = CreateWidget<UUserWidget>(PC, HUDClass);
+
+		if (HUD)
+		{
+			HUD->AddToViewport();
+		}
+		else
+		{
+			Debug::Print(ThisClass::StaticClass(), TEXT("Failed to create HUD"), FColor::Red);
+		}
+	}
+	/////////////////
 }
 
 void UProjectileSubsystem::TestCppFunc()
@@ -52,6 +83,10 @@ void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> Pro
 					break;
 				}
 			}
+
+			// Debug
+			OnAmmoCountUpdate.Broadcast(ProjectilePool.AvailableProjectiles.Num(), ProjectilePool.AvailableProjectiles.Num());
+			// Debug
 		}
 	);
 }
@@ -67,6 +102,11 @@ APxiiProjectileBase* UProjectileSubsystem::SpawnProjectileFromPool(UPARAM(meta =
 
 	SpawnedProjectile->SetActorTransform(SpawnTransform);
 	SpawnedProjectile->SetIsInUse(true);
+
+	// Debug
+	FProjectilePool* FoundProjectilePool = ProjectilesMap.Find(ProjectileTag);
+	OnAmmoCountUpdate.Broadcast(FoundProjectilePool->UnusedProjectileCount(), FoundProjectilePool->AvailableProjectiles.Num());
+	// Debug
 
 	return SpawnedProjectile;
 }
@@ -148,37 +188,35 @@ TSoftClassPtr<APxiiProjectileBase> UProjectileSubsystem::GetSoftProjectileClassB
 }
 
 
-#pragma region GameplayTags
-namespace Projectiles
-{
-	UE_DEFINE_GAMEPLAY_TAG(Pxii_Projectiles_Basic, "Pxii.Projectiles.Basic");
-}
-#pragma endregion
-
-
 #pragma region Debug
 namespace Debug
 {
 	void Print(UClass* InClass, const FString& InMsg, FColor InColor)
 	{
-		FString ClassName = InClass ? InClass->GetName() : TEXT("None");
-
-		if (GEngine)
+		if (bPrintDebugLog)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("[%s]: %s"), *ClassName, *InMsg));
-		}
+			FString ClassName = InClass ? InClass->GetName() : TEXT("None");
 
-		UE_LOG(LogProjectileSubsystem, Warning, TEXT("[%s]: %s"), *ClassName, *InMsg);
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("[%s]: %s"), *ClassName, *InMsg));
+			}
+
+			UE_LOG(LogProjectileSubsystem, Warning, TEXT("[%s]: %s"), *ClassName, *InMsg);
+		}
 	}
 
 	void Print(const FString& InMsg, FColor InColor)
 	{
-		if (GEngine)
+		if (bPrintDebugLog)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("%s"), *InMsg));
-		}
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("%s"), *InMsg));
+			}
 
-		UE_LOG(LogProjectileSubsystem, Warning, TEXT("%s"), *InMsg);
+			UE_LOG(LogProjectileSubsystem, Warning, TEXT("%s"), *InMsg);
+		}
 	}
 }
 #pragma endregion

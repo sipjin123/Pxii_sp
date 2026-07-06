@@ -215,6 +215,10 @@
 		{
 			"Name": "PCGPrimitives_MeshPartitionInterop",
 			"Enabled": true
+		},
+		{
+			"Name": "GraphNUnrealPlugin",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "1673045636"

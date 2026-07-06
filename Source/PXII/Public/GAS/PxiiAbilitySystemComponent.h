@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "PxiiAbilitySystemComponent.generated.h"
 
+class UPlayerInputSubsystem;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTempAbilityComp, Log, All);
 /**
  * 
@@ -26,8 +28,23 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool LogAbilityInit;
+
+	UFUNCTION(BlueprintCallable, Category="Input")
+	bool ConsumeBufferedInput(FGameplayTag InputTag);
+
+	UFUNCTION(BlueprintPure, Category="Input")
+	bool HasBufferedInput(FGameplayTag InputTag) const;
+
+	bool AbilityInputTagPressed(const FGameplayTag& InputTag);
+	
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
 	UDataTable* AbilityDataTable;
+
+private:
+	UPlayerInputSubsystem* GetPlayerInputSubsystem() const;
 };

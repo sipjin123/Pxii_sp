@@ -11,6 +11,7 @@ APxiiProjectileBase::APxiiProjectileBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +44,10 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 				this->SetIsInUse(false);
 
 				Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Projectile returned to pool")), FColor::Blue);
+
+				// Debug
+				this->GetWorld()->GetSubsystem<UProjectileSubsystem>()->OnProjectileReturnPool.Broadcast();
+				// Debug
 			},
 			Lifetime,
 			false
