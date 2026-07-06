@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/PxiiCharacter.h"
 #include "GAS/PxiiGA_OneshotBase.h"
 #include "PxiiGA_Fire.generated.h"
 
@@ -14,4 +15,18 @@ class PXII_API UPxiiGA_Fire : public UPxiiGA_OneshotBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPxiiGA_Fire();
+
+	// Override the activation function
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData) override;
+
+	UFUNCTION(BlueprintCallable)
+	void FireProjectile(APxiiCharacter* Character);
+
+public:
 };

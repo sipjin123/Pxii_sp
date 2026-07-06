@@ -45,3 +45,8 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 		});
 	}
 }
+
+APxiiWeaponBase* APxiiCharacter::GetWeaponBase()
+{
+	return nullptr;
+}

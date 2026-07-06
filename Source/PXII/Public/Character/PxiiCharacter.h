@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/PxiiCharacterBase.h"
+#include "Weapon/PxiiWeaponBase.h"
 #include "PxiiCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitTarget, FVector, Location);
@@ -23,10 +24,22 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	
 	virtual void Tick(float DeltaSeconds) override;
-
+	
 public:
 	
+	UFUNCTION()
+	bool GetIsADSEnabled() { return bIsADSActive; }
+
+	UFUNCTION()
+	void SetIsADSEnabled(bool bCond) { bIsADSActive = bCond; }
+
+	UFUNCTION(BlueprintCallable)
+	APxiiWeaponBase* GetWeaponBase();
+
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FHitTarget TraceTarget;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsADSActive;
 };
