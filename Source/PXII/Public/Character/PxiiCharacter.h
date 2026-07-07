@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Character/PxiiCharacterBase.h"
 #include "Weapon/PxiiWeaponBase.h"
+#include "Weapon/PxiiWeaponMelee.h"
+#include "Weapon/PxiiWeaponRange.h"
 #include "PxiiCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitTarget, FVector, Location);
@@ -44,10 +46,18 @@ public:
 	void SetIsObstructed(bool bCond) { bIsObstructed = bCond; }
 
 	UFUNCTION(BlueprintCallable)
-	APxiiWeaponBase* GetWeaponBase();
+	APxiiWeaponRange* GetWeaponRanged();
 
+	UFUNCTION(BlueprintCallable)
+	APxiiWeaponMelee* GetWeaponBaseMelee();
+
+	UPROPERTY(BlueprintReadWrite)
+	APxiiWeaponRange* CurrentWeaponRanged;
+	UPROPERTY(BlueprintReadWrite)
+	APxiiWeaponMelee* CurrentWeaponMelee;
+	
 	/** Signals that a projectile hits a target **/
-	UPROPERTY(BlueprintAssignable, Category="Combat")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHitTarget TraceTarget;
 
 };

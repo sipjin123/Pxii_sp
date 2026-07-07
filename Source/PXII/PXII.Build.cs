@@ -17,22 +17,35 @@ public class PXII : ModuleRules
 			"AIModule",
 			"GameplayTasks",
             "GameplayTags",
-            "UMG",
-			"Slate",
-			"SlateCore",
-			"EnhancedInput",
+            "EnhancedInput",
 			"Niagara",
 			"PhysicsCore",
 			"GameplayTags",
 			"GameplayAbilities",
 			"GameplayTasks",
-			"DeveloperSettings" });
+			"DeveloperSettings",
+			
+			// UI
+			"UMG",
+			"Slate",
+			"SlateCore",
+			
+			// Common UI
+			"CommonUI",
+			"CommonInput",
+		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+		});
 
+		PublicIncludePaths.AddRange(new string[]
+		{
+			"PXII",
+		});
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 

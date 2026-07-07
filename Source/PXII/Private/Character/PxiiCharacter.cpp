@@ -16,7 +16,7 @@ void APxiiCharacter::BeginPlay()
 
 	if (GetAbilitySystemComponent())
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: ASC INITIALIZED"));
+		UE_LOG(LogTempCharacter, Log, TEXT("DZ_LOG:: ASC INITIALIZED"));
 		GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 	}
 }
@@ -24,14 +24,13 @@ void APxiiCharacter::BeginPlay()
 void APxiiCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Possessed By"));
+	UE_LOG(LogTempCharacter, Log, TEXT("DZ_LOG:: Possessed By"));
 	GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 }
 
 void APxiiCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 
 	if (IsAttacking)
 	{
@@ -46,7 +45,13 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-APxiiWeaponBase* APxiiCharacter::GetWeaponBase()
+APxiiWeaponRange* APxiiCharacter::GetWeaponRanged()
 {
 	return nullptr;
 }
+
+APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee()
+{
+	return nullptr;
+}
+

@@ -23,10 +23,10 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	APxiiCharacter* Character = Cast<APxiiCharacter>(Avatar);
 	if (Character)
 	{
-		APxiiWeaponBase* WeaponRef = Character->GetWeaponBase();
+		APxiiWeaponBase* WeaponRef = Character->GetWeaponRanged();
 		if (WeaponRef)
 		{
-			UPxiiGameplayEffectCooldown* GECooldownRef = Character->GetWeaponBase()->GEFireRateCooldown;
+			UPxiiGameplayEffectCooldown* GECooldownRef = Character->GetWeaponRanged()->GEFireRateCooldown;
 			// Note(Burlin): Maybe add scaling cooldown here in the future
 		}
 		else
@@ -156,7 +156,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
 
     //const bool bHasMuzzleObstruction = !Character->HasMuzzleObstruction;
     const bool bHasMuzzleObstruction = false;
-    if (Character->GetWeaponBase() && !bHasMuzzleObstruction) 
+    if (Character->GetWeaponRanged() && !bHasMuzzleObstruction) 
     {
         // TODO: Weapon Mesh and Socket
         /*
