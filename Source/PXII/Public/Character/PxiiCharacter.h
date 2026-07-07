@@ -32,9 +32,9 @@ protected:
 	bool bIsObstructed;
 public:
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool GetIsADSEnabled() { return bIsADSActive; }
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool GetIsObstructed() { return bIsObstructed; }
 
 	UFUNCTION()
