@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GAS/PxiiGameplayEffectCooldown.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "PxiiWeaponBase.generated.h"
 
 UCLASS()
@@ -26,4 +27,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	UPxiiGameplayEffectCooldown* GEFireRateCooldown;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapons")
+	TObjectPtr<USkeletalMeshComponent> SKWeapon;
 };
