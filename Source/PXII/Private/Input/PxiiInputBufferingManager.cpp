@@ -34,6 +34,7 @@ void UPxiiInputBufferingManager::BufferInput(const FGameplayTag& InputTag, float
 	NewInput.RemainingTime = BufferTime;
 
 	BufferedInputs.Add(NewInput);
+	OnInputBuffered.Broadcast(InputTag);
 }
 
 bool UPxiiInputBufferingManager::HasBufferedInput(const FGameplayTag& InputTag) const

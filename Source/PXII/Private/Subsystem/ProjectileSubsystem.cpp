@@ -26,13 +26,13 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	if (HUDClass && PC)
+	if (!CreatedHUD && HUDClass && PC)
 	{
-		UUserWidget* HUD = CreateWidget<UUserWidget>(PC, HUDClass);
+		CreatedHUD = CreateWidget<UUserWidget>(PC, HUDClass);
 
-		if (HUD)
+		if (CreatedHUD)
 		{
-			HUD->AddToViewport();
+			CreatedHUD->AddToViewport();
 		}
 		else
 		{

@@ -15,12 +15,16 @@ struct FBufferedInput
 	float RemainingTime = 0.f;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPxiiInputBufferedDelegate, FGameplayTag, InputTag);
+
 UCLASS()
 class PXII_API UPxiiInputBufferingManager : public UPlayerInputManagerBase
 {
 	GENERATED_BODY()
 	
 public:
+
+	FPxiiInputBufferedDelegate OnInputBuffered;
 
 	void Tick(float DeltaTime);
 

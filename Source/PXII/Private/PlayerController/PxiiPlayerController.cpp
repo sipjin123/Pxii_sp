@@ -1,6 +1,7 @@
 ﻿#include "PlayerController/PxiiPlayerController.h"
 
-#include "Input/PxiiIPlayerInputComponent.h"
+#include "Input/PxiiPlayerInputComponent.h"
+#include "Utility/PXIILogUtility.h"
 
 void APxiiPlayerController::BeginPlay()
 {
@@ -18,12 +19,20 @@ void APxiiPlayerController::SetupInputComponent()
 
 	if(!InputComponent)
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input is NULL"));
+		PXII_LOG(ELogCategory::Controls, Error, TEXT("DZ_LOG:: Input is NULL"));
 	}
 	
-	if (UPxiiIPlayerInputComponent* EnhancedInputComponent = Cast<UPxiiIPlayerInputComponent>(InputComponent))
+	if (UPxiiPlayerInputComponent* EnhancedInputComponent = Cast<UPxiiPlayerInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APxiiPlayerController::AbilityInputTagPressed, &APxiiPlayerController::AbilityInputTagReleased, &APxiiPlayerController::AbilityInputTagHeld, &APxiiPlayerController::AbilityInputTagHolding);
+		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: Binding Input"));
+
+		// Moving
+		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Move);
+
+		// Looking
+		EnhancedInputComponent->BindAction(LookInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Look);
+		
+		EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APxiiPlayerController::AbilityInputTagPressed, &APxiiPlayerController::AbilityInputTagReleased);
 	}
 }
 
@@ -38,6 +47,66 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 
 }
 
+void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
+{
+	APawn* TargetPawn = GetPawn().Get();
+
+	if (!TargetPawn)
+	{
+		return;
+	}
+
+	LastMovementInput = InputActionValue.Get<FVector2D>();
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		if (LastMovementInput.Y > 0)
+		{
+			// Block forward movement
+		}
+		else
+		{
+			//ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
+		}
+
+		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Input control: %s"), *LastMovementInput.ToString());
+
+		ControlledPawn->AddMovementInput(ForwardDirection, LastMovementInput.Y);
+		ControlledPawn->AddMovementInput(RightDirection, LastMovementInput.X);
+	}
+	else
+	{
+		PXII_LOG(ELogCategory::Controls, Error, TEXT("DZ_LOG:: [Move] Pawn is Null"));
+	}
+}
+
+void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
+{
+	APawn* TargetPawn = GetPawn().Get();
+	if (!TargetPawn)
+	{
+		PXII_LOG(ELogCategory::Controls, Error, TEXT("DZ_LOG:: [Look] Pawn is Null"));
+		return;
+	}
+	
+	const FVector2D LookAxis = InputActionValue.Get<FVector2D>();
+	
+	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Look] Input control: %s"), *LookAxis.ToString());
+
+	TargetPawn->AddControllerYawInput(-LookAxis.X * AimYawScale);
+	TargetPawn->AddControllerPitchInput(LookAxis.Y * AimPitchScale);
+}
+
+FVector2D APxiiPlayerController::GetLastMovementInput() const
+{
+	return LastMovementInput;
+}
+
 void APxiiPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem();
@@ -48,16 +117,17 @@ void APxiiPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	}
 
 	InputSubsystem->GetInputStateManager()->PressInput(InputTag);
-	InputSubsystem->GetInputBufferManager()->BufferInput(InputTag);
 
-	if(InputSubsystem->GetAbilityRouterManager()->HandleInputPressed(InputTag))
+	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: INPUT Pressed! Tag: %s"), *InputTag.ToString());
+
+	if(!InputSubsystem->GetAbilityRouterManager()->HandleInputPressed(InputTag))
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Consumed"));
-		InputSubsystem->GetInputBufferManager()->ConsumeBufferedInput(InputTag);
+		InputSubsystem->GetInputBufferManager()->BufferInput(InputTag);
+		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Buffered"))
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Buffered"))
+		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Consumed"));
 	}
 	
 }
@@ -70,19 +140,10 @@ void APxiiPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	{
 		return;
 	}
-
+	
+	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: INPUT COMPLETED! Tag: %s"), *InputTag.ToString());
 	InputSubsystem->GetInputStateManager()->ReleaseInput(InputTag);
 	InputSubsystem->GetAbilityRouterManager()->HandleInputReleased(InputTag);
-}
-
-void APxiiPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
-{
-	
-}
-
-void APxiiPlayerController::AbilityInputTagHolding(FGameplayTag InputTag)
-{
-	
 }
 
 UPlayerInputSubsystem* APxiiPlayerController::GetPlayerInputSubsystem() const

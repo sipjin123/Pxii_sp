@@ -106,6 +106,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile Subsystem | Debug")
 	TSubclassOf<UUserWidget> HUDClass;
 
+	UPROPERTY(BlueprintReadOnly , Category = "Projectile Subsystem | Debug")
+	UUserWidget* CreatedHUD;
+
 	UPROPERTY(BlueprintAssignable, Category = "Projectile Subsystem | Debug")
 	FOnAmmoCountUpdate OnAmmoCountUpdate;
 

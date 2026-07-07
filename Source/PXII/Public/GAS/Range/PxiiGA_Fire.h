@@ -10,6 +10,7 @@
 /**
  * 
  */
+DECLARE_LOG_CATEGORY_EXTERN(LogFireProjectile, Log, All);
 UCLASS()
 class PXII_API UPxiiGA_Fire : public UPxiiGA_OneshotBase
 {

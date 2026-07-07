@@ -23,6 +23,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void TriggerProjectileTraceArc(FVector ImpactNormal, FVector ImpactLocation, float ArcHeight);
 
-		
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation);
+	
+	// Line Trace Debug Parameters
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool ShowDebugLine;
 };

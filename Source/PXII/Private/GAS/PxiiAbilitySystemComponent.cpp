@@ -56,7 +56,7 @@ bool UPxiiAbilitySystemComponent::ConsumeBufferedInput(FGameplayTag InputTag)
 {
 	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Buffered Input"))
+		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Checking Buffered Input"))
 		return InputSubsystem->GetInputBufferManager()->ConsumeBufferedInput(InputTag);
 	}
 

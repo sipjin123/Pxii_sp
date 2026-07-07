@@ -78,11 +78,6 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 		CurrentPlayerCharacter->AddControllerYawInput(OffsetHorizontalAdjustment);
 		*/
 	}
-	
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated Done!"));
-	UAbilityTask_WaitInputRelease* WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
-	WaitInputReleaseTask->OnRelease.AddDynamic(this, &UPxiiGA_ADS::OnInputRelease);
-	WaitInputReleaseTask->Activate();
 }
 
 void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -97,17 +92,4 @@ void UPxiiGA_ADS::CancelAbility(const FGameplayAbilitySpecHandle Handle, const F
 {
 	UE_LOG(LogTemp, Warning, TEXT("Ability has been Cancel!"));
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
-}
-
-void UPxiiGA_ADS::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been Released 2!"));
-	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
-}
-
-void UPxiiGA_ADS::OnInputRelease(float TimeHeld)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been Released!"));
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

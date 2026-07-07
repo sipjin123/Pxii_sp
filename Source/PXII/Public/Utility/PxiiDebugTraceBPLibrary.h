@@ -17,6 +17,8 @@ class PXII_API UPxiiDebugTraceBPLibrary : public UBlueprintFunctionLibrary
 public:
 	
 	UFUNCTION(BlueprintCallable, Category="Debug", meta=(WorldContext="WorldContextObject"))
-	static void DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color,
-	                           float Duration);
+	static void DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color, float Duration);
+	
+	UFUNCTION(BlueprintCallable, Category="Debug", meta=(WorldContext="WorldContextObject"))
+	static void DrawDebugArrowSimple(const UObject* WorldContextObject, FVector Start, FVector End, FLinearColor Color, float Duration);
 };

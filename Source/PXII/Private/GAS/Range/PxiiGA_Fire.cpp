@@ -5,9 +5,11 @@
 
 #include "AbilitySystemComponent.h"
 #include "Character/PxiiCharacter.h"
+#include "Components/PxiiCombatComponent.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
 
+DEFINE_LOG_CATEGORY(LogFireProjectile);
 UPxiiGA_Fire::UPxiiGA_Fire()
 {
 }
@@ -37,24 +39,25 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		}
 
-		//FireProjectile(Character);
+		FireProjectile(Character);
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }
 
 void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
 {
-    bool DrawTraces = false;
+    bool DrawTraces = true;
     if (!Character) return;
 
     // Fire mode toggle
     bool bUseSphereTrace = false;
     if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
     {
+        /*
         if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Status.Buff.Homing"))))
         {
             bUseSphereTrace = true;
-        }
+        }*/
     }
 
     constexpr float TraceDistance = 10000.f;
@@ -192,93 +195,84 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     );
 
 
+    UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Should Fire Here"));
     // TODO: Burlin
     // ---- Server authority logic ----
-    /*
-    if (Character->HasAuthority())
-    {
-        if (APXIICharacter* MainCharacter = Cast<APXIICharacter>(Character))
+    if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))
         {
-            if (MainCharacter->HasAimObstruction)
+            if (MainCharacter->GetIsObstructed())
             {
                 return;
             }
             
             if (bHit)
             {
-                //UE_LOG(LogTemp, Warning, TEXT("---------------- I HIT"));
+                UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I HIT"));
                 if (DrawTraces)
                 {
-                    UProjXIIBPFunctionLibrary::DrawDebugArrowSimple(
-                        this,
-                        MuzzleStartLocation,
-                        OutHitResult.ImpactPoint,
-                        FLinearColor::Green,
-                        3.f   // Duration
-                    );
+                    UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
+                        MuzzleStartLocation, OutHitResult.ImpactPoint,
+                        FLinearColor::Green, 3.f);
     
-                    UProjXIIBPFunctionLibrary::DrawDebugSphereSimple(
-                           this,        // WorldContextObject
+                    UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
                            OutHitResult.ImpactPoint, 
-                           7.f, 
-                           FColor::Cyan, 
-                           3.f
-                       );
+                           7.f, FColor::Cyan, 3.f);
                 }
                 if (!bUseSphereTrace)
                 {
-                    MainCharacter->Multicast_SimulateProjectile(OutHitResult.ImpactNormal, OutHitResult.ImpactPoint);
-                    //MainCharacter->Multicast_SimulateProjectileArc(OutHitResult.ImpactNormal, OutHitResult.ImpactPoint, ArcHeight);
+                    if (UPxiiCombatComponent* CombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(MainCharacter))
+                    {
+                        CombatComp->TriggerProjectileTrace(OutHitResult.ImpactNormal, EndLocation);
+                    }
                 }
                 if (OutHitResult.GetActor())
                 {
-                    RequestProjectileHit(MainCharacter, MuzzleStartLocation, OutHitResult.ImpactPoint);
+                    //TODO[BURLIN]: Hit TraceLogic without Server
+                    //RequestProjectileHit(MainCharacter, MuzzleStartLocation, OutHitResult.ImpactPoint);
                 }
             }
             else
             {
                 
-                UE_LOG(LogTemp, Warning, TEXT("---------------- I MISS"));
-                MainCharacter->HitValidTarget.Broadcast(false);
+                UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I MISS"));
+                //MainCharacter->HitValidTarget.Broadcast(false);
                 if (DrawTraces)
                 {
-                    UProjXIIBPFunctionLibrary::DrawDebugArrowSimple(
-                        this,
-                        MuzzleStartLocation,
-                        EndLocation,
-                        FLinearColor::Red,
-                        3.f   // Duration
-                    );
+                    UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
+                        MuzzleStartLocation, EndLocation,
+                        FLinearColor::Red, 3.f);
     
-                    UProjXIIBPFunctionLibrary::DrawDebugSphereSimple(
-                           this,        // WorldContextObject
-                           EndLocation, 
-                           7.f, 
-                           FColor::Cyan, 
-                           3.f
-                       );
+                    UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
+                           EndLocation,
+                           7.f, FColor::Cyan, 3.f);
                 }
-                if (bUseSphereTrace)
+                
+                if (UPxiiCombatComponent* CombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(MainCharacter))
                 {
-                    FVector Start = MuzzleStartLocation;
-                    FVector End = EndLocation;
+                    if (bUseSphereTrace)
+                    {
+                        FVector Start = MuzzleStartLocation;
+                        FVector End = EndLocation;
 
-                    float Distance = FVector::Dist(Start, OutHitResult.ImpactPoint);
+                        float Distance = FVector::Dist(Start, OutHitResult.ImpactPoint);
 
-                    // Scale height: 500 height per 1000 units
-                    float ArcHeight = (Distance / 1000.f) * 250.f;
+                        // Scale height: 500 height per 1000 units
+                        float ArcHeight = (Distance / 1000.f) * 250.f;
 
-                    // Clamp if you don’t want absurdly tall arcs
-                    ArcHeight = FMath::Clamp(ArcHeight, 200.f, 3000.f);
+                        // Clamp if you don’t want absurdly tall arcs
+                        ArcHeight = FMath::Clamp(ArcHeight, 200.f, 3000.f);
     
-                    MainCharacter->Multicast_SimulateProjectileArc(OutHitResult.ImpactNormal, EndLocation, ArcHeight);
-                }
-                else
-                {
-                    MainCharacter->Multicast_SimulateProjectile(OutHitResult.ImpactNormal, EndLocation);
+                        CombatComp->TriggerProjectileTraceArc(OutHitResult.ImpactNormal, EndLocation, ArcHeight);
+                    }
+                    else
+                    {
+                        CombatComp->TriggerProjectileTrace(OutHitResult.ImpactNormal, EndLocation);
+                    }
                 }
             }
-            
+
+            // TODO[BURLIN]: Use this for Destructibles
+            /*
             if (OutHitResult.GetComponent())
             {
                 UGeometryCollectionComponent* GCComp = Cast<UGeometryCollectionComponent>(OutHitResult.GetComponent());
@@ -286,8 +280,6 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                 {
                     MainCharacter->HitFracture.Broadcast(OutHitResult.ImpactPoint, GCComp);
                 }
-            }
+            }*/
         }
-    }
-    */
 }

@@ -25,13 +25,23 @@ protected:
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsADSActive;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsObstructed;
 public:
 	
 	UFUNCTION()
 	bool GetIsADSEnabled() { return bIsADSActive; }
+	UFUNCTION()
+	bool GetIsObstructed() { return bIsObstructed; }
 
 	UFUNCTION()
 	void SetIsADSEnabled(bool bCond) { bIsADSActive = bCond; }
+	
+	UFUNCTION()
+	void SetIsObstructed(bool bCond) { bIsObstructed = bCond; }
 
 	UFUNCTION(BlueprintCallable)
 	APxiiWeaponBase* GetWeaponBase();
@@ -40,6 +50,4 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FHitTarget TraceTarget;
 
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsADSActive;
 };

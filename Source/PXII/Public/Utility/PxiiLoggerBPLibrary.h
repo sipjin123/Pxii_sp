@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PXIILogUtility.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "PxiiLoggerBPLibrary.generated.h"
 
@@ -14,4 +15,18 @@ class PXII_API UPxiiLoggerBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
+	static void PXIIPrintLog(ELogCategory LogCategory, EPXIILogVerbosity Verbosity, FString FullAddress);
+
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
+	static void EnableLogCategories(TArray<ELogCategory> Category);
+
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
+	static void DisableLogCategories(TArray<ELogCategory> Category);
+
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
+	static void EnableLogCategory(ELogCategory Category);
+
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
+	static void DisableLogCategory(ELogCategory Category);
 };

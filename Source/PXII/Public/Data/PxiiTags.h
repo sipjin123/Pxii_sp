@@ -15,3 +15,9 @@ namespace Projectiles
 	//Extend more projectile tags here
 	//Using Projectiles namespace for better organization and to avoid name conflicts
 }
+
+namespace UI 
+{
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_HUD);
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_Menu);
+}

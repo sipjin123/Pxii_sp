@@ -6,21 +6,18 @@
 #include "DrawDebugHelpers.h"
 
 
-void UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius,
-                                                     FLinearColor Color, float Duration)
+void UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color, float Duration)
 {
 	if (!WorldContextObject) return;
-
 	UWorld* World = WorldContextObject->GetWorld();
 	if (!World) return;
+	DrawDebugSphere(World, Location, Radius, 12, Color.ToFColor(true), Duration < 0.0f, Duration);
+}
 
-	DrawDebugSphere(
-		World,
-		Location,
-		Radius,
-		12, // Segments (reasonable default)
-		Color.ToFColor(true),
-		Duration < 0.0f, // persistent lines if < 0
-		Duration
-	);
+void UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(const UObject* WorldContextObject, FVector Start, FVector End, FLinearColor Color, float Duration)
+{
+	if (!WorldContextObject) return;
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) return;
+	DrawDebugDirectionalArrow(World, Start, End, 10.f, Color.ToFColor(true), false, Duration, 0, 1.f);
 }
