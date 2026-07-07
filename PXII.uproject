@@ -221,6 +221,10 @@
 		{
 			"Name": "GraphNUnrealPlugin",
 			"Enabled": true
+		},
+		{
+			"Name": "CommonUI",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "1673045636"

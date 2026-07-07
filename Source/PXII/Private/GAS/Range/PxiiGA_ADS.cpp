@@ -84,6 +84,10 @@ void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Ability has been End!"));
+	if (CurrentPlayerCharacter)
+	{
+		CurrentPlayerCharacter->SetIsADSEnabled(false);
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
