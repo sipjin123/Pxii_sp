@@ -4,11 +4,14 @@
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "Data/PxiiAbilityData.h"
 #include "Subsystem/PlayerInputSubsystem.h"
+#include "Utility/PXIILogUtility.h"
 
 DEFINE_LOG_CATEGORY(LogTempAbilityComp);
 void UPxiiAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OnAbilityEnded.AddUObject(this, &UPxiiAbilitySystemComponent::HandleAbilityEnded);
 }
 
 void UPxiiAbilitySystemComponent::GrantAbilityByRow(FName RowName)
@@ -63,12 +66,46 @@ bool UPxiiAbilitySystemComponent::ConsumeBufferedInput(FGameplayTag InputTag)
 	return false;
 }
 
+bool UPxiiAbilitySystemComponent::ConsumeAndQueueInput(FGameplayTag InputTag)
+{
+	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
+	{
+		if(InputSubsystem->GetInputBufferManager()->HasQueuedInput(InputTag))
+		{
+			PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Queue Failed"));
+			return false;
+		}
+
+		if(InputSubsystem->GetInputBufferManager()->HasBufferedInput(InputTag))
+		{
+			bool result = InputSubsystem->GetInputBufferManager()->ConsumeAndQueueBufferedInput(InputTag);
+			return result;
+		}
+		
+		return false;
+	}
+
+	PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Subsystem Failed"));
+	return false;
+}
+
 bool UPxiiAbilitySystemComponent::HasBufferedInput(FGameplayTag InputTag) const
 {
 	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
 	{
 		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Buffered Input"))
 		return InputSubsystem->GetInputBufferManager()->HasBufferedInput(InputTag);
+	}
+
+	return false;
+}
+
+bool UPxiiAbilitySystemComponent::CanQueueInput(FGameplayTag InputTag) const
+{
+	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
+	{
+		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Checking Buffered Input"))
+		return !InputSubsystem->GetInputBufferManager()->HasQueuedInput(InputTag);
 	}
 
 	return false;
@@ -112,6 +149,18 @@ void UPxiiAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag) && AbilitySpec.IsActive())
 		{
 			AbilitySpecInputReleased(AbilitySpec);
+		}
+	}
+}
+
+void UPxiiAbilitySystemComponent::HandleAbilityEnded(const FAbilityEndedData& EndData)
+{
+	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
+	{
+		FGameplayTag queuedTag = InputSubsystem->GetInputBufferManager()->ConsumeQueuedInput();
+		if(queuedTag != FGameplayTag::EmptyTag)
+		{
+			AbilityInputTagPressed(queuedTag);
 		}
 	}
 }

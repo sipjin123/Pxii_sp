@@ -32,14 +32,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	bool ConsumeBufferedInput(FGameplayTag InputTag);
 
+	UFUNCTION(BlueprintCallable, Category="Input")
+	bool ConsumeAndQueueInput(FGameplayTag InputTag);
+	
 	UFUNCTION(BlueprintPure, Category="Input")
 	bool HasBufferedInput(FGameplayTag InputTag) const;
+
+	UFUNCTION(BlueprintPure, Category="Input")
+	bool CanQueueInput(FGameplayTag InputTag) const;
 
 	bool AbilityInputTagPressed(const FGameplayTag& InputTag);
 	
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+
+	UFUNCTION()
+	void HandleAbilityEnded(const FAbilityEndedData& EndData);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")

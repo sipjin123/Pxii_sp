@@ -4,7 +4,7 @@
 #include "Subsystem/PlayerInputSubsystem.h"
 #include "PxiiWaitInputTagPressed.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPxiiInputTagPressedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPxiiInputTagPressedDelegate, FGameplayTag, InputTag);
 
 UCLASS()
 class PXII_API UPxiiWaitInputTagPressed : public UAbilityTask

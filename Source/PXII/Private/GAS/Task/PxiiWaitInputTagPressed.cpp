@@ -1,6 +1,5 @@
 ﻿#include "GAS/Task/PxiiWaitInputTagPressed.h"
-
-#include "../../../Public/Utility/PXIILogUtility.h"
+#include "Utility/PXIILogUtility.h"
 
 UPxiiWaitInputTagPressed* UPxiiWaitInputTagPressed::WaitInputTagPressed(
 	UGameplayAbility* OwningAbility, FGameplayTag InputTag)
@@ -43,6 +42,15 @@ void UPxiiWaitInputTagPressed::Activate()
 
 void UPxiiWaitInputTagPressed::OnDestroy(bool bInOwnerFinished)
 {
+	if (InputSubsystem)
+	{
+		if (auto* BufferManager = InputSubsystem->GetInputBufferManager())
+		{
+			BufferManager->OnInputBuffered.RemoveDynamic(
+				this,
+				&UPxiiWaitInputTagPressed::HandleInputPressed);
+		}
+	}
 	Super::OnDestroy(bInOwnerFinished);
 }
 
@@ -55,8 +63,7 @@ void UPxiiWaitInputTagPressed::HandleInputPressed(FGameplayTag PressedTag)
 	}
 	
 	PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Tag Buffered Matched! Tag : %s"), *PressedTag.ToString());
-	InputSubsystem->GetInputBufferManager()->ConsumeBufferedInput(PressedTag);
-	OnPressed.Broadcast();
+	OnPressed.Broadcast(PressedTag);
 
 	EndTask();
 }

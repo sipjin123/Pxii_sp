@@ -32,7 +32,13 @@ public:
 
 	bool HasBufferedInput(const FGameplayTag& InputTag) const;
 
+	bool HasQueuedInput(const FGameplayTag& InputTag) const;
+	
 	bool ConsumeBufferedInput(const FGameplayTag& InputTag);
+
+	bool ConsumeAndQueueBufferedInput(const FGameplayTag& InputTag);
+	
+	FGameplayTag ConsumeQueuedInput();
 
 	void Clear();
 
@@ -40,4 +46,6 @@ private:
 
 	UPROPERTY()
 	TArray<FBufferedInput> BufferedInputs;
+
+	TArray<FBufferedInput> QueuedInputs;
 };
