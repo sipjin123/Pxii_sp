@@ -13,5 +13,8 @@ UCLASS()
 class PXII_API UPxiiMathBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
+public:
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static FVector GetLocationInFrontOfActor(const AActor* Actor, float Distance);
 };

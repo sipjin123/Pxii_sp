@@ -21,7 +21,8 @@ void UPxiiGameplayAbilityHold::EndAbility(const FGameplayAbilitySpecHandle Handl
 
 void UPxiiGameplayAbilityHold::OnHoldReleased_Implementation(float TimeHeld)
 {
-	
+	HoldTimeFinal = TimeHeld;
+	UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: HOLD END Time: %f !"), TimeHeld);
 }
 
 void UPxiiGameplayAbilityHold::InputReleased(const FGameplayAbilitySpecHandle Handle,

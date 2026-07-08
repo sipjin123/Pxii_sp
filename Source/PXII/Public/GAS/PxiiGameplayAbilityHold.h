@@ -20,6 +20,8 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHoldReleased(float TimeHeld);
+	UPROPERTY(BlueprintReadWrite)
+	float HoldTimeFinal;
 
 private:
 
