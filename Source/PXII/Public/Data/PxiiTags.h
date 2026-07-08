@@ -18,8 +18,12 @@ namespace Projectiles
 
 namespace UI 
 {
+	// Widget Stack
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_Frontend);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_HUD);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_Menu);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_WidgetStack_Modal);
+
+	// Widgets
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_CheatMenu);
 }

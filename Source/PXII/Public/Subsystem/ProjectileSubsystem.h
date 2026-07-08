@@ -6,12 +6,8 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Combat/PxiiProjectileBase.h"
 #include "GameplayTagContainer.h"
-#include "NativeGameplayTags.h"
-#include "Engine/DeveloperSettings.h"
 #include "Data/PxiiTags.h"
 #include "ProjectileSubsystem.generated.h"
-
-DECLARE_LOG_CATEGORY_EXTERN(LogProjectileSubsystem, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoCountUpdate, int32, CurrentAmmoCount, int32, CurrentTotalAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileReturnPool);
@@ -79,7 +75,7 @@ UCLASS(Abstract, Blueprintable)
 class PXII_API UProjectileSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
-	
+
 protected:
 	// ~Begin UWorldSubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
@@ -87,14 +83,8 @@ protected:
 	// ~End UWorldSubsystem interface
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void TestCppFunc();
-
 	UFUNCTION(BlueprintCallable, Category = "Projectile Subsystem")
 	void InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize);
-
-	UFUNCTION(BlueprintPure, Category = "Projectile Subsystem")
-	TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag (UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag);
 
 	UFUNCTION(BlueprintPure, Category = "Projectile Subsystem")
 	TMap<FGameplayTag, FProjectilePool> GetProjectilesMap() { return ProjectilesMap; }
@@ -102,11 +92,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile Subsystem")
 	APxiiProjectileBase* SpawnProjectileFromPool(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ProjectileTag, FTransform SpawnTransform);
 
-// Debug
+	// Debug
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile Subsystem | Debug")
 	TSubclassOf<UUserWidget> HUDClass;
 
-	UPROPERTY(BlueprintReadOnly , Category = "Projectile Subsystem | Debug")
+	UPROPERTY(BlueprintReadOnly, Category = "Projectile Subsystem | Debug")
 	UUserWidget* CreatedHUD;
 
 	UPROPERTY(BlueprintAssignable, Category = "Projectile Subsystem | Debug")
@@ -117,36 +107,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile Subsystem | Debug")
 	bool bPrintDebugLog { false };
-// Debug
+	// Debug
 
 private:
 	TMap<FGameplayTag, FProjectilePool> ProjectilesMap;
 
-	TObjectPtr<APxiiProjectileBase> FindAvalaibleProjectileInPool (FGameplayTag InTag);
+	TObjectPtr<APxiiProjectileBase> FindAvalaibleProjectileInPool(FGameplayTag InTag);
 	void AddMoreProjectilesToPoolAsNeeded(FProjectilePool* ProjectilePool, FGameplayTag ProjectileTag, const int32 NumOfProjectileToAdd);
 };
-
-
-#pragma region Developer Settings
-// Developer settings section
-UCLASS(Config = Game, defaultconfig, meta = (DisplayName = "Projectile Subsystem Settings"))
-class PXII_API UProjectileSubsystemDeveloperSettings : public UDeveloperSettings 
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(Config, EditAnywhere, Category = "Projectile Classes Soft Reference", meta = (ForceInlineRow, Categories = "Pxii.Projectiles"))
-	TMap<FGameplayTag, TSoftClassPtr<APxiiProjectileBase>> ProjectileClassesMap;
-};
-#pragma endregion
-
-
-#pragma region Debug
-// For debug
-namespace Debug 
-{
-	bool bPrintDebugLog { false };
-	void Print(UClass* InClass, const FString& InMsg, FColor InColor);
-	void Print(const FString& InMsg, FColor InColor);
-}
-#pragma endregion

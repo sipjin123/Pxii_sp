@@ -3,6 +3,7 @@
 
 #include "Combat/PxiiProjectileBase.h"
 #include "Subsystem/ProjectileSubsystem.h"
+#include "Utility/PXIILogUtility.h"
 
 // Sets default values
 APxiiProjectileBase::APxiiProjectileBase()
@@ -43,11 +44,19 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 			[this]() {
 				this->SetIsInUse(false);
 
-				Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Projectile returned to pool")), FColor::Blue);
+				UProjectileSubsystem* ProjectileSubsystem = this->GetWorld()->GetSubsystem<UProjectileSubsystem>();
+				
+				if (ProjectileSubsystem)
+				{
+					if(ProjectileSubsystem->bPrintDebugLog)
+					{
+						PXII_LOG(ELogCategory::Combat, Log, TEXT("Projectile returned to pool"));
+					}
 
-				// Debug
-				this->GetWorld()->GetSubsystem<UProjectileSubsystem>()->OnProjectileReturnPool.Broadcast();
-				// Debug
+					// Debug
+					ProjectileSubsystem->OnProjectileReturnPool.Broadcast();
+					// Debug
+				}
 			},
 			Lifetime,
 			false

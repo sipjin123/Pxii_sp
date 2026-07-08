@@ -6,9 +6,9 @@
 #include "Engine/AssetManager.h" 
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "Utility/PxiiCombatBPLibrary.h"
+#include "Utility/PXIILogUtility.h"
 
-
-DEFINE_LOG_CATEGORY(LogProjectileSubsystem);
 void UProjectileSubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
 	Super::Initialize(collection);
@@ -20,9 +20,7 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 	/////////////////
 	// For debug purpose only
-	Debug::bPrintDebugLog = bPrintDebugLog;
-
-	InitializePool(GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
+	InitializePool(UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -36,22 +34,24 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 		}
 		else
 		{
-			Debug::Print(ThisClass::StaticClass(), TEXT("Failed to create HUD"), FColor::Red);
+			if(bPrintDebugLog)
+			{
+				PXII_LOG(ELogCategory::Combat, Warning, TEXT("Failed to create HUD"));
+			}
 		}
 	}
 	/////////////////
-}
-
-void UProjectileSubsystem::TestCppFunc()
-{
-	UE_LOG(LogProjectileSubsystem,Warning,TEXT("Test Success"));
 }
 
 void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize)
 {
 	if (ProjectileClass.IsNull())
 	{
-		Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Invalid soft projectile class")), FColor::Red);
+		if(bPrintDebugLog)
+		{
+			PXII_LOG(ELogCategory::Combat, Warning, TEXT("Invalid soft projectile class"));
+		}
+
 		return;
 	}
 
@@ -96,7 +96,11 @@ APxiiProjectileBase* UProjectileSubsystem::SpawnProjectileFromPool(UPARAM(meta =
 	APxiiProjectileBase* SpawnedProjectile = FindAvalaibleProjectileInPool(ProjectileTag);
 	if (!SpawnedProjectile) 
 	{
-		Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Failed to spawn projectile from pool")), FColor::Red);
+		if(bPrintDebugLog)
+		{
+			PXII_LOG(ELogCategory::Combat, Warning, TEXT("Failed to spawn projectile from pool"));
+		}
+
 		return nullptr;
 	}
 
@@ -116,7 +120,10 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 	FProjectilePool* FoundProjectilePool = ProjectilesMap.Find(InTag);
 	if (!FoundProjectilePool) 
 	{
-		Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Cant find desired pool in the map")), FColor::Red);
+		if(bPrintDebugLog)
+		{
+			PXII_LOG(ELogCategory::Combat, Warning, TEXT("Cant find desired pool in the map"));
+		}
 		return nullptr;
 	}
 
@@ -126,11 +133,14 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 		{
 			AddMoreProjectilesToPoolAsNeeded(FoundProjectilePool, InTag, 1);
 		}
-		else 
+		else
 		{
-			Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Current Projectile Pool Reached Max")), FColor::Red);
-			return nullptr;
+			if (bPrintDebugLog)
+			{
+				PXII_LOG(ELogCategory::Combat, Warning, TEXT("Current Projectile Pool Reached Max"));
+			}
 		}
+			return nullptr;
 	}
 
 	for (APxiiProjectileBase* AvailableProjectile : FoundProjectilePool->AvailableProjectiles)
@@ -145,13 +155,17 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 		}
 	}
 
-	Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Current Projectile Pool Used Up")), FColor::Red);
+	if (bPrintDebugLog)
+	{
+		PXII_LOG(ELogCategory::Combat, Warning, TEXT("Current Projectile Pool Used Up"));
+	}
+
 	return nullptr;
 }
 
 void UProjectileSubsystem::AddMoreProjectilesToPoolAsNeeded(FProjectilePool* ProjectilePool, FGameplayTag ProjectileTag, const int32 NumOfProjectileToAdd)
 {
-	TSoftClassPtr ProjectileClass = GetSoftProjectileClassByTag(ProjectileTag);
+	TSoftClassPtr ProjectileClass = UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(ProjectileTag);
 	UClass* LoadedProjectileClass = ProjectileClass.Get();
 
 	FActorSpawnParameters SpawnParams;
@@ -173,50 +187,3 @@ void UProjectileSubsystem::AddMoreProjectilesToPoolAsNeeded(FProjectilePool* Pro
 		}
 	}
 }
-
-TSoftClassPtr<APxiiProjectileBase> UProjectileSubsystem::GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag)
-{
-	const UProjectileSubsystemDeveloperSettings* ProjectileDevSettings = GetDefault<UProjectileSubsystemDeveloperSettings>();
-
-	if (!ProjectileDevSettings->ProjectileClassesMap.Contains(InTag)) 
-	{
-		Debug::Print(ThisClass::StaticClass(), FString::Printf(TEXT("Projectile class %s is not assigned in Developer Settings"), *InTag.ToString()), FColor::Red);
-		return nullptr;
-	}
-
-	return ProjectileDevSettings->ProjectileClassesMap.FindRef(InTag);
-}
-
-
-#pragma region Debug
-namespace Debug
-{
-	void Print(UClass* InClass, const FString& InMsg, FColor InColor)
-	{
-		if (bPrintDebugLog)
-		{
-			FString ClassName = InClass ? InClass->GetName() : TEXT("None");
-
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("[%s]: %s"), *ClassName, *InMsg));
-			}
-
-			UE_LOG(LogProjectileSubsystem, Warning, TEXT("[%s]: %s"), *ClassName, *InMsg);
-		}
-	}
-
-	void Print(const FString& InMsg, FColor InColor)
-	{
-		if (bPrintDebugLog)
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, InColor, FString::Printf(TEXT("%s"), *InMsg));
-			}
-
-			UE_LOG(LogProjectileSubsystem, Warning, TEXT("%s"), *InMsg);
-		}
-	}
-}
-#pragma endregion
