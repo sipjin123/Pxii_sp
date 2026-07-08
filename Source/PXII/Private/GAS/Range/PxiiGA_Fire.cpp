@@ -105,20 +105,24 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraTraceEnd;
 
 
-
-
     // TODO[Dhenz]: Setup trace points for weapons
-    /*
-    const FVector TraceStart =
-        Character->GetWeaponBase()
-            ->SMWeapon
-            ->GetSocketTransform(MuzzleSocketName)
-            .GetLocation();
-    */
+    MuzzleSocketName = "Muzzle";
+    FVector TraceStart = Character->GetActorLocation();
 
-    const FVector TraceStart = Character->GetActorLocation();
+    if (Character->GetWeaponRanged())
+    {
+        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have Weapon"));
+        if (Character->GetWeaponRanged()->SKWeapon){
+            UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have Weapon SK"));
+            TraceStart = Character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName).GetLocation();
+        }
+    }else
+    {
+        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have NNOOO Weapon"));
+    }
+    //const FVector TraceStart = Character->GetActorLocation();
     
-    // const FVector TraceEnd = AimPoint; This will fail because its exact distance
+    //const FVector TraceEnd = AimPoint; This will fail because its exact distance
     const FVector TraceEnd = AimPoint + (AimPoint - TraceStart).GetSafeNormal() * 100.f;
     FCollisionQueryParams WeaponParams;
     WeaponParams.AddIgnoredActor(Character);
@@ -132,16 +136,9 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         WeaponParams
     );
 
-
-    /*
-    UProjXIIBPFunctionLibrary::DrawDebugArrowSimple(
-        this,
-        TraceStart,
-        TraceEnd,
-        FLinearColor::Gray,
-        3.f   // Duration
-    );*/
-
+    UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
+        TraceStart, TraceEnd,
+        FLinearColor::Gray, 3.f);
 
     MuzzleStartLocation = TraceStart;
     EndLocation = TraceEnd;

@@ -47,11 +47,11 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 
 APxiiWeaponRange* APxiiCharacter::GetWeaponRanged()
 {
-	return nullptr;
+	return CurrentWeaponRanged;
 }
 
 APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee()
 {
-	return nullptr;
+	return CurrentWeaponMelee;
 }
 

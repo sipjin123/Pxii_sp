@@ -29,5 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FireProjectile(APxiiCharacter* Character);
 
+	// The name of the socket on the weapon's mesh from which the projectile should spawn
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	FName MuzzleSocketName;
+
 public:
 };
