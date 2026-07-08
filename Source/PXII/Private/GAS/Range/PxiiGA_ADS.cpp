@@ -6,6 +6,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Character/PxiiCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HUD/PxiiHUD.h"
+#include "HUD/PxiiHUDBase.h"
 #include "PlayerController/PxiiPlayerController.h"
 
 UPxiiGA_ADS::UPxiiGA_ADS(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -38,6 +40,7 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
 	if (!CommitAbility(Handle, OwnerInfo, ActivationInfo))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
 		return;
 	}
 
@@ -54,19 +57,23 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	
 	if (!CurrentPlayerCharacter->GetIsADSEnabled())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: GetIsADSEnabled"));
+
 		CurrentPlayerCharacter->SetIsADSEnabled(true);
 
 		//CurrentPlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 		//CurrentPlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		CurrentPlayerCharacter->bUseControllerRotationYaw = true;
 
-		/*
 		// TODO[DHENZ]: Trigger Reticle Logic Here
-		APXIIHUD* PXIIHUD = Cast<APXIIHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+		APxiiHUDBase* PXIIHUD = Cast<APxiiHUDBase>(GetWorld()->GetFirstPlayerController()->GetHUD());
 		if (PXIIHUD)
 		{
-			PXIIHUD->SetShowReticle(true);
-		}*/
+			if(PXIIHUD->HUDLayout)
+			{
+				PXIIHUD->HUDLayout->ToggleADS(true);
+			}
+		}
 
 		// TODO[DHENZ]: Trigger Controller Logic Here
 		/*
@@ -87,6 +94,15 @@ void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 	if (CurrentPlayerCharacter)
 	{
 		CurrentPlayerCharacter->SetIsADSEnabled(false);
+	}
+
+	APxiiHUDBase* PXIIHUD = Cast<APxiiHUDBase>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (PXIIHUD)
+	{
+		if(PXIIHUD->HUDLayout)
+		{
+			PXIIHUD->HUDLayout->ToggleADS(false);
+		}
 	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
