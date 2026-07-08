@@ -37,6 +37,7 @@ enum class ELogCategory : uint8
 	SkillTree,
 	Objective,
 	Controls,
+	UI,
 };
 
 class PXII_API PXIILogUtility 

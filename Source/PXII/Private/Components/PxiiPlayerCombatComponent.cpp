@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Enum/PxiiDamageType.h"
+#include "Subsystem/PxiiCombatRegistrySubsystem.h"
 
 UPxiiPlayerCombatComponent::UPxiiPlayerCombatComponent()
 {
@@ -216,6 +217,8 @@ void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector H
 		if (IsValid(GetOwner()) && GetOwner()->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
 		{
 			//PlayerDamage = UPxiiCombatInterface::Execute_OnGetCurrentDamage(GetOwner());
+			// TODO[ANY]: Interface Damage
+			PlayerDamage = 10.f;
 		}
 		/*
 		const bool IsHeavyAttack = AbilitySystemComponent->HasMatchingGameplayTag(
@@ -235,33 +238,26 @@ void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector H
 		}
 		else
 		{
-			if (GetOwnerRole() == ROLE_Authority)
+			// This Should be sent to RPC Manager
+			const UWorld* World = GetWorld();
+			if (World)
 			{
-				// This Should be sent to RPC Manager
-				const UWorld* World = GetWorld();
-				if (World)
+				if (UPxiiCombatRegistrySubsystem* CombatSubsystem = World->GetSubsystem<UPxiiCombatRegistrySubsystem>())
 				{
-					/*
-					if (UCombatRegistrySubsystem* CombatSubsystem = World->GetSubsystem<UCombatRegistrySubsystem>())
-					{
-						FDamageHit Hit;
-						Hit.Target = TargetUnit;
-						Hit.Damage = TotalDamage;
-						Hit.Flags  = 1;
-						Hit.HitCoord = HitLoc;
-						Hit.DamageSource = EDamageSource::Melee;
+					FDamageHit Hit;
+					Hit.Target = TargetUnit;
+					Hit.Damage = TotalDamage;
+					Hit.Flags  = 1;
+					Hit.HitCoord = HitLoc;
+					Hit.DamageSource = EDamageSource::Melee;
 
-						CombatSubsystem->EnqueueDamage(GetOwner(), Hit);
-						HasValidHit = true;
-					}*/
-					// Use for AOE
-					// UCombatRegistryBPLibrary::ApplyAOEDamageEffect(GetOwner(), GetOwner(), HitLoc, 100.f, TotalDamage, EHitEffectType::Default, EDamageSource::None);
+					CombatSubsystem->EnqueueDamage(GetOwner(), Hit);
+					HasValidHit = true;
 				}
+				// Use for AOE
+				// UCombatRegistryBPLibrary::ApplyAOEDamageEffect(GetOwner(), GetOwner(), HitLoc, 100.f, TotalDamage, EHitEffectType::Default, EDamageSource::None);
 			}
-			else
-			{
-				DisplayHitVfx.Broadcast(HitLoc);
-			}
+			DisplayHitVfx.Broadcast(HitLoc);
 		}
 	}
 }

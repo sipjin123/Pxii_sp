@@ -16,6 +16,8 @@ namespace Projectiles
 
 namespace UI
 {
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_WidgetStack_Frontend, "Pxii.UI.WidgetStack.Frontend");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_WidgetStack_HUD, "Pxii.UI.WidgetStack.HUD");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_WidgetStack_Menu, "Pxii.UI.WidgetStack.Menu");
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_WidgetStack_Modal, "Pxii.UI.WidgetStack.Modal");
 }

@@ -29,7 +29,7 @@ public:
 	UPxiiCombatComponent* GetCombatComponent()const;
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
-	UPxiiAttributeSet* GetAttributeSet()const;
+	const UPxiiAttributeSet* GetAttributeSet() const;
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	bool IsAlive()const;

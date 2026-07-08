@@ -35,9 +35,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UPxiiAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY(EditDefaultsOnly,Category="Components")
-	TSubclassOf<UPxiiCombatComponent> CombatComponentClass;
-
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	TObjectPtr<UPxiiCombatComponent> CombatComponent;
 
@@ -48,7 +45,11 @@ public:
 	
 	const UPxiiAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
+	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
 protected:
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PXII|AbilitySystem")
+	//UPxiiAttributeSet* AttributeSet;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
 	const class UPxiiAttributeSet* AttributeSet;

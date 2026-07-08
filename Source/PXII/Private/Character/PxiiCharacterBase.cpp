@@ -31,13 +31,16 @@ void APxiiCharacterBase::BeginPlay()
 	{
 		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing Ability Component!"));
 	}
-	if(CombatComponentClass)
+
+	CombatComponent = FindComponentByClass<UPxiiCombatComponent>();
+	if(CombatComponent)
 	{
-		CombatComponent=NewObject<UPxiiCombatComponent>(this,CombatComponentClass);
-		if(CombatComponent)
-		{
-			CombatComponent->RegisterComponent();
-		}
+		UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
+		//CombatComponent->RegisterComponent();
+	}
+	else
+	{
+		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing Ability Component!"));
 	}
 }
 
@@ -58,4 +61,14 @@ void APxiiCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 UAbilitySystemComponent* APxiiCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UPxiiCombatComponent* APxiiCharacterBase::GetCombatComponent_Implementation() const
+{
+	return CombatComponent;
+}
+
+const UPxiiAttributeSet* APxiiCharacterBase::GetAttributeSet_Implementation() const
+{
+	return AttributeSet;
 }

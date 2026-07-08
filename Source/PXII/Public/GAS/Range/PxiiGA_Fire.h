@@ -35,5 +35,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	FName MuzzleSocketName;
 
+	UPROPERTY()
+	APxiiCharacter* SelfCharacter;
 public:
 };

@@ -22,7 +22,8 @@ public:
 		{ ELogCategory::Ability,    true },
 		{ ELogCategory::Equipment,  true },
 		{ ELogCategory::SkillTree,  true },
-		{ ELogCategory::Objective,  true }
+		{ ELogCategory::Objective,  true },
+		{ ELogCategory::UI,         true },
 	};
 };
 
