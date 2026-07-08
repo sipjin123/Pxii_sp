@@ -8,7 +8,7 @@
 #include "PxiiNPC.generated.h"
 
 UCLASS()
-class PXII_API APxiiNPC : public APxiiCharacterBase
+class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface
 {
 	GENERATED_BODY()
 
@@ -27,4 +27,29 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UPxiiAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(EditDefaultsOnly,Category="Components")
+	TSubclassOf<UPxiiCombatComponent> CombatComponentClass;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	TObjectPtr<UPxiiCombatComponent> CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapons")
+	TObjectPtr<USkeletalMeshComponent> MeshRef;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsAttacking;
+	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	const UPxiiAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
+	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
+	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
+protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
+	const class UPxiiAttributeSet* AttributeSet;
 };

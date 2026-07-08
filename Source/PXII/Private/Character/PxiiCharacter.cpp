@@ -28,6 +28,11 @@ void APxiiCharacter::PossessedBy(AController* NewController)
 	GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 }
 
+USkeletalMeshComponent* APxiiCharacter::GetMesh()
+{
+	return MeshRef;
+}
+
 void APxiiCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

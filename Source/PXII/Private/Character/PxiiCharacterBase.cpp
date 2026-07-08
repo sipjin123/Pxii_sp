@@ -4,6 +4,7 @@
 #include "Character/PxiiCharacterBase.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "AbilitySystemComponent.h"
+#include "MoverComponent.h"
 #include "Components/PxiiCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 
@@ -41,6 +42,27 @@ void APxiiCharacterBase::BeginPlay()
 	else
 	{
 		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing Ability Component!"));
+	}
+
+	
+	MeshRef = FindComponentByClass<USkeletalMeshComponent>();
+	if(MeshRef)
+	{
+		UE_LOG(LogTempBaseCharacter, Warning, TEXT("USkeletalMesh Component Registered"));
+	}
+	else
+	{
+		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing USkeletalMesh Component!"));
+	}
+
+	MoverComponent = FindComponentByClass<UMoverComponent>();
+	if (MoverComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MoverComponent found"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing MoverComponent!"));
 	}
 }
 

@@ -24,7 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void PossessedBy(AController* NewController) override;
-	
+
 	virtual void Tick(float DeltaSeconds) override;
 	
 	UPROPERTY(BlueprintReadWrite)
@@ -33,6 +33,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsObstructed;
 public:
+	UFUNCTION(BlueprintCallable)
+	USkeletalMeshComponent* GetMesh();
 	
 	UFUNCTION(BlueprintCallable)
 	bool GetIsADSEnabled() { return bIsADSActive; }

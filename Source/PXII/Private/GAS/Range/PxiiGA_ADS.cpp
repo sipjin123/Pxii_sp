@@ -56,8 +56,8 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	{
 		CurrentPlayerCharacter->SetIsADSEnabled(true);
 
-		CurrentPlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
-		CurrentPlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		//CurrentPlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+		//CurrentPlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		CurrentPlayerCharacter->bUseControllerRotationYaw = true;
 
 		/*

@@ -8,12 +8,13 @@
 #include "Interface/PxiiCombatInterface.h"
 #include "PxiiCharacterBase.generated.h"
 
+class UMoverComponent;
 class UPxiiAttributeSet;
 class UPxiiAbilitySystemComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTempBaseCharacter, Log, All);
 UCLASS()
-class PXII_API APxiiCharacterBase : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface
+class PXII_API APxiiCharacterBase : public APawn, public IAbilitySystemInterface, public IPxiiCombatInterface
 {
 	GENERATED_BODY()
 
@@ -35,21 +36,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UPxiiAbilitySystemComponent> AbilitySystemComponent;
 
+	UPROPERTY(EditDefaultsOnly,Category="Components")
+	TSubclassOf<UPxiiCombatComponent> CombatComponentClass;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	TObjectPtr<UPxiiCombatComponent> CombatComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapons")
+	TObjectPtr<USkeletalMeshComponent> MeshRef;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool IsAttacking;
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
 	const UPxiiAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
 	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Movement")
+	TObjectPtr<UMoverComponent> MoverComponent;
 protected:
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PXII|AbilitySystem")
-	//UPxiiAttributeSet* AttributeSet;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
 	const class UPxiiAttributeSet* AttributeSet;
