@@ -20,5 +20,5 @@ public:
 	static void DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color, float Duration);
 	
 	UFUNCTION(BlueprintCallable, Category="Debug", meta=(WorldContext="WorldContextObject"))
-	static void DrawDebugArrowSimple(const UObject* WorldContextObject, FVector Start, FVector End, FLinearColor Color, float Duration);
+	static void DrawDebugArrowSimple(const UObject* WorldContextObject, FVector Start, FVector End, FLinearColor Color, float Thickness = 0.f, float Duration = 0.f);
 };

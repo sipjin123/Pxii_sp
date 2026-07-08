@@ -44,43 +44,27 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }
 
-void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
+void UPxiiGA_Fire::RequestProjectileHit(APxiiCharacter* PxiiCharacter, const FVector& Vector, const FVector& ImpactPoint)
 {
-    bool DrawTraces = true;
-    if (!Character) return;
-
-    // Fire mode toggle
-    bool bUseSphereTrace = false;
-    if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
-    {
-        /*
-        if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Status.Buff.Homing"))))
-        {
-            bUseSphereTrace = true;
-        }*/
-    }
-
+    
+    FHitResult OutHitResult;
     constexpr float TraceDistance = 10000.f;
-    float MaxOffsetAngleDegrees = 1.0f; // tweak for spread
 
-    // Get the camera location and forward direction
-    //FVector StartLocation;
-    FVector EndLocation;
+    // Get camera location and forward direction
+    FVector StartLocation;
     FVector MuzzleStartLocation;
     FRotator ViewRotation;
-
-    APlayerController* PC = Cast<APlayerController>(Character->GetController());
-    if (!PC)
-    {
-        return;
-    }
-
-    //--------------------------------------------------------------------------------------------------------------------
-
+    PxiiCharacter->GetController()->GetPlayerViewPoint(StartLocation, ViewRotation);
+    MuzzleStartLocation = StartLocation;
     
+    
+
+
+    // New CAM Trace with Player body Offset
+    //---------------------------------------------------------------------------------------------
     FVector CameraLocation;
 
-    Character->GetController()->GetPlayerViewPoint(
+    PxiiCharacter->GetController()->GetPlayerViewPoint(
         CameraLocation,
         ViewRotation
     );
@@ -89,7 +73,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         CameraLocation + (ViewRotation.Vector() * TraceDistance);
 
     FCollisionQueryParams CameraParams;
-    CameraParams.AddIgnoredActor(Character);
+    CameraParams.AddIgnoredActor(PxiiCharacter);
 
     FHitResult CameraHit;
     GetWorld()->LineTraceSingleByChannel(
@@ -105,27 +89,20 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraTraceEnd;
 
 
-    // TODO[Dhenz]: Setup trace points for weapons
-    MuzzleSocketName = "Muzzle";
-    FVector TraceStart = Character->GetActorLocation();
 
-    if (Character->GetWeaponRanged())
-    {
-        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have Weapon"));
-        if (Character->GetWeaponRanged()->SKWeapon){
-            UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have Weapon SK"));
-            TraceStart = Character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName).GetLocation();
-        }
-    }else
-    {
-        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Have NNOOO Weapon"));
-    }
-    //const FVector TraceStart = Character->GetActorLocation();
-    
-    //const FVector TraceEnd = AimPoint; This will fail because its exact distance
+
+
+    const FVector TraceStart =
+        PxiiCharacter->GetWeaponRanged()
+            ->SKWeapon
+            ->GetSocketTransform(MuzzleSocketName)
+            .GetLocation();
+
+    // const FVector TraceEnd = AimPoint; This will fail because its exact distance
     const FVector TraceEnd = AimPoint + (AimPoint - TraceStart).GetSafeNormal() * 100.f;
+
     FCollisionQueryParams WeaponParams;
-    WeaponParams.AddIgnoredActor(Character);
+    WeaponParams.AddIgnoredActor(PxiiCharacter);
 
     FHitResult HitResult;
     GetWorld()->LineTraceSingleByChannel(
@@ -136,17 +113,100 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         WeaponParams
     );
 
+
+    MuzzleStartLocation = TraceStart;
+    // Origin = TraceStart;
+    FVector EndLocation = TraceEnd;
+
+    if (true)
+    {
+        UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
+            CameraLocation, EndLocation,
+            FLinearColor::Blue, 1.f, 3.f   // Duration
+        );
+    }
+    
+}
+
+void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
+{
+    bool DrawTraces = true;
+    if (!Character) return;
+
+    APlayerController* PC = Cast<APlayerController>(Character->GetController());
+    if (!PC) return;
+
+    // Fire mode toggle
+    bool bUseSphereTrace = false;
+    if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
+    {
+        // TODO[ANY]: If the projectile hits any target within AOE
+        /*
+        if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Status.Buff.Homing"))))
+        {
+            bUseSphereTrace = true;
+        }*/
+    }
+
+    constexpr float TraceDistance = 10000.f;
+    float MaxOffsetAngleDegrees = 1.0f; // tweak for spread
+
+    // Get the camera location and forward direction
+    FVector EndLocation;
+    FVector MuzzleStartLocation;
+    FRotator ViewRotation;
+
+    //--------------------------------------------------------------------------------------------------------------------
+    FVector CameraLocation;
+    Character->GetController()->GetPlayerViewPoint(CameraLocation, ViewRotation);
+    const FVector CameraTraceEnd = CameraLocation + (ViewRotation.Vector() * TraceDistance);
+    FCollisionQueryParams CameraParams;
+    CameraParams.AddIgnoredActor(Character);
+
+    FHitResult CameraHit;
+    GetWorld()->LineTraceSingleByChannel(CameraHit,
+        CameraLocation,CameraTraceEnd,
+        ECC_Visibility,CameraParams);
+
+    if (DrawTraces)
+    {
+        UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
+            CameraLocation, CameraTraceEnd,
+            FLinearColor::Blue, 1.f, 3.f   // Duration
+        );
+    }
+    
+    // 🔒 This is the TRUE crosshair world point
+    const FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraTraceEnd;
+    //--------------------------------------------------------------------------------------------------------------------
+    // TODO[Dhenz]: Setup trace points for weapons
+    MuzzleSocketName = "Muzzle";
+    FVector TraceStart = Character->GetActorLocation();
+    if (Character->GetWeaponRanged() && Character->GetWeaponRanged()->SKWeapon)
+    {
+        TraceStart = Character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName).GetLocation();
+    } else
+    {
+        UE_LOG(LogFireProjectile, Error, TEXT("[Firing] I Have No Weapon"));
+    }
+    const FVector TraceEnd = AimPoint + (AimPoint - TraceStart).GetSafeNormal() * 100.f;
+    FCollisionQueryParams WeaponParams;
+    WeaponParams.AddIgnoredActor(Character);
+
+    FHitResult HitResult;
+    GetWorld()->LineTraceSingleByChannel(HitResult,
+        TraceStart, TraceEnd,
+        ECC_Visibility, WeaponParams);
+
     UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
         TraceStart, TraceEnd,
-        FLinearColor::Gray, 3.f);
+        FLinearColor::Gray, 2.f, 3.f);
 
     MuzzleStartLocation = TraceStart;
     EndLocation = TraceEnd;
 
-
-
-
     //--------------------------------------------------------------------------------------------------------------------
+    // TODO[ANY]: Trace Deviation Logic if any
     // Aim direction (with optional spread)
     //FVector ShootDir = FMath::VRandCone(ViewRotation.Vector(), FMath::DegreesToRadians(MaxOffsetAngleDegrees));
     //FVector AimEnd = StartLocation + (ShootDir * TraceDistance);
@@ -156,19 +216,16 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     if (Character->GetWeaponRanged() && !bHasMuzzleObstruction) 
     {
         // TODO: Weapon Mesh and Socket
-        /*
-        FTransform MuzzleTransform = Character->GetWeaponBase()->SMWeapon->GetSocketTransform(MuzzleSocketName);
+        FTransform MuzzleTransform = Character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName);
         MuzzleStartLocation = MuzzleTransform.GetLocation();
-        */
 
         if (DrawTraces)
         {
-            UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
-                   MuzzleStartLocation, 
-                   3.f, FColor::Blue, 3.f
-               );
+            UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, MuzzleStartLocation, 
+                   3.f, FColor::Blue, 3.f);
         }
     }
+    //--------------------------------------------------------------------------------------------------------------------
     //FVector EndLocation = (AimEnd - MuzzleStartLocation).GetSafeNormal();
     MaxOffsetAngleDegrees = 0;
     //FVector DeviatedDirection = FMath::VRandCone(ViewRotation.Vector(), FMath::DegreesToRadians(MaxOffsetAngleDegrees));
@@ -185,13 +242,12 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     // ---- Single Line Trace ----
     bHit = GetWorld()->LineTraceSingleByChannel(
         OutHitResult,
-        MuzzleStartLocation,
-        EndLocation,
+        MuzzleStartLocation, EndLocation,
         ECC_Visibility,
         TraceParams
     );
 
-
+    //--------------------------------------------------------------------------------------------------------------------
     UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Should Fire Here"));
     // TODO: Burlin
     // ---- Server authority logic ----
@@ -209,7 +265,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                 {
                     UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
                         MuzzleStartLocation, OutHitResult.ImpactPoint,
-                        FLinearColor::Green, 3.f);
+                        FLinearColor::Green, 1.f, 3.f);
     
                     UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
                            OutHitResult.ImpactPoint, 
@@ -237,7 +293,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                 {
                     UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
                         MuzzleStartLocation, EndLocation,
-                        FLinearColor::Red, 3.f);
+                        FLinearColor::Red, 1.f, 3.f);
     
                     UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
                            EndLocation,

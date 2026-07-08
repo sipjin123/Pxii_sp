@@ -26,6 +26,8 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData) override;
 
+	UFUNCTION()
+	void RequestProjectileHit(APxiiCharacter* PxiiCharacter, const FVector& Vector, const FVector& ImpactPoint);
 	UFUNCTION(BlueprintCallable)
 	void FireProjectile(APxiiCharacter* Character);
 
