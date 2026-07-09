@@ -2,6 +2,7 @@
 
 
 #include "Widgets/Components/PxiiButtonBase.h"
+#include "CommonTextBlock.h"
 #include "Components/OverlaySlot.h"
 
 void UPxiiButtonBase::SetButtonText(const FText& InButtonText)
@@ -18,12 +19,9 @@ void UPxiiButtonBase::SetButtonText(const FText& InButtonText)
 
 void UPxiiButtonBase::SetButtonToolTipText(const FText& InButtonDescriptionText)
 {
-	if (Button)
+	if (bShowToolTip)
 	{
-		if (bShowToolTip)
-		{
-			Button->SetToolTipText(InButtonDescriptionText);
-		}
+		SetToolTipText(InButtonDescriptionText);
 	}
 }
 
@@ -40,6 +38,15 @@ void UPxiiButtonBase::SetShowToolTip(bool InShowToolTip)
 {
 	bShowToolTip = InShowToolTip;
 }
+
+void UPxiiButtonBase::NativeOnCurrentTextStyleChanged()
+{}
+
+void UPxiiButtonBase::NativeOnHovered()
+{}
+
+void UPxiiButtonBase::NativeOnUnhovered()
+{}
 
 void UPxiiButtonBase::NativePreConstruct()
 {

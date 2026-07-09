@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/PxiiWidgetBase.h"
+#include "CommonUI/PxiiActivatableWidget.h"
 #include "Widgets/Components/PxiiButtonBase.h"
 #include "Widgets/Components/PxiiTabListWidgetBase.h"
 #include "Widgets/Components/PxiiListViewBase.h"
@@ -13,7 +13,7 @@
  * 
  */
 UCLASS()
-class PXII_API UPxiiCheatMenuScreen : public UPxiiWidgetBase
+class PXII_API UPxiiCheatMenuScreen : public UPxiiActivatableWidget
 {
 	GENERATED_BODY()
 	
@@ -22,19 +22,18 @@ protected:
 	virtual void NativeOnInitialized() override;
 	// ~ End UUserWidget Interface
 
-private:
-	// Debug
-	virtual void NativeConstruct() override;
-	virtual void NativeDestruct() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI | Cheat Menu", meta = (AllowPrivateAccess = "true"))
-	TArray<FName> CheatMenuTabIDs;
+	//~ Begin UCommonActivatableWidget Interface
+	virtual void NativeOnActivated() override;
+	//~ End UCommonActivatableWidget Interface
 
-	TArray<UPxiiButtonBase*> CheatMenuTabButtons;
-	// Debug
+private:
+	//UDataRegistry_Options* GetOrCreateDataRegistry();
 
 	void OnResetBoundActionTriggered();
 	void OnBackBoundActionTriggered();
+
+	UFUNCTION()
+	void OnTabSelected(FName TabID);
 
 #pragma region Bound Widgets
 	UPROPERTY(meta = (BindWidget))
@@ -44,6 +43,12 @@ private:
 	UPxiiListViewBase* ListView_CheatList;
 #pragma endregion Bound Widgets
 
-	UFUNCTION()
-	void OnTabSelected(FName TabID);
+	//Handle creation of data in the options screen. Direct access to this variable is forbidden.
+	//UPROPERTY(Transient)
+	//UDataRegistry_Options* CreatedOwningDataRegistry;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Option Screen", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
+	FDataTableRowHandle ResetAction;
+
+	FUIActionBindingHandle ResetActionHandle;
 };

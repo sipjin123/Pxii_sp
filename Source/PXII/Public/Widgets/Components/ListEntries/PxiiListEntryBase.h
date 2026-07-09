@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/PxiiWidgetBase.h"
+#include "CommonUI/PxiiCommonUserWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
-#include "Components/TextBlock.h"
+#include "CommonTextBlock.h"
 #include "PxiiListEntryBase.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class PXII_API UPxiiListEntryBase : public UPxiiWidgetBase, public IUserObjectListEntry
+class PXII_API UPxiiListEntryBase : public UPxiiCommonUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	
@@ -25,6 +25,6 @@ protected:
 private:
 #pragma region Bound Widgets
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, AllowPrivateAccess = "true"))
-	UTextBlock* TextBlock_EntryDisplayName;
+	UCommonTextBlock* TextBlock_EntryDisplayName;
 #pragma endregion 
 };

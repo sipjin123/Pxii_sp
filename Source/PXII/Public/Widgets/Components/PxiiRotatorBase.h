@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonListView.h"
-#include "PxiiListViewBase.generated.h"
+#include "CommonRotator.h"
+#include "PxiiRotatorBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PXII_API UPxiiListViewBase : public UCommonListView
+class PXII_API UPxiiRotatorBase : public UCommonRotator
 {
 	GENERATED_BODY()
 	

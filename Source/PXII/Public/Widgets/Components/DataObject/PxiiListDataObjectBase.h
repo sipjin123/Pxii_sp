@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonListView.h"
-#include "PxiiListViewBase.generated.h"
+#include "UObject/Object.h"
+#include "PxiiListDataObjectBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PXII_API UPxiiListViewBase : public UCommonListView
+class PXII_API UPxiiListDataObjectBase : public UObject
 {
 	GENERATED_BODY()
 	

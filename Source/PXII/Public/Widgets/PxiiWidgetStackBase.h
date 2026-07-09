@@ -2,56 +2,29 @@
 
 #pragma once
 
+#include "CommonUI/PxiiCommonUserWidget.h"
 #include "CoreMinimal.h"
-#include "Widgets/PxiiWidgetBase.h"
 #include "GameplayTagContainer.h"
-#include "Components/Widget.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
 #include "PxiiWidgetStackBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class PXII_API UPxiiWidgetStackBase : public UPxiiWidgetBase
+class PXII_API UPxiiWidgetStackBase : public UPxiiCommonUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
-	// Debug
 	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	UUserWidget* PushWidgetToStack(TSubclassOf<UUserWidget> WidgetClass, FGameplayTag InStackTag, bool bActivateOnCreate);
+	UCommonActivatableWidgetContainerBase* FindStackByTag(const FGameplayTag& InStackTag) const;
 
-	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	void PopWidgetFromStack(FGameplayTag InStackTag);
-
-	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	void PopAllWidget();
-
-	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	UUserWidget* GetTopMostWidget() const;
-
-	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	FORCEINLINE int32 GetStackSize() const { return  RegisteredWidgetStack.Num(); }
-	// Debug
-
-	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	UWidget* FindStackByTag(const FGameplayTag& InStackTag) const;
-	
 protected:
 	UFUNCTION(BlueprintCallable, Category = "UI | Widget Stack")
-	void RegisterWidgetStack(UPARAM(meta = (Categories = "Pxii.UI.WidgetStack")) FGameplayTag InStackTag, UWidget* InWidgetStack);
-
-	// Debug
-	// Called when a widget becomes the top of the stack
-	UFUNCTION(BlueprintImplementableEvent, Category = "Widget Stack")
-	void OnWidgetActivated(UUserWidget* Widget);
-
-	// Called when a widget is no longer the top
-	UFUNCTION(BlueprintImplementableEvent, Category = "Widget Stack")
-	void OnWidgetDeactivated(UUserWidget* Widget);
-	//Debug
+	void RegisterWidgetStack(UPARAM(meta = (Categories = "Pxii.UI.WidgetStack")) FGameplayTag InStackTag, UCommonActivatableWidgetContainerBase* InWidgetStack);
 
 private:
 	UPROPERTY(Transient)
-	TMap<FGameplayTag, UWidget*> RegisteredWidgetStack;
+	TMap<FGameplayTag, UCommonActivatableWidgetContainerBase*> RegisteredWidgetStackMap;
 };

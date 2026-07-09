@@ -23,5 +23,6 @@ namespace UI
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_WidgetStack_Modal, "Pxii.UI.WidgetStack.Modal");
 
 	// Widgets
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_HUD, "Pxii.UI.Widget.HUD");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_CheatMenu, "Pxii.UI.Widget.CheatMenu");
 }

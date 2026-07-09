@@ -1,72 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/PxiiWidgetStackBase.h"
-#include "Components/NamedSlot.h"
+#include "Utility/PXIILogUtility.h"
 
-UUserWidget* UPxiiWidgetStackBase::PushWidgetToStack(TSubclassOf<UUserWidget> WidgetClass, FGameplayTag InStackTag, bool bActivateOnCreate)
+UCommonActivatableWidgetContainerBase* UPxiiWidgetStackBase::FindStackByTag(const FGameplayTag& InStackTag) const
 {
-	if (!WidgetClass || RegisteredWidgetStack.IsEmpty())
+	if (RegisteredWidgetStackMap.Contains(InStackTag))
 	{
-		return nullptr;
+		return RegisteredWidgetStackMap.FindRef(InStackTag);
 	}
 
-	// Create a new widget instance of the specified class
-	UUserWidget* NewWidget = CreateWidget<UUserWidget>(GetOwningPlayer(), WidgetClass);
-	if (!NewWidget) 
-	{
-		return nullptr;
-	}
-
-	UNamedSlot* Stack = Cast<UNamedSlot>(FindStackByTag(InStackTag));
-	Stack->SetContent(NewWidget);
-
-	if (bActivateOnCreate)
-	{
-		OnWidgetActivated(NewWidget);
-	}
-
-	return NewWidget;
-}
-
-void UPxiiWidgetStackBase::PopWidgetFromStack(FGameplayTag InStackTag)
-{
-	if (RegisteredWidgetStack.IsEmpty())
-	{
-		return;
-	}
-
-	UNamedSlot* Stack = Cast<UNamedSlot>(FindStackByTag(InStackTag));
-	UWidget* WidgetToRemove = Stack->GetChildAt(Stack->GetChildrenCount() - 1);
-	WidgetToRemove->RemoveFromParent();
-}
-
-void UPxiiWidgetStackBase::PopAllWidget()
-{
-}
-
-UUserWidget* UPxiiWidgetStackBase::GetTopMostWidget() const
-{
-	return nullptr;
-}
-
-UWidget* UPxiiWidgetStackBase::FindStackByTag(const FGameplayTag& InStackTag) const
-{
-	if (RegisteredWidgetStack.Contains(InStackTag))
-	{
-		return RegisteredWidgetStack.FindRef(InStackTag);
-	}
+	PXII_LOG(ELogCategory::UI, Warning, TEXT("[%s]: Widget %s not found"), *GetClass()->GetName(), *InStackTag.ToString());
 
 	return nullptr;
 }
 
-void UPxiiWidgetStackBase::RegisterWidgetStack(UPARAM(meta = (Categories = "Pxii.UI.WidgetStack")) FGameplayTag InStackTag, UWidget* InWidgetStack)
+void UPxiiWidgetStackBase::RegisterWidgetStack(UPARAM(meta = (Categories = "Pxii.UI.WidgetStack")) FGameplayTag InStackTag, UCommonActivatableWidgetContainerBase* InWidgetStack)
 {
 	if (!IsDesignTime())
 	{
-		if (!RegisteredWidgetStack.Contains(InStackTag))
+		if (!RegisteredWidgetStackMap.Contains(InStackTag))
 		{
-			RegisteredWidgetStack.Add(InStackTag, InWidgetStack);
+			RegisteredWidgetStackMap.Add(InStackTag, InWidgetStack);
 		}
 	}
 }

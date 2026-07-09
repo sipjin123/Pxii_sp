@@ -3,12 +3,18 @@
 
 #include "Widgets/Components/PxiiTabListWidgetBase.h"
 #include "Editor/WidgetCompilerLog.h"
-#include "Layout/Margin.h"
-#include "Components/HorizontalBoxSlot.h"
+#include "Widgets/Components/PxiiButtonBase.h"
 
-UPxiiButtonBase* UPxiiTabListWidgetBase::RequestRegisterTab(const FName& InTabDataID)
+void UPxiiTabListWidgetBase::RequestRegisterTab(const FName& InTabDataID, const FText& InTabDisplayName)
 {
-	return RegisterTab(InTabDataID);
+	// Registers and adds a new tab to the list that corresponds to a given widget instance. If not present in the linked switcher, it will be added.
+	RegisterTab(InTabDataID, TabButtonEntryWidgetClass, nullptr);
+
+	if(UPxiiButtonBase* FoundButton = Cast<UPxiiButtonBase>(GetTabButtonBaseByID(InTabDataID)))
+	{
+		FoundButton->SetButtonText(InTabDisplayName);
+		FoundButton->SetButtonToolTipText(FText::FromString(TEXT("Page for ") + InTabDisplayName.ToString()));
+	}
 }
 
 #if WITH_EDITOR	
@@ -25,19 +31,3 @@ void UPxiiTabListWidgetBase::ValidateCompiledDefaults(IWidgetCompilerLog& Compil
 	}
 }
 #endif
-
-UPxiiButtonBase* UPxiiTabListWidgetBase::RegisterTab(const FName& TabID)
-{
-	UPxiiButtonBase* CreatedTabButton = CreateWidget<UPxiiButtonBase>(GetWorld(), TabButtonEntryWidgetClass);
-
-
-	UHorizontalBoxSlot* ChildSlot = HorizontalBox_TabsContainer->AddChildToHorizontalBox(CreatedTabButton);
-
-	CreatedTabButton->SetShowToolTip(true);
-	CreatedTabButton->SetButtonText(FText::FromName(TabID));
-	CreatedTabButton->SetButtonToolTipText(FText::FromString(TEXT("Page for ") + TabID.ToString()));
-
-	ChildSlot->SetPadding(FMargin(5.f, 0.f));
-
-	return CreatedTabButton;
-}

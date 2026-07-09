@@ -2,43 +2,61 @@
 
 
 #include "Widgets/CheatMenu/PxiiCheatMenuScreen.h"
+#include "Utility/PXIILogUtility.h"
 
 void UPxiiCheatMenuScreen::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
 	// For reset action
+	//if(ResetAction.IsNull())
+	//{
+	//	PXII_LOG(LogTemp, Warning, TEXT("Reset Action is null and is not assigned in table row."));
+	//}
+	//else
+	//{
+	//	ResetActionHandle = RegisterUIActionBinding(
+	//	   FBindUIActionArgs(
+	//		   ResetAction,
+	//		   true,
+	//		   FSimpleDelegate::CreateUObject(this, &ThisClass::OnResetBoundActionTriggered)
+	//	   )
+	//	);
+	//}
 
+	//RegisterUIActionBinding(
+	//FBindUIActionArgs(
+	//	ICommonInputModule::GetSettings().GetDefaultBackAction(),
+	//	true,
+	//	FSimpleDelegate::CreateUObject(this, &ThisClass::OnBackBoundActionTriggered)
+	//)
+	//);
 
-	//TabListWidget_CheatTabs->OnTabSelected.AddDynamic(this, &UPxiiCheatMenuScreen::OnTabSelected);
+	// Bind delegate
+	TabListWidget_CheatTabs->OnTabSelected.AddDynamic(this, &ThisClass::OnTabSelected);
 }
 
-void UPxiiCheatMenuScreen::NativeConstruct()
+void UPxiiCheatMenuScreen::NativeOnActivated()
 {
-	Super::NativeConstruct();
+	Super::NativeOnActivated();
 
-	if (!CheatMenuTabIDs.IsEmpty())
-	{
-		for (int32 i = 0; i < CheatMenuTabIDs.Num(); ++i)
-		{
-			CheatMenuTabButtons.AddUnique(TabListWidget_CheatTabs->RequestRegisterTab(CheatMenuTabIDs[i]));
-		}
-	}
+	//for(UListDataObject_Collection* TabCollection : GetOrCreateDataRegistry()->GetRegisteredOptionTabsCollections())
+	//{
+	//	if(!TabCollection)
+	//	{
+	//		continue;
+	//	}
 
-	APlayerController* PC = GetOwningPlayer();
-	FInputModeGameAndUI InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(true);
-}
+	//	const FName TabDataID = TabCollection->GetDataID();
 
-void UPxiiCheatMenuScreen::NativeDestruct()
-{
-	APlayerController* PC = GetOwningPlayer();
-	FInputModeGameOnly InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(false);
+	//	// Button already exists
+	//	if(TabListWidget_OptionsTabs->GetTabButtonBaseByID(TabDataID) != nullptr)
+	//	{
+	//		continue;
+	//	}
 
-	Super::NativeDestruct();
+	//	TabListWidget_OptionsTabs->RequestRegisterTab(TabDataID, TabCollection->GetDataDisplayName());
+	//}
 }
 
 void UPxiiCheatMenuScreen::OnResetBoundActionTriggered()
@@ -50,5 +68,4 @@ void UPxiiCheatMenuScreen::OnBackBoundActionTriggered()
 }
 
 void UPxiiCheatMenuScreen::OnTabSelected(FName TabID)
-{
-}
+{}

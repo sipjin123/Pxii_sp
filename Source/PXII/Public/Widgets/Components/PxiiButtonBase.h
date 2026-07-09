@@ -3,16 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/Button.h"
-#include "Components/TextBlock.h"
+#include "CommonButtonBase.h"
+#include "CommonTextBlock.h"
 #include "PxiiButtonBase.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class PXII_API UPxiiButtonBase : public UUserWidget
+class PXII_API UPxiiButtonBase : public UCommonButtonBase
 {
 	GENERATED_BODY()
 
@@ -30,16 +29,19 @@ public:
 	void SetShowToolTip(bool InShowToolTip);
 	
 private:
+	//~ Begin UCommonButtonBase Interface
+	virtual void NativeOnCurrentTextStyleChanged() override;
+	virtual void NativeOnHovered() override;
+	virtual void NativeOnUnhovered() override;
+	//~ End UCommonButtonBase Interface
+	
 	//~ Begin UUserWidget Interface
 	virtual void NativePreConstruct() override;
 	//~ End UUserWidget Interface
 
 	// **** Bound Widgets **** //
-	UPROPERTY(meta = (BindWidget))
-	UButton* Button;
-
 	UPROPERTY(meta = (BindWidgetOptional))
-	UTextBlock* TextBlock_ButtonText;
+	UCommonTextBlock* TextBlock_ButtonText;
 	// **** Bound Widgets **** //
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "UI | Button", meta = (AllowPrivateAccess = "true"))
