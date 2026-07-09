@@ -17,6 +17,6 @@ class PXII_API UPxiiCombatBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintPure, Category = "Projectile Subsystem")
+	UFUNCTION(BlueprintPure, Category = "Combat | BP Function Library")
 	static TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag);
 };
