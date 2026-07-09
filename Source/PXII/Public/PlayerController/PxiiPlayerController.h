@@ -11,6 +11,15 @@ class PXII_API APxiiPlayerController : public APlayerController
 	
 public:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	TObjectPtr<UInputAction> MoveInput;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	TObjectPtr<UInputAction> LookInput;
+
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -19,24 +28,15 @@ public:
 	virtual void Look(const FInputActionValue& InputActionValue);
 
 	UFUNCTION(BlueprintPure)
-	FVector2D GetLastMovementInput() const;
+	FVector2D GetCacheMoveInput() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector2D GetCachedLookInput() const;
 	
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UPxiiPlayerInputConfig> InputConfig;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> MoveInput;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> LookInput;
-
-	UPROPERTY()
-	FVector2D LastMovementInput;
 
 	// Aim Pitch Scale
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -45,6 +45,12 @@ protected:
 	// Aim Yaw Scale
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float  AimYawScale = 0.25f;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D CachedMovementInput;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D CachedLookInput;
 	
 private:
 

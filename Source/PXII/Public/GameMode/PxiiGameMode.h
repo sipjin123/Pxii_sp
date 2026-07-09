@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PxiiGameModeBase.h"
 #include "GameFramework/GameMode.h"
 #include "PxiiGameMode.generated.h"
 
@@ -10,7 +11,7 @@
  * 
  */
 UCLASS()
-class PXII_API APxiiGameMode : public AGameMode
+class PXII_API APxiiGameMode : public APxiiGameModeBase
 {
 	GENERATED_BODY()
 	

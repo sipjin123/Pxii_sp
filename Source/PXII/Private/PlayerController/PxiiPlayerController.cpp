@@ -1,5 +1,6 @@
 ﻿#include "PlayerController/PxiiPlayerController.h"
 
+#include "GameFramework/Pawn.h"
 #include "Input/PxiiPlayerInputComponent.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -28,9 +29,12 @@ void APxiiPlayerController::SetupInputComponent()
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Move);
-
 		// Looking
 		EnhancedInputComponent->BindAction(LookInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Look);
+
+		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Completed, this, &APxiiPlayerController::Move);
+		// Looking
+		EnhancedInputComponent->BindAction(LookInput, ETriggerEvent::Completed, this, &APxiiPlayerController::Look);
 		
 		EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APxiiPlayerController::AbilityInputTagPressed, &APxiiPlayerController::AbilityInputTagReleased);
 	}
@@ -56,7 +60,7 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 		return;
 	}
 
-	LastMovementInput = InputActionValue.Get<FVector2D>();
+	CachedMovementInput = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 	
@@ -65,7 +69,7 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
-		if (LastMovementInput.Y > 0)
+		if (CachedMovementInput.Y > 0)
 		{
 			// Block forward movement
 		}
@@ -74,10 +78,11 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 			//ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		}
 
-		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Input control: %s"), *LastMovementInput.ToString());
+		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Pawn: %s Input control: %s"), *ControlledPawn->GetClass()->GetName(), *CachedMovementInput.ToString());
 
-		ControlledPawn->AddMovementInput(ForwardDirection, LastMovementInput.Y);
-		ControlledPawn->AddMovementInput(RightDirection, LastMovementInput.X);
+		ControlledPawn->AddMovementInput(ForwardDirection, CachedMovementInput.Y);
+		ControlledPawn->AddMovementInput(RightDirection, CachedMovementInput.X);
+		//MoveCharacter(LastMovementInput, ForwardDirection, RightDirection);
 	}
 	else
 	{
@@ -94,17 +99,22 @@ void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
 		return;
 	}
 	
-	const FVector2D LookAxis = InputActionValue.Get<FVector2D>();
+	CachedLookInput = InputActionValue.Get<FVector2D>();
 	
-	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Look] Input control: %s"), *LookAxis.ToString());
+	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Look] Input control: %s"), *CachedLookInput.ToString());
 
-	TargetPawn->AddControllerYawInput(-LookAxis.X * AimYawScale);
-	TargetPawn->AddControllerPitchInput(LookAxis.Y * AimPitchScale);
+	TargetPawn->AddControllerYawInput(-CachedLookInput.X * AimYawScale);
+	TargetPawn->AddControllerPitchInput(CachedLookInput.Y * AimPitchScale);
 }
 
-FVector2D APxiiPlayerController::GetLastMovementInput() const
+FVector2D APxiiPlayerController::GetCachedLookInput() const
 {
-	return LastMovementInput;
+	return CachedLookInput;
+}
+
+FVector2D APxiiPlayerController::GetCacheMoveInput() const
+{
+	return CachedMovementInput;
 }
 
 void APxiiPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
