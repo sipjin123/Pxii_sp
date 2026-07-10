@@ -7,6 +7,7 @@
 #include "Widgets/Components/PxiiButtonBase.h"
 #include "Widgets/Components/PxiiTabListWidgetBase.h"
 #include "Widgets/Components/PxiiListViewBase.h"
+#include "Widgets/Components/DataRegistries/PxiiCheatDataRegistry.h"
 #include "PxiiCheatMenuScreen.generated.h"
 
 /**
@@ -17,6 +18,10 @@ class PXII_API UPxiiCheatMenuScreen : public UPxiiActivatableWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnTabSelected(FName TabID);
+
 protected:
 	// ~ Begin UUserWidget Interface
 	virtual void NativeOnInitialized() override;
@@ -27,13 +32,10 @@ protected:
 	//~ End UCommonActivatableWidget Interface
 
 private:
-	//UDataRegistry_Options* GetOrCreateDataRegistry();
+	UPxiiCheatDataRegistry* GetOrCreateDataRegistry();
 
 	void OnResetBoundActionTriggered();
 	void OnBackBoundActionTriggered();
-
-	UFUNCTION()
-	void OnTabSelected(FName TabID);
 
 #pragma region Bound Widgets
 	UPROPERTY(meta = (BindWidget))
@@ -44,8 +46,8 @@ private:
 #pragma endregion Bound Widgets
 
 	//Handle creation of data in this screen. Direct access to this variable is forbidden.
-	//UPROPERTY(Transient)
-	//UDataRegistry_Options* CreatedOwningDataRegistry;
+	UPROPERTY(Transient)
+	UPxiiCheatDataRegistry* CreatedOwningDataRegistry;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI | Input", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
 	FDataTableRowHandle ResetAction;

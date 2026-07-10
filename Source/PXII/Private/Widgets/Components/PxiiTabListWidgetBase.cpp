@@ -13,7 +13,11 @@ void UPxiiTabListWidgetBase::RequestRegisterTab(const FName& InTabDataID, const 
 	if(UPxiiButtonBase* FoundButton = Cast<UPxiiButtonBase>(GetTabButtonBaseByID(InTabDataID)))
 	{
 		FoundButton->SetButtonText(InTabDisplayName);
-		FoundButton->SetButtonToolTipText(FText::FromString(TEXT("Page for ") + InTabDisplayName.ToString()));
+
+		if (bShouldShowToolTip)
+		{
+			FoundButton->SetButtonToolTipText(FText::FromString(TEXT("Page for ") + InTabDisplayName.ToString()));
+		}
 	}
 }
 

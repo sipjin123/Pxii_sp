@@ -5,6 +5,8 @@
 #include "Utility/PXIILogUtility.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
+#include "Utility/PXIILogUtility.h"
 
 void UPxiiCheatMenuScreen::NativeOnInitialized()
 {
@@ -42,23 +44,40 @@ void UPxiiCheatMenuScreen::NativeOnActivated()
 {
 	Super::NativeOnActivated();
 
-	//for(UListDataObject_Collection* TabCollection : GetOrCreateDataRegistry()->GetRegisteredOptionTabsCollections())
-	//{
-	//	if(!TabCollection)
-	//	{
-	//		continue;
-	//	}
+	for(UPxiiListDataObjectCollection* TabCollection : GetOrCreateDataRegistry()->GetRegisteredTabsCollections())
+	{
+		if(!TabCollection)
+		{
+			continue;
+		}
 
-	//	const FName TabDataID = TabCollection->GetDataID();
+		const FName TabDataID = TabCollection->GetDataID();
 
-	//	// Button already exists
-	//	if(TabListWidget_OptionsTabs->GetTabButtonBaseByID(TabDataID) != nullptr)
-	//	{
-	//		continue;
-	//	}
+		// Button already exists
+		if(TabListWidget_CheatTabs->GetTabButtonBaseByID(TabDataID) != nullptr)
+		{
+			continue;
+		}
 
-	//	TabListWidget_OptionsTabs->RequestRegisterTab(TabDataID, TabCollection->GetDataDisplayName());
-	//}
+		TabListWidget_CheatTabs->RequestRegisterTab(TabDataID, TabCollection->GetDataDisplayName());
+	}
+}
+
+UPxiiCheatDataRegistry* UPxiiCheatMenuScreen::GetOrCreateDataRegistry()
+{
+	if(!CreatedOwningDataRegistry)
+	{
+		CreatedOwningDataRegistry = NewObject<UPxiiCheatDataRegistry>();
+		CreatedOwningDataRegistry->InitDataRegistry(GetOwningLocalPlayer());
+	}
+
+	if(!CreatedOwningDataRegistry)
+	{
+		PXII_LOG(ELogCategory::UI, Error, TEXT("[%s]: Data registry for cheat menu is not valid"), *ThisClass::StaticClass()->GetName());
+		return nullptr;
+	}
+
+	return CreatedOwningDataRegistry;
 }
 
 void UPxiiCheatMenuScreen::OnResetBoundActionTriggered()
@@ -71,6 +90,3 @@ void UPxiiCheatMenuScreen::OnBackBoundActionTriggered()
 {
 	DeactivateWidget();
 }
-
-void UPxiiCheatMenuScreen::OnTabSelected(FName TabID)
-{}

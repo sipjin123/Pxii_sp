@@ -7,7 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "PxiiPathMovementComponent.generated.h"
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, BlueprintType, ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
 class PXII_API UPxiiPathMovementComponent : public UActorComponent
 {
 	GENERATED_BODY()

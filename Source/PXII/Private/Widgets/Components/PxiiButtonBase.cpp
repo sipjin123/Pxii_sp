@@ -43,17 +43,21 @@ void UPxiiButtonBase::NativeOnCurrentTextStyleChanged()
 {
 	Super::NativeOnCurrentTextStyleChanged();
 
-	if(TextBlock_ButtonText)
+	if (TextBlock_ButtonText && GetCurrentTextStyleClass())
 	{
 		TextBlock_ButtonText->SetStyle(GetCurrentTextStyleClass());
 	}
 }
 
 void UPxiiButtonBase::NativeOnHovered()
-{}
+{
+	Super::NativeOnHovered();
+}
 
 void UPxiiButtonBase::NativeOnUnhovered()
-{}
+{
+	Super::NativeOnUnhovered();
+}
 
 void UPxiiButtonBase::NativePreConstruct()
 {

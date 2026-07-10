@@ -30,4 +30,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI | Tab List", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UPxiiButtonBase> TabButtonEntryWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI | Tab List", meta = (AllowPrivateAccess = "true"))
+	bool bShouldShowToolTip { false };
 };
