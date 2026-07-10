@@ -1,6 +1,7 @@
 ﻿#include "PlayerController/PxiiPlayerController.h"
-
 #include "GameFramework/Pawn.h"
+#include "AbilitySystemGlobals.h"
+#include "GAS/PxiiAbilitySystemComponent.h"
 #include "Input/PxiiPlayerInputComponent.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -49,6 +50,7 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 		InputSubsystem->InitializeForPawn(InPawn);
 	}
 
+	ASC = Cast<UPxiiAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(InPawn));
 }
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -67,7 +69,14 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	if (APawn* ControlledPawn = GetPawn<APawn>())
+	if(ASC && ASC->IsInputBlocked())
+	{
+		CachedMovementInput = FVector2D::ZeroVector;
+		PXII_LOG(ELogCategory::Controls, Error, TEXT("DZ_LOG:: Input Blocked"));
+		return;
+	}
+	
+	if (TargetPawn || !ASC->IsInputBlocked())
 	{
 		if (CachedMovementInput.Y > 0)
 		{
@@ -78,10 +87,10 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 			//ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		}
 
-		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Pawn: %s Input control: %s"), *ControlledPawn->GetClass()->GetName(), *CachedMovementInput.ToString());
+		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Pawn: %s Input control: %s"), *TargetPawn->GetClass()->GetName(), *CachedMovementInput.ToString());
 
-		ControlledPawn->AddMovementInput(ForwardDirection, CachedMovementInput.Y);
-		ControlledPawn->AddMovementInput(RightDirection, CachedMovementInput.X);
+		TargetPawn->AddMovementInput(ForwardDirection, CachedMovementInput.Y);
+		TargetPawn->AddMovementInput(RightDirection, CachedMovementInput.X);
 		//MoveCharacter(LastMovementInput, ForwardDirection, RightDirection);
 	}
 	else

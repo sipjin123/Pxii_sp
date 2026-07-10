@@ -7,6 +7,12 @@
 #include "Utility/PXIILogUtility.h"
 
 DEFINE_LOG_CATEGORY(LogTempAbilityComp);
+
+UPxiiAbilitySystemComponent::UPxiiAbilitySystemComponent()
+{
+	InputBlockTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.InputTag.Block")));
+}
+
 void UPxiiAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -16,16 +22,22 @@ void UPxiiAbilitySystemComponent::BeginPlay()
 
 void UPxiiAbilitySystemComponent::GrantAbilityByRow(FName RowName)
 {
-	if(!AbilityDataTable)return;
+	if(!AbilityData)
+	{
+		return;	
+	}
 
-	const FPxiiAbilityData* Row = AbilityDataTable->FindRow<FPxiiAbilityData>(RowName,TEXT("GrantAbilityByRow"));
+	FAbilityData* Row = AbilityData->PlayerGrantedAbilities.FindByPredicate([&](const FAbilityData& Data)
+	{
+		return Data.AbilityID == RowName;
+	});
 
 	if(!Row||!Row->AbilityClass)
 	{
 		return;	
 	}
 
-	FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row->AbilityClass,Row->Level,INDEX_NONE);
+	FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row->AbilityClass, Row->Level, INDEX_NONE);
 	Spec.GetDynamicSpecSourceTags().AddTag(Row->InputTag);
 	
 	GiveAbility(Spec);
@@ -33,26 +45,72 @@ void UPxiiAbilitySystemComponent::GrantAbilityByRow(FName RowName)
 
 void UPxiiAbilitySystemComponent::GrantAllAbilities()
 {
-	if(!AbilityDataTable)return;
+	if(!AbilityData)
+	{
+		return;	
+	}
 
 	static const FString Context(TEXT("GrantAllAbilities"));
 
-	TArray<FPxiiAbilityData*> Rows;
-	AbilityDataTable->GetAllRows(Context,Rows);
-
-	for(const FPxiiAbilityData* Row:Rows)
+	for(FAbilityData Row : AbilityData->PlayerGrantedAbilities)
 	{
-		if(!Row||!Row->AbilityClass)continue;
+		if(!Row.AbilityClass)
+		{
+			continue;	
+		}
+		
 		if (LogAbilityInit)
 		{
-			UE_LOG(LogTempAbilityComp,Warning,TEXT("GiveAbility: %s"),*Row->Name.ToString());
+			UE_LOG(LogTempAbilityComp,Warning,TEXT("GiveAbility: %s"),*Row.Name.ToString());
 		}
 
-		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row->AbilityClass,Row->Level,INDEX_NONE);
-		Spec.GetDynamicSpecSourceTags().AddTag(Row->InputTag);
+		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row.AbilityClass, Row.Level,INDEX_NONE);
+		Spec.GetDynamicSpecSourceTags().AddTag(Row.InputTag);
 		
 		GiveAbility(Spec);
 	}
+}
+
+void UPxiiAbilitySystemComponent::GrantAllPlayerEffects()
+{
+	if(!AbilityData)
+	{
+		return;	
+	}
+
+	if(AbilityData->PlayerGrantedAbilities.IsEmpty())
+	{
+		return;
+	}
+
+	static const FString Context(TEXT("GrantAllAbilities"));
+
+	for(FGameplayEffectData Row : AbilityData->PlayerGrantedEffect)
+	{
+		if(!Row.EffectClass)
+		{
+			continue;	
+		}
+		
+		if (LogAbilityInit)
+		{
+			UE_LOG(LogTempAbilityComp, Warning,TEXT("Give Effect: %s"),*Row.Name.ToString());
+		}
+
+		FGameplayEffectContextHandle context = MakeEffectContext();
+		context.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(Row.EffectClass, Row.Level, context);
+		if(SpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+bool UPxiiAbilitySystemComponent::IsInputBlocked() const
+{
+	return HasAnyMatchingGameplayTags(InputBlockTags);
 }
 
 bool UPxiiAbilitySystemComponent::ConsumeBufferedInput(FGameplayTag InputTag)
@@ -164,6 +222,7 @@ void UPxiiAbilitySystemComponent::HandleAbilityEnded(const FAbilityEndedData& En
 		}
 	}
 }
+
 
 UPlayerInputSubsystem* UPxiiAbilitySystemComponent::GetPlayerInputSubsystem() const
 {

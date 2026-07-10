@@ -27,6 +27,7 @@ void APxiiCharacterBase::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GrantAllAbilities();
+		AbilitySystemComponent->GrantAllPlayerEffects();
 	}
 	else
 	{

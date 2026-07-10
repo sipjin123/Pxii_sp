@@ -54,6 +54,9 @@ protected:
 	
 private:
 
+	UPROPERTY()
+	TObjectPtr<UPxiiAbilitySystemComponent> ASC;
+	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);

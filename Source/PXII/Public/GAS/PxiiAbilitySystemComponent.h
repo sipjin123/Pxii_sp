@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "Data/PxiiAbilityData.h"
 #include "PxiiAbilitySystemComponent.generated.h"
 
 class UPlayerInputSubsystem;
@@ -20,14 +21,21 @@ class PXII_API UPxiiAbilitySystemComponent : public UAbilitySystemComponent
 	virtual void BeginPlay() override;
 
 public:
+	
 	UFUNCTION(BlueprintCallable,Category="Ability")
 	void GrantAbilityByRow(FName RowName);
 
 	UFUNCTION(BlueprintCallable,Category="Ability")
 	void GrantAllAbilities();
 
+	UFUNCTION(BlueprintCallable,Category="Ability")
+	void GrantAllPlayerEffects();
+
 	UPROPERTY(EditAnywhere)
 	bool LogAbilityInit;
+
+	UFUNCTION(BlueprintPure)
+	bool IsInputBlocked() const;
 
 	UFUNCTION(BlueprintCallable, Category="Input")
 	bool ConsumeBufferedInput(FGameplayTag InputTag);
@@ -51,9 +59,13 @@ public:
 	void HandleAbilityEnded(const FAbilityEndedData& EndData);
 	
 protected:
+	UPxiiAbilitySystemComponent();
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Ability")
-	UDataTable* AbilityDataTable;
+	TObjectPtr<UPxiiAbilityData> AbilityData;
 
 private:
 	UPlayerInputSubsystem* GetPlayerInputSubsystem() const;
+
+	FGameplayTagContainer InputBlockTags;
 };
