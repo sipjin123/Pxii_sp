@@ -43,11 +43,11 @@ private:
 	UPxiiListViewBase* ListView_CheatList;
 #pragma endregion Bound Widgets
 
-	//Handle creation of data in the options screen. Direct access to this variable is forbidden.
+	//Handle creation of data in this screen. Direct access to this variable is forbidden.
 	//UPROPERTY(Transient)
 	//UDataRegistry_Options* CreatedOwningDataRegistry;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Option Screen", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
+	UPROPERTY(EditDefaultsOnly, Category = "UI | Input", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
 	FDataTableRowHandle ResetAction;
 
 	FUIActionBindingHandle ResetActionHandle;

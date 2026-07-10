@@ -13,6 +13,14 @@ UPxiiAttributeSet::UPxiiAttributeSet()
 	MaxMana.SetCurrentValue(100.0f);
 	Ammo.SetBaseValue(30.0f);
 	Ammo.SetCurrentValue(30.0f);
+	
+	MovementSpeed.SetBaseValue(30.0f);
+	MovementSpeed.SetCurrentValue(30.0f);
+	MovementSpeedBonus.SetBaseValue(0.0f);
+	MovementSpeedBonus.SetCurrentValue(0.0f);
+	SpeedModifier.SetBaseValue(1.0f);
+	SpeedModifier.SetCurrentValue(1.0f);
+
 }
 
 void UPxiiAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

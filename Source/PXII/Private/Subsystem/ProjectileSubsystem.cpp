@@ -18,29 +18,10 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 
-	/////////////////
-	// For debug purpose only
+	///////////////////
+	//// For debug purpose only
 	InitializePool(UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
-
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-
-	if (!CreatedHUD && HUDClass && PC)
-	{
-		CreatedHUD = CreateWidget<UUserWidget>(PC, HUDClass);
-
-		if (CreatedHUD)
-		{
-			CreatedHUD->AddToViewport();
-		}
-		else
-		{
-			if(bPrintDebugLog)
-			{
-				PXII_LOG(ELogCategory::Combat, Warning, TEXT("Failed to create HUD"));
-			}
-		}
-	}
-	/////////////////
+	///////////////////
 }
 
 void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize)

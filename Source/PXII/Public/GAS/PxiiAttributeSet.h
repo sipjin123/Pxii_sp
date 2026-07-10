@@ -61,4 +61,16 @@ public:
 	FGameplayAttributeData Intelligence;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Intelligence);
 
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MovementSpeed;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MovementSpeed);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MovementSpeedBonus;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MovementSpeedBonus);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData SpeedModifier;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, SpeedModifier);
+	
 };

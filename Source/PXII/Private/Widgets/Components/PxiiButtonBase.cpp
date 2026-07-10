@@ -40,7 +40,14 @@ void UPxiiButtonBase::SetShowToolTip(bool InShowToolTip)
 }
 
 void UPxiiButtonBase::NativeOnCurrentTextStyleChanged()
-{}
+{
+	Super::NativeOnCurrentTextStyleChanged();
+
+	if(TextBlock_ButtonText)
+	{
+		TextBlock_ButtonText->SetStyle(GetCurrentTextStyleClass());
+	}
+}
 
 void UPxiiButtonBase::NativeOnHovered()
 {}
