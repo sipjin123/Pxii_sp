@@ -2,7 +2,6 @@
 
 
 #include "GAS/GECalculations/GEEC_DynamicDamage.h"
-
 #include "GAS/PxiiAttributeSet.h"
 
 DEFINE_LOG_CATEGORY(LogGEECDamage);

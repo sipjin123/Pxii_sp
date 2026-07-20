@@ -16,11 +16,17 @@ UPxiiAttributeSet::UPxiiAttributeSet()
 	
 	MovementSpeed.SetBaseValue(30.0f);
 	MovementSpeed.SetCurrentValue(30.0f);
+	BaseMovementSpeed.SetBaseValue(30.0f);
+	BaseMovementSpeed.SetCurrentValue(30.0f);
 	MovementSpeedBonus.SetBaseValue(0.0f);
 	MovementSpeedBonus.SetCurrentValue(0.0f);
 	SpeedModifier.SetBaseValue(1.0f);
 	SpeedModifier.SetCurrentValue(1.0f);
 
+	Yin.SetBaseValue(0.0f);
+	MaxYin.SetBaseValue(100.0f);
+	Yang.SetBaseValue(0.0f);
+	MaxYang.SetBaseValue(100.0f);
 }
 
 void UPxiiAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -32,3 +38,4 @@ void UPxiiAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 {
 	Super::PostGameplayEffectExecute(Data);
 }
+

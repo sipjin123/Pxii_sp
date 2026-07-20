@@ -48,7 +48,23 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MaxAmmo;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxAmmo);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData Yin;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Yin);
 	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MaxYin;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxYin);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData Yang;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Yang);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MaxYang;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxYang);
+	//----------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData Strength;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Strength);
@@ -64,6 +80,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MovementSpeed);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData BaseMovementSpeed;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, BaseMovementSpeed);
 
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MovementSpeedBonus;

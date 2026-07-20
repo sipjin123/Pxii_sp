@@ -12,6 +12,12 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class EPxiiYinYangType : uint8
+{
+	Yin,
+	Yang
+};
 
 class APxiiCharacterBase;
 
@@ -99,4 +105,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Debug")
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugTrace = EDrawDebugTrace::None;
+
+	UFUNCTION(BlueprintCallable)
+	void GrantYinYang(EPxiiYinYangType Type, float Amount, bool bIsPercent);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat|Gameplay Effects")
+	TSubclassOf<UGameplayEffect> GE_YinYang;
 };

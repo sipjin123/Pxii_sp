@@ -8,6 +8,9 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Damage_Fire, "Damage.Fire");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Damage_Ice,  "Damage.Ice");
 UE_DEFINE_GAMEPLAY_TAG(TAG_HitType,  "Combat.HitType");
 UE_DEFINE_GAMEPLAY_TAG(TAG_DamageSource,  "Combat.DamageSource")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_YinYangType, "Stat.Yin");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_Amount, "Stat.Yang");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_IsPercent, "Data.IsPercent");
 
 namespace Projectiles
 {
