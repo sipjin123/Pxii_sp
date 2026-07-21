@@ -186,7 +186,7 @@ void UPxiiPlayerCombatComponent::FinalizeHitTraceLogic()
 				if (CharRef)
 				{
 					//for (int i = 0; i < 10 ; i++) // Simulating Spamming in network
-					ProcessUnitDamage(CurrHitActor, ImpactPoint);
+					ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, 0.f);
 					//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
 				}
 				else
@@ -198,7 +198,7 @@ void UPxiiPlayerCombatComponent::FinalizeHitTraceLogic()
 	}
 }
 
-void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc)
+void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, float DamageSource)
 {
 	if (TargetUnit == nullptr || GetOwner() == nullptr)
 	{
@@ -219,7 +219,7 @@ void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector H
 		{
 			//PlayerDamage = UPxiiCombatInterface::Execute_OnGetCurrentDamage(GetOwner());
 			// TODO[ANY]: Interface Damage
-			PlayerDamage = 10.f;
+			PlayerDamage = Damage;
 		}
 		/*
 		const bool IsHeavyAttack = AbilitySystemComponent->HasMatchingGameplayTag(
@@ -230,7 +230,7 @@ void UPxiiPlayerCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector H
 		const bool IsHeavyAttack = false;
 		const bool IsAbilityAttacking = false;
 
-	
+		
 		const float TotalDamage = PlayerDamage * (IsHeavyAttack ? 2 : 1);
 			
 		if (IsAbilityAttacking)

@@ -222,7 +222,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                     {
                         if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
                         {
-                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, OutHitResult.ImpactPoint);
+                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, OutHitResult.ImpactPoint, 5.f, 1.0f);
                         }
                         const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
                         UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Damage: {%f}"), AttributeSet->Health.GetCurrentValue());

@@ -56,7 +56,7 @@ public:
 	void ProcessDepthSlash(FVector EndLoc);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc);
+	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, float DamageSource);
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> HitTracedActors;
