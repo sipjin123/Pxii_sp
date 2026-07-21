@@ -69,8 +69,15 @@ public:
 	FGameplayAttributeData StaggerMeter;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, StaggerMeter);
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
-	FGameplayAttributeData StaggerMeterMax;
-	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, StaggerMeterMax);
+	FGameplayAttributeData MaxStaggerMeter;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxStaggerMeter);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData Shield;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Shield);
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MaxShield;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxShield);
 	//----------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData Strength;

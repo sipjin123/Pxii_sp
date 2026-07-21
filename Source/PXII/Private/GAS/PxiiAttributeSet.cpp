@@ -29,7 +29,9 @@ UPxiiAttributeSet::UPxiiAttributeSet()
 	MaxYang.SetBaseValue(100.0f);
 	
 	StaggerMeter.SetBaseValue(0.0f);
-	StaggerMeterMax.SetBaseValue(100.0f);
+	MaxStaggerMeter.SetBaseValue(100.0f);
+	Shield.SetBaseValue(0.0f);
+	MaxShield.SetBaseValue(100.0f);
 }
 
 void UPxiiAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

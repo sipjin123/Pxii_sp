@@ -16,7 +16,7 @@ class PXII_API UPxiiLoggerBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
-	static void PXIIPrintLog(ELogCategory LogCategory, EPXIILogVerbosity Verbosity, FString FullAddress);
+	static void PXIIPrintLog(ELogCategory LogCategory, EPXIILogVerbosity Verbosity, FString InString);
 
 	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
 	static void EnableLogCategories(TArray<ELogCategory> Category);
