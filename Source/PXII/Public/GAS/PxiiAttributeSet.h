@@ -64,6 +64,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MaxYang;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxYang);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData StaggerMeter;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, StaggerMeter);
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData StaggerMeterMax;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, StaggerMeterMax);
 	//----------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData Strength;
