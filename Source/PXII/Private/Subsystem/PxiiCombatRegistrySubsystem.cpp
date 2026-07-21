@@ -102,8 +102,9 @@ void UPxiiCombatRegistrySubsystem::ManualTick()
 			continue;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("[CRS] %d ---- PROCESS: %s -> %s | Damage=%.1f Flags=%u Source=%u"), CurrentTickIndex,
-			*GetNameSafe(Source), *GetNameSafe(Target), Entry.HitData.Damage, Entry.HitData.Flags, Entry.HitData.DamageSource);
+		if (bLogFlow)
+			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d ---- PROCESS: %s -> %s | Damage=%.1f Flags=%u Source=%u"), CurrentTickIndex,
+				*GetNameSafe(Source), *GetNameSafe(Target), Entry.HitData.Damage, Entry.HitData.Flags, Entry.HitData.DamageSource);
 		
 		// 🔹 Check per-source RPC limit
 		int32& RpcCount = SourceRpcCount.FindOrAdd(Source);
@@ -140,8 +141,10 @@ void UPxiiCombatRegistrySubsystem::ProcessDamageRegistry(const FQueuedDamage& Da
 		IAbilitySystemInterface* SourceASI = Cast<IAbilitySystemInterface>(DamageEntry.Source);
 		IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(DamageEntry.HitData.Target.Get());
 
-		if (SourceASI && TargetASI){
-			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d ---- Process Damage, Remain {%d}"), CurrentTickIndex, DamageQueue.Num());
+		if (SourceASI && TargetASI)
+		{
+			if (bLogFlow)
+				UE_LOG(LogTemp, Warning, TEXT("[CRS] %d ---- Process Damage, Remain {%d}"), CurrentTickIndex, DamageQueue.Num());
 			EHitEffectType EffectType = static_cast<EHitEffectType>(DamageEntry.HitData.Flags);
 			ApplySingleDamageEffect(
 				DamageEntry.Source.Get(),
@@ -204,7 +207,8 @@ void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActo
 		ParrySpecHandle.Data->SetSetByCallerMagnitude(DamageSourceTag, static_cast<float>(DamageSource));
 		
 		// Apply to Target
-		UE_LOG(LogTemp, Warning, TEXT("[CRS] %d -------------------------------------- Damage Applied, Remain {%d} INDEX: {%d} --  {%d}"), CurrentTickIndex, DamageQueue.Num(), DamageSource, HitEffectType);
+		if (bLogFlow)
+			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d -------------------------------------- Damage Applied, Remain {%d} INDEX: {%d} --  {%d}"), CurrentTickIndex, DamageQueue.Num(), DamageSource, HitEffectType);
 		SourceASC->ApplyGameplayEffectSpecToTarget(*ParrySpecHandle.Data.Get(), TargetASC);
 
 		/*

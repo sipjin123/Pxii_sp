@@ -53,6 +53,7 @@ void UPxiiGA_Fire::RequestProjectileHit(APxiiCharacter* PxiiCharacter, const FVe
 
 void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
 {
+    bool isHeadshot = false;
     bool DrawTraces = true;
     if (!Character) return;
 
@@ -177,19 +178,15 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))
     {
         UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(MainCharacter);
-        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- Pre 1"));
         if (!SelfCombatComp) return;
-        
-        UE_LOG(LogFireProjectile, Warning, TEXT("---------------- Pre 2"));
-        if (MainCharacter->GetIsObstructed())
-        {
-            return;
-        }
+        if (MainCharacter->GetIsObstructed())  return;
         
         UE_LOG(LogFireProjectile, Warning, TEXT("---------------- Process Trace"));
         if (bHit)
         {
-            UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I HIT"));
+            isHeadshot = OutHitResult.BoneName == FName("head");
+            UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(OutHitResult.GetActor()), *OutHitResult.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
+
             if (DrawTraces)
             {
                 // Trace Line towards impact point
