@@ -5,6 +5,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "TimerManager.h"
+#include "Components/PxiiCombatComponent.h"
+#include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTempCharacter);
@@ -94,5 +96,13 @@ APxiiWeaponRange* APxiiCharacter::GetWeaponRanged()
 APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee()
 {
 	return CurrentWeaponMelee;
+}
+
+void APxiiCharacter::ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource)
+{
+	EPxiiYinYangType YinYangType = static_cast<EPxiiYinYangType>(FMath::RoundToInt(DamageSource));
+	UE_LOG(LogTempCharacter, Log, TEXT("Dmg_LOG:: DMG: %f"), Damage);
+	Cast<UPxiiPlayerCombatComponent>(CombatComponent)->GrantYinYang(YinYangType, Damage, false);
+	Super::ProcessDamageData_Implementation(SourceActor, Damage, DamageSource);
 }
 

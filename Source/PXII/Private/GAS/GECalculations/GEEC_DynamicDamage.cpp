@@ -2,7 +2,10 @@
 
 
 #include "GAS/GECalculations/GEEC_DynamicDamage.h"
+
+#include "AbilitySystemComponent.h"
 #include "GAS/PxiiAttributeSet.h"
+#include "Interface/PxiiCombatInterface.h"
 
 DEFINE_LOG_CATEGORY(LogGEECDamage);
 struct CombatStatCapture
@@ -35,6 +38,8 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 {
 	//Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
+	AActor* SourceActor = Cast<AActor>(ExecutionParams.GetSourceAbilitySystemComponent()->GetAvatarActor());
+	
 	// Handle Tags
 	const FGameplayEffectSpec& GESpec = ExecutionParams.GetOwningSpec();
 	const FGameplayTagContainer* SourceTags = GESpec.CapturedSourceTags.GetAggregatedTags();
@@ -53,12 +58,20 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	bool bIsCritical = false;
 	float IncomingDamage = GESpec.GetSetByCallerMagnitude(
 		FGameplayTag::RequestGameplayTag(FName("Combat.Damage")), // Must match GE tag
+		false, 0.0f);
+
+	float DamageSource = GESpec.GetSetByCallerMagnitude(
+		FGameplayTag::RequestGameplayTag(FName("Combat.DamageSource")), // Must match GE tag
 		false,
 		0.0f // Default value if not found
 	);
+	
 	//float IncomingDamage = 5.f;
 	//-------------------------------------------------------------
-
+	if (SourceActor && SourceActor->Implements<UPxiiCombatInterface>())
+	{
+		IPxiiCombatInterface::Execute_ProcessDamageData(SourceActor, SourceActor, IncomingDamage, DamageSource);
+	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));
 	if (bIsCritical)

@@ -91,5 +91,7 @@ public:
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHitTarget TraceTarget;
+public:
 
+	virtual void ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource) override;
 };
