@@ -1,76 +1,29 @@
 ﻿#include "PxiiDynamicAttributeExecution.h"
+#include "AbilitySystemComponent.h"
 #include "Utility/PXIILogUtility.h"
 
 UPxiiDynamicAttributeExecution::UPxiiDynamicAttributeExecution()
 {
-	RelevantAttributesToCapture.Add(
-	FGameplayEffectAttributeCaptureDefinition(
-		BaseValueAttribute,
-		EGameplayEffectAttributeCaptureSource::Target,
-		false));
-
-	RelevantAttributesToCapture.Add(
-		FGameplayEffectAttributeCaptureDefinition(
-			FlatBonusAttribute,
-			EGameplayEffectAttributeCaptureSource::Target,
-			false));
-
-	RelevantAttributesToCapture.Add(
-		FGameplayEffectAttributeCaptureDefinition(
-			ModifierAttribute,
-			EGameplayEffectAttributeCaptureSource::Target,
-			false));
+	
 }
 
-void UPxiiDynamicAttributeExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-                                                            FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+float UPxiiDynamicAttributeExecution::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 	PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG:: GEEC EXECUTION"));
 
-	FGameplayEffectAttributeCaptureDefinition BaseCapture(
-		BaseValueAttribute,
-		EGameplayEffectAttributeCaptureSource::Target,
-		false);
+	UAbilitySystemComponent* SourceASC = Spec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
 
-	FGameplayEffectAttributeCaptureDefinition BonusCapture(
-		FlatBonusAttribute,
-		EGameplayEffectAttributeCaptureSource::Target,
-		false);
-
-	FGameplayEffectAttributeCaptureDefinition ModifierCapture(
-		ModifierAttribute,
-		EGameplayEffectAttributeCaptureSource::Target,
-		false);
-	
 	float BaseValue = 0.0f;
-	float FlatBonusValue = 0.0f;
-	float ModifierBonus = 1.0f;
-	float TestVal = 0.f;
-	FAggregatorEvaluateParameters Params;
-
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(
-		RelevantAttributesToCapture[0],
-		Params,
-		TestVal);
-	PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG:: GEEC TestVal : %f"), TestVal);
+	float Bonus = 0.0f;
+	float Modifier = 1.0f;
 	
-	if(BaseCapture.AttributeToCapture.IsValid())
-	{
-		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(BaseCapture, Params,BaseValue);
-	}
+	BaseValue = SourceASC->GetNumericAttribute(BaseValueAttribute);
+	Bonus = SourceASC->GetNumericAttribute(FlatBonusAttribute);
+	Modifier = SourceASC->GetNumericAttribute(ModifierAttribute);
 
-	if(BonusCapture.AttributeToCapture.IsValid())
-	{
-		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(BonusCapture, Params,FlatBonusValue);
-	}
+	float Result = (BaseValue + Bonus) * Modifier;
 	
-	if(ModifierCapture.AttributeToCapture.IsValid())
-	{
-		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ModifierCapture, Params,ModifierBonus);
-	}
+	PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG:: GEEC Result : %f"), Result);
 
-	float FinalValue = (BaseValue + FlatBonusValue) * ModifierBonus;
-	PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG:: GEEC FinalValue : %f"), FinalValue);
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(OutputAttribute, EGameplayModOp::Override, FinalValue));
+	return Result;
 }

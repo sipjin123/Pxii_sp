@@ -17,6 +17,8 @@ class PXII_API UPxiiMathBPLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static FVector GetLocationInFrontOfActor(const AActor* Actor, float Distance);
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static FVector GetLocationTopOfActor(const AActor* Actor, float Distance);
 
 	UFUNCTION(BlueprintPure, Category="PXII|Math", meta=(WorldContext="WorldContextObject"))
 	static TArray<FVector> GenerateArcPath(const UObject* WorldContextObject, const FVector& Start, const FVector& End,

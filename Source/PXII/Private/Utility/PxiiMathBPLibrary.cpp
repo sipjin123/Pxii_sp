@@ -12,6 +12,12 @@ FVector UPxiiMathBPLibrary::GetLocationInFrontOfActor(const AActor* Actor, float
 	return Actor->GetActorLocation() + Actor->GetActorForwardVector() * Distance;
 }
 
+FVector UPxiiMathBPLibrary::GetLocationTopOfActor(const AActor* Actor, float Distance)
+{
+	if (!Actor) return FVector::ZeroVector;
+	return Actor->GetActorLocation() + Actor->GetActorUpVector() * Distance;
+}
+
 TArray<FVector> UPxiiMathBPLibrary::GenerateArcPath(const UObject* WorldContextObject, const FVector& Start, const FVector& End, float Height,
 	int32 NodeCount, bool bDrawDebug, float DebugDuration, float drawRadius)
 {

@@ -1,9 +1,10 @@
 ﻿#pragma once
+#include "GameplayModMagnitudeCalculation.h"
 #include "GameplayEffectExecutionCalculation.h"
 #include "PxiiDynamicAttributeExecution.generated.h"
 
 UCLASS()
-class PXII_API UPxiiDynamicAttributeExecution : public UGameplayEffectExecutionCalculation
+class PXII_API UPxiiDynamicAttributeExecution : public UGameplayModMagnitudeCalculation
 {
 	GENERATED_BODY()
 
@@ -23,7 +24,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Calculation")
 	FGameplayAttribute OutputAttribute;
 
-	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
+	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 
 };
