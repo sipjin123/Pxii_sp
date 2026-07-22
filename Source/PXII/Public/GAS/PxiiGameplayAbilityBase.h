@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "MoverComponent.h"
 #include "PxiiGameplayAbilityBase.generated.h"
 
 /**
@@ -14,4 +15,9 @@ class PXII_API UPxiiGameplayAbilityBase : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
+protected:
+	UPxiiGameplayAbilityBase(const FObjectInitializer& ObjectInitializer);
+
+	UFUNCTION(BlueprintPure)
+	UMoverComponent* GetMoverComponent();
 };
