@@ -13,7 +13,8 @@
 				"GameplayAbilities",
 				"GameplayTags",
 				"GameplayTasks",
-				"CoreUObject"
+				"CoreUObject",
+				"AIModule"
 			]
 		}
 	],

@@ -32,6 +32,9 @@ UPxiiAttributeSet::UPxiiAttributeSet()
 	MaxStaggerMeter.SetBaseValue(100.0f);
 	Shield.SetBaseValue(0.0f);
 	MaxShield.SetBaseValue(100.0f);
+	
+	Defense.SetBaseValue(10.0f);
+	AttackDamage.SetBaseValue(10.0f);
 }
 
 void UPxiiAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

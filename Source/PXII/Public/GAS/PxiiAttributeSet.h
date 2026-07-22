@@ -78,6 +78,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MaxShield;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxShield);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData Defense;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Defense);
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData AttackDamage;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, AttackDamage);
 	//----------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData Strength;
