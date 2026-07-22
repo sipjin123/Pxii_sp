@@ -176,17 +176,18 @@ bool UPxiiAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inp
 		return false;
 	}
 
+	bool bActivated = false;
 	FScopedAbilityListLock ActiveScopeLoc(*this);
 	for(FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
 		{
 			AbilitySpecInputPressed(AbilitySpec);
-			return TryActivateAbility(AbilitySpec.Handle);
+			bActivated |= TryActivateAbility(AbilitySpec.Handle);
 		}
 	}
 	
-	return false;
+	return bActivated;
 }
 
 void UPxiiAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)

@@ -44,7 +44,8 @@ void UPxiiGA_MeleeAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 
 UPxiiGA_MeleeAttack::UPxiiGA_MeleeAttack(const FObjectInitializer& ObjectInitializer)
 {
-	ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.State.Combat.Melee")));
+	ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Melee")));
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Combat.State.ADS")));
 }
 
 void UPxiiGA_MeleeAttack::OnCompleted()

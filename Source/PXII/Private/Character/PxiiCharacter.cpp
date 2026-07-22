@@ -26,8 +26,12 @@ void APxiiCharacter::BeginPlay()
 void APxiiCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	UE_LOG(LogTempCharacter, Log, TEXT("DZ_LOG:: Possessed By"));
 	GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
+
+	//*DZ_NOTE: Remove this when item equip is implemented must not be granted by default.
+	GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Melee")));
+	GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range")));	
+	//*/
 }
 
 void APxiiCharacter::InitAttributeListener()

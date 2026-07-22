@@ -29,6 +29,11 @@ void APxiiNPC::BeginPlay()
 		UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
 		//CombatComponent->RegisterComponent();
 		AttributeSet = AbilitySystemComponent->GetSet<UPxiiAttributeSet>();
+		if (AbilitySystemComponent)
+		{
+			AbilitySystemComponent->GrantAllAbilities();
+			AbilitySystemComponent->GrantAllPlayerEffects();
+		}
 	}
 	else
 	{

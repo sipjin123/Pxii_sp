@@ -14,6 +14,8 @@
 DEFINE_LOG_CATEGORY(LogFireProjectile);
 UPxiiGA_Fire::UPxiiGA_Fire()
 {
+    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range")));
+    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Combat.State.ADS")));
 }
 
 void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
