@@ -85,6 +85,10 @@ public:
 	TSubclassOf<UGameplayEffect> PerfectDodgeEffect;
 	TSubclassOf<UGameplayEffect> GetPerfectDodgeEffect() const { return PerfectDodgeEffect; }
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGameplayAbility> GA_Stagger;
+	TSubclassOf<UGameplayAbility> GetGAStagger() const { return GA_Stagger; }
+	
 private:
 
 	// Simple FIFO queue

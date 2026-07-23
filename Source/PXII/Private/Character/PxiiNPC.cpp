@@ -4,6 +4,7 @@
 #include "Character/PxiiNPC.h"
 
 #include "Components/PxiiCombatComponent.h"
+#include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 
@@ -33,11 +34,22 @@ void APxiiNPC::BeginPlay()
 		{
 			AbilitySystemComponent->GrantAllAbilities();
 			AbilitySystemComponent->GrantAllPlayerEffects();
+			
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPxiiAttributeSet::GetStaggerMeterAttribute()).AddUObject(this, &ThisClass::OnStaggerMeterChanged);
 		}
 	}
 	else
 	{
 		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing Ability Component!"));
+	}
+}
+
+void APxiiNPC::OnStaggerMeterChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("StaggerMeter: %f -> %f"), Data.OldValue, Data.NewValue);
+	if (Data.NewValue >= 100.f)
+	{
+		OnHitEffectType.Broadcast(EHitEffectType::Stagger, 0);
 	}
 }
 

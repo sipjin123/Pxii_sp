@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "PxiiCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "PxiiNPC.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
 UCLASS()
 class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface
 {
@@ -19,6 +21,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void OnStaggerMeterChanged(const FOnAttributeChangeData& Data);
 
 public:	
 	// Called every frame
@@ -48,6 +51,9 @@ public:
 
 	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
 	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
+
+	UPROPERTY(BlueprintAssignable, Category="Combat")
+	FHitEffectType OnHitEffectType;
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")

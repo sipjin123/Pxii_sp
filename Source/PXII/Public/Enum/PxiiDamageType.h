@@ -52,4 +52,9 @@ enum class EHitEffectType : uint8 {
 	Knockback = 2		UMETA(DisplayName = "Knockback"),
 	Knockdown = 3	UMETA(DisplayName = "Knockdown"),
 	Knockbackdown = 4	UMETA(DisplayName = "Knockbackdown"),
+	Stagger = 5	UMETA(DisplayName = "Stagger"),
+	Stun = 6	UMETA(DisplayName = "Stun"),
+	Slow = 7	UMETA(DisplayName = "Slow"),
+	Freeze = 8	UMETA(DisplayName = "Freeze"),
+	Timestop = 9	UMETA(DisplayName = "Timestop"),
 };
