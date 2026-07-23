@@ -13,5 +13,6 @@ UCLASS(Blueprintable)
 class PXII_API UPxiiGameplayEffectCooldown : public UPxiiGameplayEffectBase
 {
 	GENERATED_BODY()
-	
+
+	UPxiiGameplayEffectCooldown();
 };

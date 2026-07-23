@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Combat/PxiiProjectileBase.h"
 #include "GameplayTagContainer.h"
+#include "Character/PxiiCharacter.h"
 #include "PxiiCombatBPLibrary.generated.h"
 
 /**
@@ -19,4 +20,7 @@ class PXII_API UPxiiCombatBPLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category = "Combat | BP Function Library")
 	static TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag);
+
+	UFUNCTION(BlueprintCallable)
+	static void StartProjectileTrace(APxiiCharacter* character, FName MuzzleSocketName = "Muzzle");
 };

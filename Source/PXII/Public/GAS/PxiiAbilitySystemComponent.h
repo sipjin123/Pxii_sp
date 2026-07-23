@@ -57,6 +57,9 @@ public:
 
 	UFUNCTION()
 	void HandleAbilityEnded(const FAbilityEndedData& EndData);
+
+	UFUNCTION(BlueprintPure)
+	FCooldownInfo GetCooldownRemainingForTag(FGameplayTag CooldownTag);
 	
 protected:
 	UPxiiAbilitySystemComponent();

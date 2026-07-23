@@ -3,6 +3,7 @@
 
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "Data/PxiiAbilityData.h"
+#include "GAS/PxiiGameplayAbilityBase.h"
 #include "Subsystem/PlayerInputSubsystem.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -222,6 +223,25 @@ void UPxiiAbilitySystemComponent::HandleAbilityEnded(const FAbilityEndedData& En
 			AbilityInputTagPressed(queuedTag);
 		}
 	}
+}
+
+FCooldownInfo UPxiiAbilitySystemComponent::GetCooldownRemainingForTag(FGameplayTag CooldownTag)
+{
+	FCooldownInfo cooldown;
+	
+	FGameplayTagContainer Tags;
+	Tags.AddTag(CooldownTag);
+
+	TArray<TPair<float, float>> Times = GetActiveEffectsTimeRemainingAndDuration(FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(Tags));
+
+	if(!Times.IsEmpty())
+	{
+		TPair<float, float> cooldownVal = Times[0];
+		cooldown.RemainingTime = cooldownVal.Key;
+		cooldown.TotalDuration = cooldownVal.Value;
+	}
+
+	return cooldown;
 }
 
 

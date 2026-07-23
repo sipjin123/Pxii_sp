@@ -30,7 +30,6 @@ void APxiiCharacter::PossessedBy(AController* NewController)
 
 	//*DZ_NOTE: Remove this when item equip is implemented must not be granted by default.
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Melee")));
-	GetAbilitySystemComponent()->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range")));	
 	//*/
 }
 

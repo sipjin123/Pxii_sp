@@ -3,3 +3,11 @@
 
 #include "GAS/PxiiGameplayEffectCooldown.h"
 
+UPxiiGameplayEffectCooldown::UPxiiGameplayEffectCooldown()
+{
+	DurationPolicy = EGameplayEffectDurationType::HasDuration;
+
+	FSetByCallerFloat SetByCaller;
+	SetByCaller.DataTag = FGameplayTag::RequestGameplayTag(TEXT("Magnitude.Data.Cooldown"));
+	DurationMagnitude =	SetByCaller;
+}

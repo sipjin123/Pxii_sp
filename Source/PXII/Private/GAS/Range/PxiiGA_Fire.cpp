@@ -1,20 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/Range/PxiiGA_Fire.h"
-
 #include "AbilitySystemComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Utility/PxiiCombatBPLibrary.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogFireProjectile);
 UPxiiGA_Fire::UPxiiGA_Fire()
 {
-    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range")));
+    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range.HoldToShoot")));
     ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Combat.State.ADS")));
 }
 
@@ -43,7 +42,7 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		}
 
-		FireProjectile(SelfCharacter);
+		UPxiiCombatBPLibrary::StartProjectileTrace(SelfCharacter);
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }
