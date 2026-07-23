@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "Interface/PxiiCombatInterface.h"
+#include "Subsystem/WorldSpawnerSubsystem.h"
 
 DEFINE_LOG_CATEGORY(LogGEECDamage);
 struct CombatStatCapture
@@ -39,6 +40,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	//Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
 	AActor* SourceActor = Cast<AActor>(ExecutionParams.GetSourceAbilitySystemComponent()->GetAvatarActor());
+	AActor* TargetActor = Cast<AActor>(ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor());
 	
 	// Handle Tags
 	const FGameplayEffectSpec& GESpec = ExecutionParams.GetOwningSpec();
@@ -74,6 +76,20 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));
+
+	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
+
+	if (TargetASC)
+	{
+		if (UWorld* World = TargetASC->GetWorld())
+		{
+			if (UWorldSpawnerSubsystem* Spawner = World->GetSubsystem<UWorldSpawnerSubsystem>())
+			{
+				FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+				Spawner->OnSpawnDamageText.Broadcast(spawnLoc, IncomingDamage, bIsCritical);
+			}
+		}
+	}
 	if (bIsCritical)
 	{
 		//ExecutionParams.GetOwningSpecForPreExecuteMod()->DynamicGrantedTags.AddTag(TAG_Damage_Crit);
