@@ -13,7 +13,7 @@
 DEFINE_LOG_CATEGORY(LogFireProjectile);
 UPxiiGA_Fire::UPxiiGA_Fire()
 {
-    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range.HoldToShoot")));
+    ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Weapon.Type.Range.OneShot")));
     ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.Combat.State.ADS")));
 }
 

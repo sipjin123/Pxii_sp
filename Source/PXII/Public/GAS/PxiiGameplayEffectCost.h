@@ -13,5 +13,8 @@ UCLASS(Blueprintable)
 class PXII_API UPxiiGameplayEffectCost : public UPxiiGameplayEffectBase
 {
 	GENERATED_BODY()
+
+public:
 	
+	UPxiiGameplayEffectCost();
 };

@@ -6,9 +6,9 @@
 UPxiiAttributeSet::UPxiiAttributeSet()
 {
 	Health.SetBaseValue(100.0f);
-	Health.SetCurrentValue(100.0f);
+	Stamina.SetCurrentValue(100.0f);
 	MaxHealth.SetBaseValue(100.0f);
-	MaxHealth.SetCurrentValue(100.0f);
+	MaxStamina.SetCurrentValue(100.0f);
 	Mana.SetBaseValue(100.0f);
 	MaxMana.SetCurrentValue(100.0f);
 	Ammo.SetBaseValue(30.0f);

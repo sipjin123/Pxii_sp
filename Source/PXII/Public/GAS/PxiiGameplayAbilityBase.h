@@ -8,6 +8,52 @@
 #include "PxiiGameplayAbilityBase.generated.h"
 
 USTRUCT(BlueprintType)
+struct FCostData
+{
+	GENERATED_BODY()
+	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Value;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool IsPercentage;
+};
+
+USTRUCT(BlueprintType)
+struct PXII_API FAbilityCost
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FCostData Health;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FCostData Mana;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FCostData Stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FCostData Yin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FCostData Yang;
+
+	bool HasAnyCost() const
+	{
+		return Health.Value > 0 ||
+			Mana.Value > 0 ||
+			Stamina.Value > 0 ||
+			Yin.Value > 0 ||
+			Yang.Value > 0;
+	}
+};
+
+USTRUCT(BlueprintType)
 struct PXII_API FCooldownInfo
 {
 	GENERATED_BODY()
@@ -32,6 +78,9 @@ protected:
 	UPxiiGameplayAbilityBase(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
+	FAbilityCost AbilityCost;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
 	FGameplayTag CooldownTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
@@ -44,7 +93,16 @@ protected:
 
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 
-private:
+	FAbilityCost CalculateCost() const;
+	
+	virtual bool CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayTagContainer* OptionalRelevantTags) const override;
 
+	virtual bool CheckCostData(const FCostData& CostData, float currentValue, FString attrib) const;
+
+	virtual void ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
+
+	float GetFinalCost(const FCostData& costData, float currentValue) const;
+
+private:
 	mutable FGameplayTagContainer TempCooldownTags;
 };

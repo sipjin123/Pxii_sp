@@ -40,6 +40,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxMana);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData Stamina;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, Stamina);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData MaxStamina;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxStamina);
 	
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData Ammo;
