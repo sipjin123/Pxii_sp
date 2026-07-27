@@ -17,6 +17,11 @@ void APxiiHUDBase::BeginPlay()
 
 	StackLayout = CreateWidget<UPxiiWidgetStackBase>(GetOwningPlayerController(), StackLayoutClass);
 
+	if(!UISubsystem)
+	{
+		return;
+	}
+	
 	if(StackLayout)
 	{
 		StackLayout->AddToViewport();
