@@ -9,6 +9,7 @@
 #include "PxiiNPC.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttackState, bool, IsEnabled, int32, Payload);
 UCLASS()
 class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface
 {
@@ -51,9 +52,14 @@ public:
 
 	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
 	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
+	virtual void EnableAttackState_Implementation() override;
+	virtual void DisableAttackState_Implementation() override;
 
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FHitEffectType OnHitEffectType;
+	
+	UPROPERTY(BlueprintAssignable, Category="Combat")
+	FAttackState OnAttackState;
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")

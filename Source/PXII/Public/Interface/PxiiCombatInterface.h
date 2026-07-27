@@ -66,4 +66,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void ProcessDamageData(AActor* SourceActor, float Damage, float DamageSource);
+
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void EnableAttackState();
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void DisableAttackState();
 };

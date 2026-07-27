@@ -81,3 +81,15 @@ const UPxiiAttributeSet* APxiiNPC::GetAttributeSet_Implementation() const
 {
 	return AttributeSet;
 }
+
+void APxiiNPC::EnableAttackState_Implementation()
+{
+	IsAttacking = true;
+	OnAttackState.Broadcast(true, 0);
+}
+
+void APxiiNPC::DisableAttackState_Implementation()
+{
+	IsAttacking = false;
+	OnAttackState.Broadcast(false, 0);
+}
