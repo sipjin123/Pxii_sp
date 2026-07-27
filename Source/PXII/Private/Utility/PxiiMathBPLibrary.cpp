@@ -4,7 +4,9 @@
 #include "Utility/PxiiMathBPLibrary.h"
 
 #include "DrawDebugHelpers.h"
+#include "NavigationSystem.h"
 #include "Engine/Engine.h"
+#include "NavFilters/NavigationQueryFilter.h"
 
 FVector UPxiiMathBPLibrary::GetLocationInFrontOfActor(const AActor* Actor, float Distance)
 {
@@ -53,4 +55,64 @@ TArray<FVector> UPxiiMathBPLibrary::GenerateArcPath(const UObject* WorldContextO
 	}
 
 	return Points;
+}
+
+FVector UPxiiMathBPLibrary::GetOffsetPositionTowardOrigin(const FVector& Origin, const FVector& Target, float Distance)
+{
+	FVector Direction = (Origin - Target).GetSafeNormal();
+	return Target + (Direction * Distance);
+}
+
+bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObject, const FVector& Origin,
+	float InnerRadius, float OuterRadius, TSubclassOf<UNavigationQueryFilter> FilterClass, FVector& OutLocation,
+	int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug)
+{
+	if (!WorldContextObject) return false;
+
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) return false;
+
+	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
+	if (!NavSys) return false;
+
+	ANavigationData* NavData = NavSys->GetDefaultNavDataInstance();
+	if (!NavData) return false;
+
+	FSharedConstNavQueryFilter NavFilter = UNavigationQueryFilter::GetQueryFilter(*NavData, FilterClass);
+
+	if (bDrawDebug)
+	{
+		DrawDebugSphere(World, Origin, InnerRadius, 32, FColor::Red, false, 5.f, 0, 2.f);
+		DrawDebugSphere(World, Origin, OuterRadius, 32, FColor::Green, false, 5.f, 0, 2.f);
+	}
+	Attempts = 0;
+	for (int32 i = 0; i < MaxAttempts; ++i)
+	{
+		Attempts++;
+		FNavLocation RandomPoint;
+
+		const bool bFoundPoint = bRequireReachable
+			? NavSys->GetRandomReachablePointInRadius(Origin, OuterRadius, RandomPoint, NavData, NavFilter)
+			: NavSys->GetRandomPointInNavigableRadius(Origin, OuterRadius, RandomPoint, NavData, NavFilter);
+
+		
+		if (bFoundPoint)
+		{
+			float DistSq = FVector::DistSquared2D(Origin, RandomPoint.Location);
+
+			if (DistSq >= InnerRadius * InnerRadius)
+			{
+				OutLocation = RandomPoint.Location;
+
+				if (bDrawDebug)
+				{
+					DrawDebugPoint(World, OutLocation, 16.f, FColor::Yellow, false, 5.f);
+				}
+
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
