@@ -198,6 +198,7 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 
 void UPxiiCombatComponent::FinalizeHitTraceLogic()
 {
+	UE_LOG(LogTemp, Log, TEXT("FINALIZE HIT TRACE Actor: %s"), *GetOwner()->GetName());
 	//if (LogSlashLogic)
 	//	UE_LOG(LogTemp, Warning, TEXT("%s Slash Trace: Finalize Index:%d"), *UPXIINetworkBPLibrary::GetNetworkType(this), TraceIndex);
 	/*

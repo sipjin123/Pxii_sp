@@ -65,6 +65,17 @@ void APxiiNPC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsAttacking)
+	{
+		FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("palm_r_Socket"));
+		GetWorld()->GetTimerManager().SetTimerForNextTick([this, SocketLocation]()
+		{
+			//Multicast_SpawnSimulatedHit(SocketLocation);
+
+			// Sends over a broadcast to process logic on the blueprint
+			TraceTarget.Broadcast(SocketLocation);
+		});
+	}
 }
 
 UAbilitySystemComponent* APxiiNPC::GetAbilitySystemComponent() const

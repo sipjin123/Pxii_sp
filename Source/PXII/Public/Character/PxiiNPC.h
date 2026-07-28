@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "PxiiCharacter.h"
 #include "PxiiCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "PxiiNPC.generated.h"
@@ -60,6 +61,10 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FAttackState OnAttackState;
+	
+	/** Signals that a projectile hits a target **/
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FHitTarget TraceTarget;
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
