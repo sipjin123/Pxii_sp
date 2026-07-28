@@ -198,7 +198,6 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 
 void UPxiiCombatComponent::FinalizeHitTraceLogic()
 {
-	UE_LOG(LogTemp, Log, TEXT("FINALIZE HIT TRACE Actor: %s"), *GetOwner()->GetName());
 	//if (LogSlashLogic)
 	//	UE_LOG(LogTemp, Warning, TEXT("%s Slash Trace: Finalize Index:%d"), *UPXIINetworkBPLibrary::GetNetworkType(this), TraceIndex);
 	/*
@@ -232,20 +231,28 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 			continue;
 		}
 
+		/*
 		if (Cast<APxiiCharacter>(OutHitParam.GetActor()))
 		{
 			DrawDebugSphere(GetWorld(), OutHitParam.ImpactPoint, 100.f, // Radius
 				12, FColor::Emerald, false, // Segments (visual quality) // Color // bPersistentLines
 				10.f,0, 1.f // LifeTime // DepthPriority // Thickness
 			);
-		}
+		}*/
 		
 		const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass());
-		if (ImplementsCombatInterface && !HitTracedActors.Contains(CurrHitActor))
+		if (!ImplementsCombatInterface)
 		{
+			UE_LOG(LogTemp, Log, TEXT("No Interface for Combat! %s"), *CurrHitActor->GetName());
+			return;
+		}
+		
+		if (!HitTracedActors.Contains(CurrHitActor))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Trace Check Trace Success! %s"), *CurrHitActor->GetName());
 			//const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
 			const bool IsBossUnit = false;
-			const ACharacter* CharRef = Cast<ACharacter>(CurrHitActor);
+			const APawn* CharRef = Cast<APawn>(CurrHitActor);
 			if (IsBossUnit)
 			{
 				// Process Body Part
@@ -264,6 +271,12 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 					// Process Body Part
 				}
 			}
+		}
+		else
+		{
+			int32 newval = HitTracedActors.Contains(CurrHitActor) ? 0 : 1;
+			int32 newval2 = ImplementsCombatInterface;
+			UE_LOG(LogTemp, Log, TEXT("Loop Trace FAIL: %s %d %d"), *CurrHitActor->GetName(), newval, newval2);
 		}
 	}
 }
