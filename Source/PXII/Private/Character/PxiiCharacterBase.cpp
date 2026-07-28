@@ -95,3 +95,13 @@ const UPxiiAttributeSet* APxiiCharacterBase::GetAttributeSet_Implementation() co
 {
 	return AttributeSet;
 }
+
+void APxiiCharacterBase::EnableAttackState_Implementation()
+{
+	IsAttacking = true;
+}
+
+void APxiiCharacterBase::DisableAttackState_Implementation()
+{
+	IsAttacking = false;
+}

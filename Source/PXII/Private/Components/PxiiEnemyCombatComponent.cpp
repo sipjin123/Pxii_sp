@@ -3,3 +3,7 @@
 
 #include "Components/PxiiEnemyCombatComponent.h"
 
+
+UPxiiEnemyCombatComponent::UPxiiEnemyCombatComponent()
+{
+}

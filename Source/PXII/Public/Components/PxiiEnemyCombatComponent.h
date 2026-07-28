@@ -14,5 +14,7 @@ UCLASS(Blueprintable, BlueprintType, ClassGroup=(Combat), meta=(BlueprintSpawnab
 class PXII_API UPxiiEnemyCombatComponent : public UPxiiCombatComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPxiiEnemyCombatComponent();
 };
