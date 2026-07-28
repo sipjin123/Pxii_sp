@@ -55,7 +55,11 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-	if (IsMovementBlocked) return;
+	if (IsMovementBlocked)
+	{
+		CachedMovementInput = FVector2D::ZeroVector;
+		return;
+	}
 	APawn* TargetPawn = GetPawn().Get();
 
 	if (!TargetPawn)
