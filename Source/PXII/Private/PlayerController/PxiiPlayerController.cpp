@@ -55,6 +55,7 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (IsMovementBlocked) return;
 	APawn* TargetPawn = GetPawn().Get();
 
 	if (!TargetPawn)
@@ -101,6 +102,7 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
 {
+	if (IsAimBlocked) return;
 	APawn* TargetPawn = GetPawn().Get();
 	if (!TargetPawn)
 	{

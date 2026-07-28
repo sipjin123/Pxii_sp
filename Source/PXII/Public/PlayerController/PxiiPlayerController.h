@@ -33,6 +33,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	FVector2D GetCachedLookInput() const;
 	
+	UPROPERTY(BlueprintReadWrite)
+	bool IsMovementBlocked;
+	UPROPERTY(BlueprintReadWrite)
+	bool IsAimBlocked;
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
