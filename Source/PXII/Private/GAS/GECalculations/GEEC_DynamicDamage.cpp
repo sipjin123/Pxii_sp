@@ -4,6 +4,7 @@
 #include "GAS/GECalculations/GEEC_DynamicDamage.h"
 
 #include "AbilitySystemComponent.h"
+#include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "Interface/PxiiCombatInterface.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
@@ -67,12 +68,46 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		false,
 		0.0f // Default value if not found
 	);
+
+	bool BlockDamageProcessing = false;
+	static const FGameplayTag BlockingTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.Blocking"));
+	static const FGameplayTag PerfectDodgeTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.PerfectDodgeWindow"));
+	static const FGameplayTag ParryTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.ParryWindow"));
+
+	const bool bIsTargetBlocking = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(BlockingTag);
+	const bool bIsTargetParry = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(ParryTag);
+	const bool bIsTargetDodge = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(PerfectDodgeTag);
 	
-	//float IncomingDamage = 5.f;
+
+	UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
+
+	if (bIsTargetBlocking)
+		IncomingDamage *= .5f;
+	if (bIsTargetParry)
+	{
+		BlockDamageProcessing = true;
+		IncomingDamage = 0;
+	}
+	if (bIsTargetDodge)
+	{
+		BlockDamageProcessing = true;
+		IncomingDamage = 0;
+	}
+	
 	//-------------------------------------------------------------
 	if (SourceActor && SourceActor->Implements<UPxiiCombatInterface>())
 	{
 		IPxiiCombatInterface::Execute_ProcessDamageData(SourceActor, SourceActor, IncomingDamage, DamageSource);
+		
+		if (bIsTargetParry)
+		IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::Parry, 0);
+
+		if (bIsTargetDodge)
+			IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::PerfectDodge, 0);
+		if (BlockDamageProcessing)
+		{
+			return;
+		}
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));
@@ -85,7 +120,6 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		{
 			if (UWorldSpawnerSubsystem* Spawner = World->GetSubsystem<UWorldSpawnerSubsystem>())
 			{
-				
 				UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
 				FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 				Spawner->OnSpawnDamageText.Broadcast(spawnLoc, IncomingDamage, bIsCritical);

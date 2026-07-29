@@ -44,7 +44,6 @@ enum class EDamageSource:uint8
 	Magic=3 UMETA(DisplayName="Magic"),
 };
 
-
 UENUM(BlueprintType)
 enum class EHitEffectType : uint8 {
 	Default = 0			UMETA(DisplayName = "Default"),
@@ -57,4 +56,15 @@ enum class EHitEffectType : uint8 {
 	Slow = 7	UMETA(DisplayName = "Slow"),
 	Freeze = 8	UMETA(DisplayName = "Freeze"),
 	Timestop = 9	UMETA(DisplayName = "Timestop"),
+};
+
+UENUM(BlueprintType)
+enum class ESpecialAction:uint8
+{
+	None=0 UMETA(DisplayName="None"),
+
+	// Physical
+	Parry=1 UMETA(DisplayName="Parry"),
+	PerfectDodge=2 UMETA(DisplayName="PerfectDodge"),
+	Magic=3 UMETA(DisplayName="Magic"),
 };

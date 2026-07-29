@@ -276,7 +276,7 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 		{
 			int32 newval = HitTracedActors.Contains(CurrHitActor) ? 0 : 1;
 			int32 newval2 = ImplementsCombatInterface;
-			UE_LOG(LogTemp, Log, TEXT("Loop Trace FAIL: %s %d %d"), *CurrHitActor->GetName(), newval, newval2);
+			//UE_LOG(LogTemp, Log, TEXT("Loop Trace FAIL: %s %d %d"), *CurrHitActor->GetName(), newval, newval2);
 		}
 	}
 }

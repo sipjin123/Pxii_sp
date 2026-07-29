@@ -13,16 +13,20 @@ void UPxiiGameplayAbilityHold::ActivateAbility(const FGameplayAbilitySpecHandle 
 void UPxiiGameplayAbilityHold::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: HOLD END!"));
-
+	if (LogData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: HOLD END!"));
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UPxiiGameplayAbilityHold::OnHoldReleased_Implementation(float TimeHeld)
 {
 	HoldTimeFinal = TimeHeld;
-	UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: HOLD END Time: %f !"), TimeHeld);
+	if (LogData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: HOLD END Time: %f !"), TimeHeld);
+	}
 }
 
 void UPxiiGameplayAbilityHold::InputReleased(const FGameplayAbilitySpecHandle Handle,

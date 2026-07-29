@@ -71,4 +71,7 @@ public:
 	void EnableAttackState();
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void DisableAttackState();
+
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void TriggerSpecialAction(ESpecialAction SpecialAction, int32 Magnitude);
 };
