@@ -33,41 +33,6 @@ void APxiiCharacter::PossessedBy(AController* NewController)
 	//*/
 }
 
-void APxiiCharacter::InitAttributeListener()
-{
-	if (AbilitySystemComponent)
-	{
-		for(FGameplayAttribute attrib : Attributes)
-		{
-			GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(attrib).AddLambda(
-			[this, attrib](const FOnAttributeChangeData& Data)
-			{
-				OnAttributeChanged(attrib, Data);
-			});
-		}
-
-	}
-}
-
-void APxiiCharacter::OnAttributeChanged(FGameplayAttribute Attribute, const FOnAttributeChangeData& Data)
-{
-	if(Attribute ==  UPxiiAttributeSet::GetMaxHealthAttribute())
-	{
-		OnMaxHealthUpdated.Broadcast(Data.NewValue);
-	}
-	else if(Attribute == UPxiiAttributeSet::GetMaxAmmoAttribute())
-	{
-		OnMaxAmmoUpdated.Broadcast(Data.NewValue);
-	}
-	else if(Attribute == UPxiiAttributeSet::GetMaxManaAttribute())
-	{
-		OnMaxManaUpdated.Broadcast(Data.NewValue);
-	}
-	else if(Attribute == UPxiiAttributeSet::GetMovementSpeedAttribute())
-	{
-		OnMovementSpeedUpdated.Broadcast(Data.NewValue);
-	}
-}
 
 USkeletalMeshComponent* APxiiCharacter::GetMesh()
 {

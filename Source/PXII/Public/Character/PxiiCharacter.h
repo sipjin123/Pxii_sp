@@ -13,7 +13,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitTarget, FVector, Location);
 DECLARE_LOG_CATEGORY_EXTERN(LogTempCharacter, Log, All);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPxiiOnAttributeChange, float, NewValue);
+
 /**
  * 
  */
@@ -21,20 +21,6 @@ UCLASS()
 class PXII_API APxiiCharacter : public APxiiCharacterBase
 {
 	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(BlueprintAssignable)
-	FPxiiOnAttributeChange OnMovementSpeedUpdated;
-
-	UPROPERTY(BlueprintAssignable)
-	FPxiiOnAttributeChange OnMaxHealthUpdated;
-
-	UPROPERTY(BlueprintAssignable)
-	FPxiiOnAttributeChange OnMaxAmmoUpdated;
-
-	UPROPERTY(BlueprintAssignable)
-	FPxiiOnAttributeChange OnMaxManaUpdated;
 
 protected:
 
@@ -58,9 +44,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsObstructed;
-
-	void InitAttributeListener();
-	void OnAttributeChanged(FGameplayAttribute Attribute, const FOnAttributeChangeData& Data);
 
 public:
 	UFUNCTION(BlueprintCallable)
