@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "UObject/Object.h"
+#include "Structs/PxiiCombatPayloads.h"
 #include "PxiiCombatInterface.generated.h"
 
 /**
@@ -74,4 +75,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void TriggerSpecialAction(ESpecialAction SpecialAction, int32 Magnitude);
+
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void NotifyHitTarget(AActor* Target, FDamageNotifPayload Payload);
 };

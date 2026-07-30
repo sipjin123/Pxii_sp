@@ -63,7 +63,7 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 
 		//CurrentPlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 		//CurrentPlayerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
-		CurrentPlayerCharacter->bUseControllerRotationYaw = true;
+		//CurrentPlayerCharacter->bUseControllerRotationYaw = true;
 
 		// TODO[DHENZ]: Trigger Reticle Logic Here
 		APxiiHUDBase* PXIIHUD = Cast<APxiiHUDBase>(GetWorld()->GetFirstPlayerController()->GetHUD());

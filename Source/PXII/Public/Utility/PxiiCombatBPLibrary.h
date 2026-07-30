@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIController.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Combat/PxiiProjectileBase.h"
 #include "GameplayTagContainer.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "PxiiCombatBPLibrary.generated.h"
 
@@ -23,4 +25,27 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void StartProjectileTrace(APxiiCharacter* character, FName MuzzleSocketName = "Muzzle");
+	
+	UFUNCTION(BlueprintCallable)
+	static void PauseAI(AAIController* AICon, const FString& Reason = "Paused")
+	{
+		if (AICon && AICon->BrainComponent)
+		{
+			if (auto* BTComp = Cast<UBehaviorTreeComponent>(AICon->BrainComponent))
+			{
+				BTComp->PauseLogic(FString::Printf(TEXT("%s"), *Reason));
+			}
+		}
+	}
+	UFUNCTION(BlueprintCallable)
+	static void ResumeAI(AAIController* AICon, const FString& Reason = "Resumed")
+	{
+		if (AICon && AICon->BrainComponent)
+		{
+			if (auto* BTComp = Cast<UBehaviorTreeComponent>(AICon->BrainComponent))
+			{
+				BTComp->ResumeLogic(FString::Printf(TEXT("%s"), *Reason));
+			}
+		}
+	}
 };
