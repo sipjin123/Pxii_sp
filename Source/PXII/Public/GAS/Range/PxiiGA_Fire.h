@@ -38,4 +38,6 @@ public:
 	UPROPERTY()
 	APxiiCharacter* SelfCharacter;
 public:
+	UPROPERTY(EditAnywhere)
+	float DrawDuration = 1.f;
 };

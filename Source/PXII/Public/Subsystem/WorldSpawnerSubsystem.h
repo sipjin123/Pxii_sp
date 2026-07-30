@@ -10,6 +10,7 @@
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSpawnDamageText, FVector, Location, int32, Magnitude, bool, bCritical);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSpawnMessageText, FVector, Location, FText, Message, FColor, Color);
 UCLASS(Abstract, Blueprintable)
 class PXII_API UWorldSpawnerSubsystem : public UWorldSubsystem
 {
@@ -21,4 +22,6 @@ protected:
 public:
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnSpawnDamageText OnSpawnDamageText;
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FOnSpawnMessageText OnSpawnMessageText;
 };

@@ -7,6 +7,7 @@
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Subsystem/WorldSpawnerSubsystem.h"
 #include "Utility/PxiiCombatBPLibrary.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
 
@@ -97,7 +98,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     {
         UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
             CameraLocation, CameraTraceEnd,
-            FLinearColor::Blue, 1.f, 3.f   // Duration
+            FLinearColor::Blue, 1.f, DrawDuration   // Duration
         );
     }
     
@@ -125,7 +126,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
 
     UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
         TraceStart, TraceEnd,
-        FLinearColor::Gray, 2.f, 3.f);
+        FLinearColor::Gray, 2.f, DrawDuration);
 
     MuzzleStartLocation = TraceStart;
     EndLocation = TraceEnd;
@@ -147,7 +148,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         if (DrawTraces)
         {
             UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, MuzzleStartLocation, 
-                   3.f, FColor::Blue, 3.f);
+                   3.f, FColor::Blue, DrawDuration);
         }
     }
     //--------------------------------------------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
     );
 
     //--------------------------------------------------------------------------------------------------------------------
-    UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Should Fire Here"));
+    UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Should Fire Here Process X1"));
     // TODO: Burlin
     // ---- Server authority logic ----
     if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))
@@ -186,19 +187,31 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
         if (bHit)
         {
             isHeadshot = OutHitResult.BoneName == FName("head");
-            UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(OutHitResult.GetActor()), *OutHitResult.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
+            UE_LOG(LogTemp, Warning, TEXT("- Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(OutHitResult.GetActor()), *OutHitResult.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
+
+            if (UWorldSpawnerSubsystem* Spawner = MainCharacter->GetWorld()->GetSubsystem<UWorldSpawnerSubsystem>())
+            {
+                FVector spawnLoc = OutHitResult.GetActor()->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+                FText NewText = FText::FromString(TEXT("HeadShot!"));
+                UE_LOG(LogFireProjectile, Warning, TEXT("---------------- HEAD SHOT Trace"));
+                Spawner->OnSpawnMessageText.Broadcast(spawnLoc, NewText, FColor::Red);
+            }
+            else
+            {
+                UE_LOG(LogFireProjectile, Warning, TEXT("---------------- HEAD SHOT FAIL"));
+            }
 
             if (DrawTraces)
             {
                 // Trace Line towards impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
                     MuzzleStartLocation, OutHitResult.ImpactPoint,
-                    FLinearColor::Green, 1.f, 3.f);
+                    FLinearColor::Green, 1.f, DrawDuration);
 
                 // Trace impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
                        OutHitResult.ImpactPoint, 
-                       7.f, FColor::Cyan, 3.f);
+                       7.f, FColor::Cyan, DrawDuration);
             }
             if (!bUseSphereTrace)
             {
@@ -243,12 +256,12 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                 // Trace Line towards impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(this,
                     MuzzleStartLocation, EndLocation,
-                    FLinearColor::Red, 1.f, 3.f);
+                    FLinearColor::Red, 1.f, DrawDuration);
 
                 // Trace impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this,
                        EndLocation,
-                       7.f, FColor::Cyan, 3.f);
+                       7.f, FColor::Cyan, DrawDuration);
             }
             
             if (bUseSphereTrace)
