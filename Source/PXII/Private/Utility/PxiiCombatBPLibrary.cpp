@@ -7,6 +7,7 @@
 #include "Utility/PXIILogUtility.h"
 #include "Interface/PxiiCombatInterface.h"
 #include "Components/PxiiPlayerCombatComponent.h"
+#include "Subsystem/WorldSpawnerSubsystem.h"
 
 TSoftClassPtr<APxiiProjectileBase> UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag)
 {
@@ -23,6 +24,7 @@ TSoftClassPtr<APxiiProjectileBase> UPxiiCombatBPLibrary::GetSoftProjectileClassB
 
 void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName MuzzleSocketName)
 {
+    float debugDuration = 1.f;
     bool isHeadshot = false;
     bool DrawTraces = true;
     if (!Character)
@@ -75,7 +77,7 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
     {
         UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(World,
             CameraLocation, CameraTraceEnd,
-            FLinearColor::Blue, 1.f, 3.f   // Duration
+            FLinearColor::Blue, 1.f, debugDuration   // Duration
         );
     }
     
@@ -102,7 +104,7 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
 
     UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(World,
         TraceStart, TraceEnd,
-        FLinearColor::Gray, 2.f, 3.f);
+        FLinearColor::Gray, 2.f, debugDuration);
 
     MuzzleStartLocation = TraceStart;
     EndLocation = TraceEnd;
@@ -124,7 +126,7 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
         if (DrawTraces)
         {
             UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(World, MuzzleStartLocation, 
-                   3.f, FColor::Blue, 3.f);
+                   3.f, FColor::Blue, debugDuration);
         }
     }
     //--------------------------------------------------------------------------------------------------------------------
@@ -165,17 +167,27 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
             isHeadshot = OutHitResult.BoneName == FName("head");
             UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(OutHitResult.GetActor()), *OutHitResult.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
 
+            if (isHeadshot)
+            {
+                if (UWorldSpawnerSubsystem* Spawner = MainCharacter->GetWorld()->GetSubsystem<UWorldSpawnerSubsystem>())
+                {
+                    FVector spawnLoc = OutHitResult.GetActor()->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+                    FText NewText = FText::FromString(TEXT("HeadShot!"));
+                    Spawner->OnSpawnMessageText.Broadcast(spawnLoc, NewText, FColor::Red);
+                }
+            }
+            
             if (DrawTraces)
             {
                 // Trace Line towards impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(World,
                     MuzzleStartLocation, OutHitResult.ImpactPoint,
-                    FLinearColor::Green, 1.f, 3.f);
+                    FLinearColor::Green, 1.f, debugDuration);
 
                 // Trace impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(World,
                        OutHitResult.ImpactPoint, 
-                       7.f, FColor::Cyan, 3.f);
+                       7.f, FColor::Cyan, debugDuration);
             }
             if (!bUseSphereTrace)
             {
@@ -220,12 +232,12 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
                 // Trace Line towards impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(World,
                     MuzzleStartLocation, EndLocation,
-                    FLinearColor::Red, 1.f, 3.f);
+                    FLinearColor::Red, 1.f, debugDuration);
 
                 // Trace impact point
                 UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(World,
                        EndLocation,
-                       7.f, FColor::Cyan, 3.f);
+                       7.f, FColor::Cyan, debugDuration);
             }
             
             if (bUseSphereTrace)
