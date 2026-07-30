@@ -79,6 +79,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	const bool bIsTargetDodge = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(PerfectDodgeTag);
 	
 
+	bool isCritical = false;
 	UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
 
 	if (bIsTargetBlocking)
@@ -108,6 +109,12 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		{
 			return;
 		}
+
+		FDamageNotifPayload NewPayload;
+		NewPayload.bIsCritical = isCritical;
+		NewPayload.DamageMagnitude = IncomingDamage;
+		NewPayload.TargetActor = TargetActor;
+		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, NewPayload);
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));

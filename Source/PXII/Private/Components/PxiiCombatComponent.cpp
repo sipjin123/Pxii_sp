@@ -249,7 +249,8 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 		
 		if (!HitTracedActors.Contains(CurrHitActor))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Trace Check Trace Success! %s"), *CurrHitActor->GetName());
+			if(LogSlashLogic)
+				UE_LOG(LogTemp, Log, TEXT("Trace Check Trace Success! %s"), *CurrHitActor->GetName());
 			//const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
 			const bool IsBossUnit = false;
 			const APawn* CharRef = Cast<APawn>(CurrHitActor);
