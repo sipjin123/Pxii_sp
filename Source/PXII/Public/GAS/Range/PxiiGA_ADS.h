@@ -30,6 +30,8 @@ private:
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool LogInfo = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float OffsetVerticalAdjustment = 2;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float OffsetHorizontalAdjustment = 0.f;

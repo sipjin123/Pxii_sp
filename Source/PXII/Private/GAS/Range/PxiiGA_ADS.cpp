@@ -36,11 +36,12 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, OwnerInfo, ActivationInfo, TriggerEventData);
-
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
+	if(LogInfo)
+		UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
 	if (!CommitAbility(Handle, OwnerInfo, ActivationInfo))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
+		if(LogInfo)
+			UE_LOG(LogTemp, Warning, TEXT("Ability has been Activated!"));
 		return;
 	}
 
@@ -57,7 +58,8 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	
 	if (!CurrentPlayerCharacter->GetIsADSEnabled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: GetIsADSEnabled"));
+		if(LogInfo)
+			UE_LOG(LogTemp, Warning, TEXT("DZ_LOG:: GetIsADSEnabled"));
 
 		CurrentPlayerCharacter->SetIsADSEnabled(true);
 
@@ -90,7 +92,8 @@ void UPxiiGA_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been End!"));
+	if(LogInfo)
+		UE_LOG(LogTemp, Warning, TEXT("Ability has been End!"));
 	if (CurrentPlayerCharacter)
 	{
 		CurrentPlayerCharacter->SetIsADSEnabled(false);
@@ -110,6 +113,7 @@ void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 void UPxiiGA_ADS::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ability has been Cancel!"));
+	if(LogInfo)
+		UE_LOG(LogTemp, Warning, TEXT("Ability has been Cancel!"));
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }

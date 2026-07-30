@@ -243,7 +243,7 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 		const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass());
 		if (!ImplementsCombatInterface)
 		{
-			UE_LOG(LogTemp, Log, TEXT("No Interface for Combat! %s"), *CurrHitActor->GetName());
+			//UE_LOG(LogTemp, Log, TEXT("No Interface for Combat! %s"), *CurrHitActor->GetName());
 			return;
 		}
 		

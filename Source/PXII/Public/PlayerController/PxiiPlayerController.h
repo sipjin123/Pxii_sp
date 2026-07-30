@@ -41,6 +41,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D CachedMovementInput;
 	
+	UPROPERTY(BlueprintReadWrite)
+	FVector2D CachedLookInput;
+	
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -54,9 +57,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float  AimYawScale = 0.25f;
 
-	UPROPERTY(BlueprintReadOnly)
-	FVector2D CachedLookInput;
-	
 private:
 
 	UPROPERTY()
