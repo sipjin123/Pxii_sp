@@ -12,6 +12,7 @@ class UMoverComponent;
 class UPxiiAttributeSet;
 class UPxiiAbilitySystemComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAggroUpdated, int32, AggroCount);
 DECLARE_LOG_CATEGORY_EXTERN(LogTempBaseCharacter, Log, All);
 UCLASS()
 class PXII_API APxiiCharacterBase : public APawn, public IAbilitySystemInterface, public IPxiiCombatInterface
@@ -63,4 +64,24 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
 	const class UPxiiAttributeSet* AttributeSet;
+
+public:
+	
+	// Interface overrides
+	virtual void ReleaseAggro_Implementation();
+	virtual void TryAcquireAggro_Implementation(bool& bOutSuccess);
+	virtual bool CanGetAggro_Implementation();
+	virtual int32 GetAvailableAggroSlots();
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int MaxAggroSlots = 2;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int CurrentAggroCount = 0;
+	
+	UFUNCTION()
+	void OnRep_AggroCountChanged() { OnAggroUpdated.Broadcast(CurrentAggroCount); }
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnAggroUpdated OnAggroUpdated;
 };

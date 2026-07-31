@@ -78,4 +78,15 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void NotifyHitTarget(AActor* Target, FDamageNotifPayload Payload);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	void ReleaseAggro();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	void TryAcquireAggro(bool& bOutSuccess);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	bool CanGetAggro();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	bool IsHostileTo(AActor* Other);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	int32 GetAvailableAggroSlots();
 };

@@ -105,3 +105,34 @@ void APxiiCharacterBase::DisableAttackState_Implementation()
 {
 	IsAttacking = false;
 }
+
+void APxiiCharacterBase::ReleaseAggro_Implementation()
+{
+	CurrentAggroCount = FMath::Max(0, CurrentAggroCount - 1);
+}
+
+void APxiiCharacterBase::TryAcquireAggro_Implementation(bool& bOutSuccess)
+{
+	if (CanGetAggro_Implementation())
+	{
+		CurrentAggroCount++;
+		//UE_LOG(LogTemp, Log, TEXT("Aggro acquired. Current count: %d"), CurrentAggroCount);
+		bOutSuccess = true;
+	}
+	else
+	{
+		bOutSuccess = false;
+		//UE_LOG(LogTemp, Log, TEXT("Aggro Failed to get. Current count: %d"), CurrentAggroCount);
+	}
+}
+
+bool APxiiCharacterBase::CanGetAggro_Implementation()
+{
+	return CurrentAggroCount < MaxAggroSlots;
+}
+
+int32 APxiiCharacterBase::GetAvailableAggroSlots()
+{
+	return MaxAggroSlots - CurrentAggroCount;
+}
+
