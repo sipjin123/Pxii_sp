@@ -84,4 +84,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnAggroUpdated OnAggroUpdated;
+
+	UPROPERTY(EditAnywhere)
+	bool LogAggro = true;
 };
