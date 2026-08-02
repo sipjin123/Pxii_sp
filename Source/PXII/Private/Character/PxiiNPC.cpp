@@ -27,7 +27,7 @@ void APxiiNPC::BeginPlay()
 	CombatComponent = FindComponentByClass<UPxiiCombatComponent>();
 	if(CombatComponent)
 	{
-		UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
+		//UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
 		//CombatComponent->RegisterComponent();
 		AttributeSet = AbilitySystemComponent->GetSet<UPxiiAttributeSet>();
 		if (AbilitySystemComponent)

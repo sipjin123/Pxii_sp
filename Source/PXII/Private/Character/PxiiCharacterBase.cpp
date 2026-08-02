@@ -37,7 +37,7 @@ void APxiiCharacterBase::BeginPlay()
 	CombatComponent = FindComponentByClass<UPxiiCombatComponent>();
 	if(CombatComponent)
 	{
-		UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
+		//UE_LOG(LogTempBaseCharacter, Warning, TEXT("Combat Component Registered"));
 		//CombatComponent->RegisterComponent();
 	}
 	else

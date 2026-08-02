@@ -65,7 +65,7 @@ FVector UPxiiMathBPLibrary::GetOffsetPositionTowardOrigin(const FVector& Origin,
 
 bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObject, const FVector& Origin,
 	float InnerRadius, float OuterRadius, TSubclassOf<UNavigationQueryFilter> FilterClass, FVector& OutLocation,
-	int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug)
+	int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug, float Duration)
 {
 	if (!WorldContextObject) return false;
 
@@ -82,8 +82,8 @@ bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObje
 
 	if (bDrawDebug)
 	{
-		DrawDebugSphere(World, Origin, InnerRadius, 32, FColor::Red, false, 5.f, 0, 2.f);
-		DrawDebugSphere(World, Origin, OuterRadius, 32, FColor::Green, false, 5.f, 0, 2.f);
+		DrawDebugSphere(World, Origin, InnerRadius, 32, FColor::Red, false, Duration, 0, 2.f);
+		DrawDebugSphere(World, Origin, OuterRadius, 32, FColor::Green, false, Duration, 0, 2.f);
 	}
 	Attempts = 0;
 	for (int32 i = 0; i < MaxAttempts; ++i)
@@ -106,7 +106,7 @@ bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObje
 
 				if (bDrawDebug)
 				{
-					DrawDebugPoint(World, OutLocation, 16.f, FColor::Yellow, false, 5.f);
+					DrawDebugPoint(World, OutLocation, 16.f, FColor::Yellow, false, Duration);
 				}
 
 				return true;

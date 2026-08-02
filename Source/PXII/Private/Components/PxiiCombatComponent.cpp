@@ -28,7 +28,7 @@ void UPxiiCombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	UE_LOG(LogTemp, Warning, TEXT("CombatComponent Init Cpp"));
+	//UE_LOG(LogTemp, Warning, TEXT("CombatComponent Init Cpp"));
 	
 	CharacterRef = Cast<APawn>(GetOwner());
 	ActorsToIgnore.Add(GetOwner());
@@ -57,7 +57,7 @@ void UPxiiCombatComponent::TriggerProjectileTraceArc(FVector ImpactNormal, FVect
 
 void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation)
 {
-	UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, ImpactLocation, 50.f, FLinearColor::Blue, 3.f);
+	UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, ImpactLocation, 50.f, FLinearColor::Blue, TraceDuration);
 	/*
 	FTransform MuzzleTransform = SMWeapon->GetSocketTransform(MuzzleSocketName);
 	FTransform SocketTransform = MuzzleTransform;
