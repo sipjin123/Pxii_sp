@@ -53,7 +53,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	EvalParams.SourceTags = SourceTags;
 	EvalParams.TargetTags = TargetTags;
 
-	UE_LOG(LogGEECDamage, Warning, TEXT("GEEC Start"));
+	//UE_LOG(LogGEECDamage, Warning, TEXT("GEEC Start"));
 	// Capture relevant attributes
 	float CurrentHealth = 0.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetCombatStatCapture().HealthDef, EvalParams, CurrentHealth);
@@ -80,7 +80,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	
 
 	bool isCritical = false;
-	UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
+	//UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
 
 	if (bIsTargetBlocking)
 		IncomingDamage *= .5f;
@@ -127,7 +127,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		{
 			if (UWorldSpawnerSubsystem* Spawner = World->GetSubsystem<UWorldSpawnerSubsystem>())
 			{
-				UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
+				//UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
 				FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 				Spawner->OnSpawnDamageText.Broadcast(spawnLoc, IncomingDamage, bIsCritical);
 			}
