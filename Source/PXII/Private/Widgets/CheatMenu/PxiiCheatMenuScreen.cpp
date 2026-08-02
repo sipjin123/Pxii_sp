@@ -90,3 +90,17 @@ void UPxiiCheatMenuScreen::OnBackBoundActionTriggered()
 {
 	DeactivateWidget();
 }
+
+void UPxiiCheatMenuScreen::OnTabSelected(FName TabID)
+{
+	TArray<UPxiiListDataObjectBase*> FoundListSourceItems = GetOrCreateDataRegistry()->GetListSourceItemsBySelectedTabID(TabID);
+
+	ListView_CheatList->SetListItems(FoundListSourceItems);
+	ListView_CheatList->RequestRefresh();
+
+	if(ListView_CheatList->GetNumItems() != 0)
+	{
+		ListView_CheatList->NavigateToIndex(0);
+		ListView_CheatList->SetSelectedIndex(0);
+	}
+}

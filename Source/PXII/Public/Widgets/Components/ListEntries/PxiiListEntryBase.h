@@ -6,6 +6,7 @@
 #include "CommonUI/PxiiCommonUserWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
 #include "CommonTextBlock.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectBase.h"
 #include "PxiiListEntryBase.generated.h"
 
 /**
@@ -16,11 +17,16 @@ class PXII_API UPxiiListEntryBase : public UPxiiCommonUserWidget, public IUserOb
 {
 	GENERATED_BODY()
 	
-
 protected:
 	//~ Begin IUserObjectListEntry Interface
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	//~ End IUserObjectListEntry Interface
+
+	// Child class should override this function to handle the initialization. Super is expected.
+	virtual void OnOwningListDataObjectSet(UPxiiListDataObjectBase* InOwningListDataObject);
+
+	// Child class should override this function to update UI values after data object is modified. Super is no need.
+	virtual void OnOwningListDataObjectModified(UPxiiListDataObjectBase* InModifiedListDataObject, EListDataModifyType InModifyType);
 
 private:
 #pragma region Bound Widgets

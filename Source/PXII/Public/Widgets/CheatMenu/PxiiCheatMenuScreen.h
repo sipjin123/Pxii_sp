@@ -17,10 +17,6 @@ UCLASS()
 class PXII_API UPxiiCheatMenuScreen : public UPxiiActivatableWidget
 {
 	GENERATED_BODY()
-	
-public:
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTabSelected(FName TabID);
 
 protected:
 	// ~ Begin UUserWidget Interface
@@ -53,4 +49,7 @@ private:
 	FDataTableRowHandle ResetAction;
 
 	FUIActionBindingHandle ResetActionHandle;
+
+	UFUNCTION()
+	void OnTabSelected(FName TabID);
 };

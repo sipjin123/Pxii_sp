@@ -3,17 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonRotator.h"
-#include "PxiiRotatorBase.generated.h"
+#include "Widgets/Components/ListEntries/PxiiListEntryBase.h"
+#include "PxiiListEntryScalar.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class PXII_API UPxiiRotatorBase : public UCommonRotator
+class PXII_API UPxiiListEntryScalar : public UPxiiListEntryBase
 {
 	GENERATED_BODY()
-	
-public:
-	void SetSelectedOptionByText(const FText& InText);
+
 };

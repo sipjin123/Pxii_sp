@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonListView.h"
+#include "DataAssetListEntryMapping.h"
 #include "PxiiListViewBase.generated.h"
 
 /**
@@ -14,4 +15,18 @@ class PXII_API UPxiiListViewBase : public UCommonListView
 {
 	GENERATED_BODY()
 	
+protected:
+	//~ Begin UCommonListView Interface
+	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable) override;
+	//~ End UCommonListView Interface
+
+private:
+	//~ Begin UWidget Interface
+#if WITH_EDITOR	
+	virtual void ValidateCompiledDefaults(class IWidgetCompilerLog& CompileLog) const override;
+#endif
+	//~ End UWidget Interface
+
+	UPROPERTY(EditAnywhere, Category = "UI | List View")
+	UDataAssetListEntryMapping* ListEntryMapping;
 };

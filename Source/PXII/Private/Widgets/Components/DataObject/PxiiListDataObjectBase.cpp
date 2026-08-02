@@ -11,3 +11,8 @@ void UPxiiListDataObjectBase::OnDataObjectInitialized()
 {
 
 }
+
+void UPxiiListDataObjectBase::NotifyListDataModified(UPxiiListDataObjectBase* InModifiedListData, EListDataModifyType InModifyReason)
+{
+	OnListDataModified.Broadcast(InModifiedListData, InModifyReason);
+}

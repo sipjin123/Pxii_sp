@@ -10,18 +10,26 @@
 	FORCEINLINE DataType Get##PropertyName() const { return PropertyName; }; \
 	FORCEINLINE void Set##PropertyName(DataType In##PropertyName) { PropertyName = In##PropertyName; };
 
+UENUM(BlueprintType)
+enum class EListDataModifyType : uint8
+{
+	DirectlyModified,
+	DependencyModified,
+	ResetToDefault
+};
+
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class PXII_API UPxiiListDataObjectBase : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	//DECLARE_MULTICAST_DELEGATE_TwoParams(FOnListDataModified, UPxiiListDataObjectBase*, EOptionsListDataModifyReason);
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnListDataModified, UPxiiListDataObjectBase*, EListDataModifyType);
 
-	//FOnListDataModified OnListDataModified;
+	FOnListDataModified OnListDataModified;
 
 	LIST_DATA_ACCESSOR(FName, DataID)
 	LIST_DATA_ACCESSOR(FText, DataDisplayName)
@@ -40,7 +48,7 @@ protected:
 	//Empty in base class. The child classes should override this function to implement their own initialization logic.
 	virtual void OnDataObjectInitialized();
 
-	//virtual void NotifyListDataModified(UPxiiListDataObject_Base* InModifiedListData, EOptionsListDataModifyReason InModifyReason = EOptionsListDataModifyReason::DirectlyModified);
+	virtual void NotifyListDataModified(UPxiiListDataObjectBase* InModifiedListData, EListDataModifyType InModifyReason = EListDataModifyType::DirectlyModified);
 
 private:
 	FName DataID;
