@@ -105,4 +105,7 @@ protected:
 
 private:
 	mutable FGameplayTagContainer TempCooldownTags;
+public:
+	UPROPERTY(EditAnywhere)
+	bool LogData;
 };

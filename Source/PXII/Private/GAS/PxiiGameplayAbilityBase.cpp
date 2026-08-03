@@ -41,11 +41,13 @@ void UPxiiGameplayAbilityBase::ApplyCooldown(const FGameplayAbilitySpecHandle Ha
 	TSubclassOf<UGameplayEffect> CooldownGE = UPxiiGameplayEffectCooldown::StaticClass();
 	if(CooldownGameplayEffectClass)
 	{
-		PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Cooldown found using custom CD Class"));
+		if (LogData)
+			PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Cooldown found using custom CD Class"));
 		FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(CooldownGameplayEffectClass, GetAbilityLevel());
 
 		if(specHandle.IsValid())
 		{
+			//specHandle.Data->DynamicGrantedTags.AddTag(CooldownTag); // add this line
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, specHandle);
 		}
 	}
@@ -56,7 +58,8 @@ void UPxiiGameplayAbilityBase::ApplyCooldown(const FGameplayAbilitySpecHandle Ha
 			return;
 		}
 		
-		PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Cooldown Ability is empty using default cooldown class"));
+		if (LogData)
+			PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Cooldown Ability is empty using default cooldown class"));
 
 		FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(CooldownGE, GetAbilityLevel());
 
