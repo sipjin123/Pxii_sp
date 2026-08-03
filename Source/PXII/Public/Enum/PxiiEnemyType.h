@@ -20,7 +20,22 @@ UENUM(BlueprintType)
 enum class EBodySizeType:uint8
 {
 	Default=0 UMETA(DisplayName="Default"),
-	Small=0 UMETA(DisplayName="Small"),
-	Medium=0 UMETA(DisplayName="Medium"),
-	Large=0 UMETA(DisplayName="Large"),
+	Small=1 UMETA(DisplayName="Small"),
+	Medium=2 UMETA(DisplayName="Medium"),
+	Large=3 UMETA(DisplayName="Large"),
+};
+
+UENUM(BlueprintType)
+enum class ENPCState:uint8
+{
+	Default=0 UMETA(DisplayName="Default"),
+	Attacking=1 UMETA(DisplayName="Attacking"),
+	Reposition=2 UMETA(DisplayName="Reposition"),
+	Patrol=3 UMETA(DisplayName="Patrol"),
+	Retreat=4 UMETA(DisplayName="Retreat"),
+	PosToAttack=5 UMETA(DisplayName="PosToAttack"),
+	Disabled=6 UMETA(DisplayName="Disabled"),
+	Wait=7 UMETA(DisplayName="Wait"),
+	SearchingTarget=8 UMETA(DisplayName="SearchingTarget"),
+	Assessment=9 UMETA(DisplayName="Assessment"),
 };

@@ -1,6 +1,7 @@
 ﻿#include "PlayerController/PxiiPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "AbilitySystemGlobals.h"
+#include "CommonInputSubsystem.h"
 #include "Components/PxiiAimAssistComponent.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "Input/PxiiPlayerInputComponent.h"
@@ -14,6 +15,9 @@ void APxiiPlayerController::BeginPlay()
 	{
 		InputSubsystem->GetInputMapManager()->AddMappingContext(DefaultMappingContext, 0);
 	}
+
+	CommonInput = UCommonInputSubsystem::Get(GetLocalPlayer());
+	CommonInput->OnInputMethodChangedNative.AddUObject(this, &APxiiPlayerController::OnInputMethodChanged);
 }
 
 void APxiiPlayerController::SetupInputComponent()
@@ -28,7 +32,7 @@ void APxiiPlayerController::SetupInputComponent()
 	if (UPxiiPlayerInputComponent* EnhancedInputComponent = Cast<UPxiiPlayerInputComponent>(InputComponent))
 	{
 		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: Binding Input"));
-
+		
 		// Moving
 		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Move);
 		// Looking
@@ -191,6 +195,21 @@ void APxiiPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: INPUT COMPLETED! Tag: %s"), *InputTag.ToString());
 	InputSubsystem->GetInputStateManager()->ReleaseInput(InputTag);
 	InputSubsystem->GetAbilityRouterManager()->HandleInputReleased(InputTag);
+}
+
+void APxiiPlayerController::OnInputMethodChanged(ECommonInputType inputType)
+{
+	FName NewGamepadName = CommonInput->GetCurrentGamepadName();
+	
+	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
+	{
+		InputSubsystem->GetInputMapManager()->ClearAllMappings();
+		InputSubsystem->GetInputMapManager()->AddMappingContext(MappingContext[inputType], 0);
+
+		bool isUpdated = InputSubsystem->GetInputMapManager()->HasMappingContext(MappingContext[inputType]);
+		PXII_LOG(ELogCategory::Controls, Warning, TEXT("Input method changed: Mapping %s Success: %s"), *UEnum::GetValueAsString(inputType),
+			isUpdated ? TEXT("TRUE") : TEXT("FALSE"));
+	}
 }
 
 UPlayerInputSubsystem* APxiiPlayerController::GetPlayerInputSubsystem() const

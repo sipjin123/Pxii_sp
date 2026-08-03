@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "CommonButtonBase.h"
 #include "Components/PxiiAimAssistComponent.h"
 #include "Input/PxiiPlayerInputConfig.h"
 #include "Math/Vector2D.h"
@@ -14,13 +15,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	TMap<ECommonInputType, TObjectPtr<UInputMappingContext>> MappingContext;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputAction> MoveInput;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputAction> LookInput;
-
+	
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -66,6 +70,9 @@ protected:
 
 	UPROPERTY()
 	float CachedSlowdownFactor;
+
+	UFUNCTION()
+	void OnInputMethodChanged(ECommonInputType inputType);
 	
 private:
 
@@ -75,6 +82,8 @@ private:
 	TObjectPtr<UPxiiAimAssistComponent> AimAssistComp;
 	UPROPERTY()
 	TObjectPtr<UPxiiAimComponent> AimComp;
+	UPROPERTY()
+	TObjectPtr<UCommonInputSubsystem> CommonInput;
 	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
