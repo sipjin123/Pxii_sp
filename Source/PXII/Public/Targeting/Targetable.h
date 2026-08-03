@@ -24,5 +24,8 @@ public:
 	bool IsLockable() const;
 
 	UFUNCTION(BlueprintNativeEvent)
-	float GetThreatPriority() const;	
+	float GetThreatPriority() const;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowTargetDebug(bool show);
 };

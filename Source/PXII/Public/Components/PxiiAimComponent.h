@@ -18,6 +18,30 @@ struct FTargetCandidate
 	float Score = 0.0f;
 };
 
+USTRUCT(BlueprintType)
+struct FHitInformation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FHitResult HitResult = FHitResult();
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector TraceStart = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector TraceEnd = FVector::ZeroVector;
+	
+	FHitInformation() = default;
+	
+	FHitInformation(const FHitResult& InHitResult, const FVector& InTraceStart, const FVector& InTraceEnd)
+		: HitResult(InHitResult), TraceStart(InTraceStart), TraceEnd(InTraceEnd)
+	{
+		
+	}
+};
+
+
 UCLASS(Blueprintable)
 class PXII_API UPxiiAimComponent : public UActorComponent
 {
@@ -55,7 +79,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateAim(float DeltaTime);
 
+	UFUNCTION(BlueprintPure)
+	bool GetIsADSActive();
+
 protected:
+
+	UPROPERTY()
+	bool AimActive;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MaxRange = 3000.0f;

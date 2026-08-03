@@ -32,12 +32,12 @@ FVector UPxiiAimAssistComponent::GetAdjustedAimDirection(const FVector& rawAimDi
 	float dotClamped = FMath::Clamp(FVector::DotProduct(rawDirection, targetDir), -1.0f, 1.0f);
 	float angle = FMath::RadiansToDegrees(FMath::Acos(dotClamped));
 
-	if(angle > ConeAssistDegress)
+	if(angle > ConeAssistDegrees)
 	{
 		return rawAimDirection;
 	}
 
-	float alpha = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, ConeAssistDegress),
+	float alpha = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, ConeAssistDegrees),
 		FVector2D(AssistStrengthAtCenter, 0.0f), angle) * AssistMultiplier;
 
 	const FVector adjustedAim = FMath::Lerp(rawDirection, targetDir, alpha).GetSafeNormal();
@@ -103,12 +103,51 @@ FVector UPxiiAimAssistComponent::GetLeadPredictedAimPoint(float projectileSpeed)
 	FVector actorLoc = owner ? owner->GetActorLocation() : GetOwner()->GetActorLocation();
 
 	float impactTime = FVector::Dist(actorLoc, targetLoc) / projectileSpeed;
-	FVector predictedLoc = targetLoc + velocity + impactTime;
+	FVector predictedLoc = targetLoc + (velocity * impactTime);
 
 	impactTime = FVector::Dist(actorLoc, predictedLoc) / projectileSpeed;
-	predictedLoc = targetLoc + velocity + impactTime;
+	predictedLoc = targetLoc + (velocity * impactTime);
 
 	return predictedLoc;
+}
+
+float UPxiiAimAssistComponent::GetAimSlowdownFactor(const FVector2D& reticleScreenPos)
+{
+	if(RequireActiveLock && (!AimComponent || !AimComponent->HasTarget()))
+	{
+		return 1.0f;
+	}
+
+	FVector worldLoc;
+	if(!GetCurrentTargetAimPoint(worldLoc))
+	{
+		return 1.0f;
+	}
+
+	APawn* owner = Cast<APawn>(GetOwner());
+	APlayerController* PC = owner ? Cast<APlayerController>(owner->GetController()) : nullptr;
+	if(!PC)
+	{
+		return 1.0f;
+	}
+
+	FVector2D screenPos;
+	if(!PC->ProjectWorldLocationToScreen(worldLoc, screenPos))
+	{
+		return 1.0f;
+	}
+
+	float screenDist = FVector2D::Distance(reticleScreenPos, screenPos);
+	if(screenDist >= SlowdownRadius)
+	{
+		return 1.0f;
+	}
+
+	float proximity = 1.0f - (screenDist / SlowdownRadius);
+	float shapedProximity = FMath::Pow(proximity, SlowdownFalloffExp);
+	float rawFactor = FMath::Lerp(1.0f, SlowDownFactor, shapedProximity);
+
+	return FMath::Lerp(1.0f, rawFactor, AssistMultiplier);
 }
 
 bool UPxiiAimAssistComponent::GetCurrentTargetAimPoint(FVector& OutLocation) const

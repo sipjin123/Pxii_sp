@@ -1,6 +1,7 @@
 ﻿#include "PlayerController/PxiiPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "AbilitySystemGlobals.h"
+#include "Components/PxiiAimAssistComponent.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "Input/PxiiPlayerInputComponent.h"
 #include "Utility/PXIILogUtility.h"
@@ -51,6 +52,8 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 	}
 
 	ASC = Cast<UPxiiAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(InPawn));
+	AimAssistComp = InPawn->GetComponentByClass<UPxiiAimAssistComponent>();
+	AimComp = InPawn->GetComponentByClass<UPxiiAimComponent>();
 }
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -115,16 +118,35 @@ void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
 	}
 	
 	CachedLookInput = InputActionValue.Get<FVector2D>();
+	FVector2D screenPos = GetViewportCenter();
+	CachedSlowdownFactor = AimComp->GetIsADSActive() ? AimAssistComp->GetAimSlowdownFactor(screenPos) : 1.0f;
+
+	FVector2D modLookDelta = CachedLookInput * CachedSlowdownFactor;
 	
 	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Look] Input control: %s"), *CachedLookInput.ToString());
 
-	TargetPawn->AddControllerYawInput(-CachedLookInput.X * AimYawScale);
-	TargetPawn->AddControllerPitchInput(CachedLookInput.Y * AimPitchScale);
+	TargetPawn->AddControllerYawInput(-modLookDelta.X * AimYawScale);
+	TargetPawn->AddControllerPitchInput(modLookDelta.Y * AimPitchScale);
 }
 
 FVector2D APxiiPlayerController::GetCachedLookInput() const
 {
 	return CachedLookInput;
+}
+
+FVector2D APxiiPlayerController::GetViewportCenter() const
+{
+	int32 sizeX = 0;
+	int32 sizeY = 0;
+
+	GetViewportSize(sizeX, sizeY);
+
+	return FVector2D(sizeX * 0.5f, sizeY * 0.5f);
+}
+
+float APxiiPlayerController::GetCachedSlowdownFactor() const
+{
+	return CachedSlowdownFactor;
 }
 
 FVector2D APxiiPlayerController::GetCacheMoveInput() const

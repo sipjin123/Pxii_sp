@@ -4,6 +4,7 @@
 #include "Character/PxiiNPC.h"
 
 #include "Components/PxiiCombatComponent.h"
+#include "Engine/SkeletalMesh.h"
 #include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "GAS/PxiiAttributeSet.h"
@@ -18,6 +19,49 @@ APxiiNPC::APxiiNPC()
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent=CreateDefaultSubobject<UPxiiAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AttributeSet = CreateDefaultSubobject<UPxiiAttributeSet>(TEXT("AttributeSet"));
+}
+
+FVector APxiiNPC::GetAimSocketLocation_Implementation() const
+{
+	if(USkeletalMeshComponent* SkeletalMesh = GetMesh())
+	{
+		if(SkeletalMesh->DoesSocketExist(AimSocketName))
+		{
+			return SkeletalMesh->GetSocketLocation(AimSocketName);
+		}
+	}
+
+	FBoxSphereBounds Bounds = GetMesh()->GetBounds();
+	float Height = Bounds.BoxExtent.Z;
+	return GetActorLocation() + Height;
+}
+
+TArray<FVector> APxiiNPC::GetWeakpointLocations_Implementation() const
+{
+	TArray<FVector> Locations;
+
+	if (USkeletalMeshComponent* SkeletalMesh = GetMesh())
+	{
+		for (const FName& SocketName : WeakPointSocketNames)
+		{
+			if (SkeletalMesh->DoesSocketExist(SocketName))
+			{
+				Locations.Add(SkeletalMesh->GetSocketLocation(SocketName));
+			}
+		}
+	}
+
+	return Locations;
+}
+
+bool APxiiNPC::IsLockable_Implementation() const
+{
+	return bIsCurrentlyLockable && !IsPendingKillPending();
+}
+
+float APxiiNPC::GetThreatPriority_Implementation() const
+{
+	return ThreatPriority;
 }
 
 // Called when the game starts or when spawned

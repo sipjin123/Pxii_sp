@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Components/PxiiAimAssistComponent.h"
 #include "Input/PxiiPlayerInputConfig.h"
 #include "Math/Vector2D.h"
 #include "Subsystem/PlayerInputSubsystem.h"
@@ -32,6 +33,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FVector2D GetCachedLookInput() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector2D GetViewportCenter() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetCachedSlowdownFactor() const;
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool IsMovementBlocked;
@@ -57,10 +64,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float  AimYawScale = 0.25f;
 
+	UPROPERTY()
+	float CachedSlowdownFactor;
+	
 private:
 
 	UPROPERTY()
 	TObjectPtr<UPxiiAbilitySystemComponent> ASC;
+	UPROPERTY()
+	TObjectPtr<UPxiiAimAssistComponent> AimAssistComp;
+	UPROPERTY()
+	TObjectPtr<UPxiiAimComponent> AimComp;
 	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);

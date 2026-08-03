@@ -24,10 +24,13 @@ class PXII_API IPxiiCombatInterface
 
 public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
-	UPxiiAbilitySystemComponent* GetPxiiAbilitySystemComponent()const;
+	UPxiiAbilitySystemComponent* GetPxiiAbilitySystemComponent() const;
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
-	UPxiiCombatComponent* GetCombatComponent()const;
+	UPxiiCombatComponent* GetCombatComponent() const;
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	UPxiiAimAssistComponent* GetAimAssistComponent() const;
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	const UPxiiAttributeSet* GetAttributeSet() const;

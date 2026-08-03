@@ -9,6 +9,8 @@
 #include "GameplayTagContainer.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Character/PxiiCharacter.h"
+#include "Components/PxiiAimComponent.h"
+#include "Components/PxiiAimAssistComponent.h"
 #include "PxiiCombatBPLibrary.generated.h"
 
 /**
@@ -25,6 +27,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void StartProjectileTrace(APxiiCharacter* character, FName MuzzleSocketName = "Muzzle");
+
+	static bool DoCameraTrace(APxiiCharacter* character, float TraceDistance, FHitResult& HitResult, FVector& TraceEnd, bool DrawTrace);
+
+	static bool DoSocketTrace(APxiiCharacter* character, FName socketName, FVector aimPoint, FHitInformation& HitResult, bool DrawTrace);
+
+	static bool GetCameraViewPoint(APxiiCharacter* character, FVector& OutLoc, FVector& OutDir);
 	
 	UFUNCTION(BlueprintCallable)
 	static void PauseAI(AAIController* AICon, const FString& Reason = "Paused")

@@ -5,6 +5,7 @@
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "AbilitySystemComponent.h"
 #include "MoverComponent.h"
+#include "Components/PxiiAimAssistComponent.h"
 #include "Components/PxiiCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 
@@ -94,6 +95,11 @@ UPxiiCombatComponent* APxiiCharacterBase::GetCombatComponent_Implementation() co
 const UPxiiAttributeSet* APxiiCharacterBase::GetAttributeSet_Implementation() const
 {
 	return AttributeSet;
+}
+
+UPxiiAimAssistComponent* APxiiCharacterBase::GetAimAssistComponent_Implementation() const
+{
+	return FindComponentByClass<UPxiiAimAssistComponent>();
 }
 
 void APxiiCharacterBase::EnableAttackState_Implementation()

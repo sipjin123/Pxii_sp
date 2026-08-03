@@ -8,6 +8,7 @@
 #include "Interface/PxiiCombatInterface.h"
 #include "PxiiCharacterBase.generated.h"
 
+class UPxiiAimAssistComponent;
 class UMoverComponent;
 class UPxiiAttributeSet;
 class UPxiiAbilitySystemComponent;
@@ -54,6 +55,7 @@ public:
 
 	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
 	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
+	virtual UPxiiAimAssistComponent* GetAimAssistComponent_Implementation() const override;
 	
 	virtual void EnableAttackState_Implementation() override;
 	virtual void DisableAttackState_Implementation() override;

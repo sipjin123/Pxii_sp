@@ -63,6 +63,16 @@ void UPxiiAimComponent::SetCurrentTarget(AActor* Target)
 	}
 
 	CurrentTarget = Target;
+	if(oldTarget)
+	{
+		ITargetable::Execute_ShowTargetDebug(oldTarget, false);
+	}
+
+	if(Target)
+	{
+		ITargetable::Execute_ShowTargetDebug(Target, true);
+	}
+	
 	OnTargetUpdated.Broadcast(oldTarget, Target);
 }
 
@@ -224,10 +234,17 @@ void UPxiiAimComponent::OnAimTagChanged(const FGameplayTag Tag, int32 NewCount)
 {
 	if (NewCount > 0)
 	{
+		AimActive = true;
 		StartAim();
 	}
 	else
 	{
+		AimActive = false;
 		StopAim();
 	}
+}
+
+bool UPxiiAimComponent::GetIsADSActive()
+{
+	return AimActive;
 }

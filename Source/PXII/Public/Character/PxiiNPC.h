@@ -7,12 +7,13 @@
 #include "PxiiCharacter.h"
 #include "PxiiCharacterBase.h"
 #include "GameFramework/Character.h"
+#include "Targeting/Targetable.h"
 #include "PxiiNPC.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttackState, bool, IsEnabled, int32, Payload);
 UCLASS()
-class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface
+class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface, public ITargetable
 {
 	GENERATED_BODY()
 
@@ -20,10 +21,28 @@ public:
 	// Sets default values for this character's properties
 	APxiiNPC();
 
+
+	virtual FVector GetAimSocketLocation_Implementation() const override;
+	virtual TArray<FVector> GetWeakpointLocations_Implementation() const override;
+	virtual bool IsLockable_Implementation() const override;
+	virtual float GetThreatPriority_Implementation() const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void OnStaggerMeterChanged(const FOnAttributeChangeData& Data);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName AimSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FName> WeakPointSocketNames;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsCurrentlyLockable = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ThreatPriority = 0.5f;
 
 public:	
 	// Called every frame
