@@ -6,6 +6,7 @@
 #include "Engine/DeveloperSettings.h"
 #include "Combat/PxiiProjectileBase.h"
 #include "GameplayTagContainer.h"
+#include "Engine/DataAsset.h"
 #include "CombatDeveloperSettings.generated.h"
 
 /**
@@ -17,6 +18,5 @@ class PXII_API UCombatDeveloperSettings : public UDeveloperSettings
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(Config, EditAnywhere, Category = "Projectiles | Projectile Classes Soft Reference", meta = (ForceInlineRow, Categories = "Pxii.Projectiles"))
-	TMap<FGameplayTag, TSoftClassPtr<APxiiProjectileBase>> ProjectileClassesMap;
+
 };

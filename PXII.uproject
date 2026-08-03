@@ -226,6 +226,10 @@
 		{
 			"Name": "CommonUI",
 			"Enabled": true
+		},
+		{
+			"Name": "GhisNiagara2DWind",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "1673045636"

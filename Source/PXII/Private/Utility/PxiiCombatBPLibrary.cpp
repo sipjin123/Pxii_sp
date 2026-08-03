@@ -7,20 +7,8 @@
 #include "Utility/PXIILogUtility.h"
 #include "Interface/PxiiCombatInterface.h"
 #include "Components/PxiiPlayerCombatComponent.h"
+#include "Data/PxiiTags.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
-
-TSoftClassPtr<APxiiProjectileBase> UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag)
-{
-	const UCombatDeveloperSettings* ProjectileDevSettings = GetDefault<UCombatDeveloperSettings>();
-
-	if(!ProjectileDevSettings->ProjectileClassesMap.Contains(InTag))
-	{
-		PXII_LOG(ELogCategory::Combat, Warning, TEXT("[%s]: Projectile class %s is not assigned in Developer Settings"), *ThisClass::StaticClass()->GetName(), *InTag.ToString());
-		return nullptr;
-	}
-
-	return ProjectileDevSettings->ProjectileClassesMap.FindRef(InTag);
-}
 
 void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName MuzzleSocketName)
 {
@@ -192,7 +180,7 @@ bool UPxiiCombatBPLibrary::DoCameraTrace(APxiiCharacter* character, float TraceD
     }
 
     PXII_LOG(ELogCategory::Aim, Log, TEXT("Raw Aim Direction: %s ===> Assisted Aim Direction: %s"), *CameraDirection.ToString(), *assistedAimDir.ToString());
-    FVector CameraTraceEnd = CameraLocation + (assistedAimDir * TraceDistance);
+    TraceEnd = CameraLocation + (assistedAimDir * TraceDistance);
     FCollisionQueryParams CameraParams;
     CameraParams.AddIgnoredActor(character);
     
@@ -204,11 +192,11 @@ bool UPxiiCombatBPLibrary::DoCameraTrace(APxiiCharacter* character, float TraceD
     
     if (DrawTrace)
     {
-        UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(world,CameraLocation, CameraTraceEnd, FLinearColor::Blue,
+        UPxiiDebugTraceBPLibrary::DrawDebugArrowSimple(world,CameraLocation, TraceEnd, FLinearColor::Blue,
             1.f, 1.0f);
     }
 
-    return world->LineTraceSingleByChannel(HitResult,CameraLocation, CameraTraceEnd,ECC_Visibility, CameraParams);
+    return world->LineTraceSingleByChannel(HitResult,CameraLocation, TraceEnd,ECC_Visibility, CameraParams);
 }
 
 bool UPxiiCombatBPLibrary::DoSocketTrace(APxiiCharacter* character, FName socketName, FVector aimPoint, FHitInformation& HitResult, bool DrawTrace)

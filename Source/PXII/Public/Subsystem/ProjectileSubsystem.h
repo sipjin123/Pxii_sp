@@ -6,6 +6,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "Combat/PxiiProjectileBase.h"
 #include "GameplayTagContainer.h"
+#include "Data/PxiiProjectileMap.h"
 #include "Data/PxiiTags.h"
 #include "ProjectileSubsystem.generated.h"
 
@@ -77,6 +78,10 @@ class PXII_API UProjectileSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPxiiProjectileMap> DataMap;
+	
 	// ~Begin UWorldSubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
@@ -107,5 +112,8 @@ private:
 	TMap<FGameplayTag, FProjectilePool> ProjectilesMap;
 
 	TObjectPtr<APxiiProjectileBase> FindAvalaibleProjectileInPool(FGameplayTag InTag);
+	
 	void AddMoreProjectilesToPoolAsNeeded(FProjectilePool* ProjectilePool, FGameplayTag ProjectileTag, const int32 NumOfProjectileToAdd);
+
+	TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag(FGameplayTag InTag);
 };

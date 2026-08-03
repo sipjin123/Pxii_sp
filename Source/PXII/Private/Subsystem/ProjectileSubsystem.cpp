@@ -20,7 +20,7 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 	///////////////////
 	//// For debug purpose only
-	InitializePool(UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
+	InitializePool(GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
 	///////////////////
 }
 
@@ -146,7 +146,7 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 
 void UProjectileSubsystem::AddMoreProjectilesToPoolAsNeeded(FProjectilePool* ProjectilePool, FGameplayTag ProjectileTag, const int32 NumOfProjectileToAdd)
 {
-	TSoftClassPtr ProjectileClass = UPxiiCombatBPLibrary::GetSoftProjectileClassByTag(ProjectileTag);
+	TSoftClassPtr ProjectileClass = GetSoftProjectileClassByTag(ProjectileTag);
 	UClass* LoadedProjectileClass = ProjectileClass.Get();
 
 	FActorSpawnParameters SpawnParams;
@@ -167,4 +167,15 @@ void UProjectileSubsystem::AddMoreProjectilesToPoolAsNeeded(FProjectilePool* Pro
 			break;
 		}
 	}
+}
+
+TSoftClassPtr<APxiiProjectileBase> UProjectileSubsystem::GetSoftProjectileClassByTag(FGameplayTag InTag)
+{
+	if(!DataMap->ProjectileClassesMap.Contains(InTag))
+	{
+		PXII_LOG(ELogCategory::Combat, Warning, TEXT("[%s]: Projectile class %s is not assigned in Developer Settings"), *ThisClass::StaticClass()->GetName(), *InTag.ToString());
+		return nullptr;
+	}
+
+	return DataMap->ProjectileClassesMap.FindRef(InTag);
 }

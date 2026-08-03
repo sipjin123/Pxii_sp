@@ -11,6 +11,7 @@
 #include "Character/PxiiCharacter.h"
 #include "Components/PxiiAimComponent.h"
 #include "Components/PxiiAimAssistComponent.h"
+#include "Engine/DataAsset.h"
 #include "PxiiCombatBPLibrary.generated.h"
 
 /**
@@ -22,8 +23,6 @@ class PXII_API UPxiiCombatBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintPure, Category = "Combat | BP Function Library")
-	static TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag InTag);
 
 	UFUNCTION(BlueprintCallable)
 	static void StartProjectileTrace(APxiiCharacter* character, FName MuzzleSocketName = "Muzzle");
