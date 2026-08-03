@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Engine/Engine.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(PXIILog, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIISocketLogs, Log, All);
@@ -41,7 +42,7 @@ enum class ELogCategory : uint8
 	Aim
 };
 
-class PXII_API PXIILogUtility 
+class PXII_API PXIILogUtility
 {
 public:
 	static TSet<ELogCategory> EnabledCategories;
@@ -113,3 +114,56 @@ do { \
 		} \
 	} \
 } while(0)
+
+static void PrintLogDifferentVerbosity(const FString& Message, ELogCategory LogCategory, EPXIILogVerbosity LogVerbosity)
+{
+	switch (LogVerbosity)
+	{
+	case EPXIILogVerbosity::Log			: PXII_LOG(LogCategory, Log, TEXT("%s"), *Message);			break;
+	case EPXIILogVerbosity::Display		: PXII_LOG(LogCategory, Display, TEXT("%s"), *Message);		break;
+	case EPXIILogVerbosity::Warning		: PXII_LOG(LogCategory, Warning, TEXT("%s"), *Message);		break;
+	case EPXIILogVerbosity::Error		: PXII_LOG(LogCategory, Error, TEXT("%s"), *Message);		break;
+	case EPXIILogVerbosity::Verbose		: PXII_LOG(LogCategory, Verbose, TEXT("%s"), *Message);		break;
+	case EPXIILogVerbosity::VeryVerbose : PXII_LOG(LogCategory, VeryVerbose, TEXT("%s"), *Message);	break;
+	case EPXIILogVerbosity::Fatal		: PXII_LOG(LogCategory, Fatal, TEXT("%s"), *Message);		break;
+	default								: PXII_LOG(LogCategory, Log, TEXT("%s"), *Message);			break;
+	}
+};
+
+namespace PxiiLog
+{
+	static void Print(const FString& ContextName, const FString& Message, ELogCategory LogCategory = ELogCategory::General, EPXIILogVerbosity LogVerbosity = EPXIILogVerbosity::Log, const FColor& Color = FColor::MakeRandomColor(), float DisplayTime = 2.f, int32 InKey = -1)
+	{
+		if (GEngine)
+		{
+			const FString FinalMsg = FString::Printf(TEXT("[%s]: %s"), *ContextName, *Message);
+			
+			GEngine->AddOnScreenDebugMessage(InKey, DisplayTime, Color, FinalMsg);
+
+			PrintLogDifferentVerbosity(FinalMsg, LogCategory, LogVerbosity);
+		}
+	}
+
+	static void Print(const FString& ContextName, float FloatValueToPrint, ELogCategory LogCategory = ELogCategory::General, EPXIILogVerbosity LogVerbosity = EPXIILogVerbosity::Log, const FColor& Color = FColor::MakeRandomColor(), float DisplayTime = 2.f, int32 InKey = -1)
+	{
+		if (GEngine)
+		{
+			const FString FinalMsg = FString::Printf(TEXT("[%s]: %s"), *ContextName, *FString::SanitizeFloat(FloatValueToPrint));
+			
+			GEngine->AddOnScreenDebugMessage(InKey, DisplayTime, Color, FinalMsg);
+
+			PrintLogDifferentVerbosity(FinalMsg, LogCategory, LogVerbosity);
+		}
+	}
+
+	// Only on screen msg, no log
+	static void PrintOnScreen(const FString& ContextName, const FString& Message, const FColor& Color = FColor::MakeRandomColor(), float DisplayTime = 2.f, int32 InKey = -1)
+	{
+		if (GEngine)
+		{
+			const FString FinalMsg = FString::Printf(TEXT("[%s]: %s"), *ContextName, *Message);
+			
+			GEngine->AddOnScreenDebugMessage(InKey, DisplayTime, Color, FinalMsg);
+		}
+	}
+};

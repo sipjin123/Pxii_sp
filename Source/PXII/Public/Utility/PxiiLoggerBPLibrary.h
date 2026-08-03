@@ -17,6 +17,10 @@ class PXII_API UPxiiLoggerBPLibrary : public UBlueprintFunctionLibrary
 	
 	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
 	static void PXIIPrintLog(ELogCategory LogCategory, EPXIILogVerbosity Verbosity, FString InString);
+	
+	UFUNCTION(BlueprintCallable, Category="PXII|Debug", meta = (DisplayName = "Print Debug Message"))
+	static void PxiiPrintDebugMessageOnScreen(const FString& ContextName, const FString& Message, ELogCategory LogCategory, 
+		EPXIILogVerbosity Verbosity, FLinearColor Color, float DisplayTime, int32 InKey, bool bShouldPrintLog);
 
 	UFUNCTION(BlueprintCallable, Category="PXII|Debug")
 	static void EnableLogCategories(TArray<ELogCategory> Category);

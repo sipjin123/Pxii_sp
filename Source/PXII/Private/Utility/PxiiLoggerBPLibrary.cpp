@@ -39,6 +39,20 @@ void UPxiiLoggerBPLibrary::PXIIPrintLog(ELogCategory LogCategory, EPXIILogVerbos
 	}
 }
 
+void UPxiiLoggerBPLibrary::PxiiPrintDebugMessageOnScreen(const FString& ContextName, const FString& Message,
+	ELogCategory LogCategory, EPXIILogVerbosity Verbosity, FLinearColor Color, float DisplayTime, int32 InKey,
+	bool bShouldPrintLog)
+{
+	if (bShouldPrintLog)
+	{
+		PxiiLog::Print(ContextName, Message, LogCategory, Verbosity, Color.ToFColor(true), DisplayTime, InKey);
+	}
+	else
+	{
+		PxiiLog::PrintOnScreen(ContextName, Message, Color.ToFColor(true), DisplayTime, InKey);
+	}
+}
+
 void UPxiiLoggerBPLibrary::EnableLogCategories(TArray<ELogCategory> Category)
 {
 	for(ELogCategory cat : Category)

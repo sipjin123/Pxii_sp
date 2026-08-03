@@ -43,6 +43,11 @@ public:
 	//Empty in base class. Child class will override this function to return the child data objects.
 	virtual TArray<UPxiiListDataObjectBase*> GetAllChildListData() const { return TArray<UPxiiListDataObjectBase*>(); }
 	virtual bool HasAnyChildListData() const { return false; }
+	
+	//The child class should override them to provide implementations for resetting the data
+	virtual bool HasDefaultValue() const { return false; }
+	virtual bool CanResetBackToDefaultValue() const { return false; }
+	virtual bool TryResetBackToDefaultValue() { return false; }
 
 protected:
 	//Empty in base class. The child classes should override this function to implement their own initialization logic.

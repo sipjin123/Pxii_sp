@@ -5,6 +5,7 @@
 #include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
 #include "Utility/PXIILogUtility.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
 
 void UPxiiCheatDataRegistry::InitDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {
@@ -40,24 +41,48 @@ void UPxiiCheatDataRegistry::InitCheatTab1()
 
 	// Construct data object
 	{
-		UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
-		DO->SetDataID(FName("String1"));
-		DO->SetDataDisplayName(FText::FromString("String1"));
+		{
+			UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
+			DO->SetDataID(FName("String1"));
+			DO->SetDataDisplayName(FText::FromString("String1"));
 
-		DO->AddDynamicOptions(TEXT("1"), FText::FromString("1"));
-		DO->AddDynamicOptions(TEXT("2"), FText::FromString("2"));
-		DO->AddDynamicOptions(TEXT("3"), FText::FromString("3"));
-		DO->AddDynamicOptions(TEXT("4"), FText::FromString("4"));
+			DO->AddDynamicOptions(TEXT("1"), FText::FromString("1"));
+			DO->AddDynamicOptions(TEXT("2"), FText::FromString("2"));
+			DO->AddDynamicOptions(TEXT("3"), FText::FromString("3"));
+			DO->AddDynamicOptions(TEXT("4"), FText::FromString("4"));
 
-		Tab1Collection->AddChildListData(DO);
-	}
+			Tab1Collection->AddChildListData(DO);
+		}
 
-	{
-		UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
-		DO->SetDataID(FName("String2"));
-		DO->SetDataDisplayName(FText::FromString("String2"));
+		{
+			UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
+			DO->SetDataID(FName("String2"));
+			DO->SetDataDisplayName(FText::FromString("String2"));
 
-		Tab1Collection->AddChildListData(DO);
+			DO->AddDynamicOptions(TEXT("1"), FText::FromString("1"));
+			DO->AddDynamicOptions(TEXT("2"), FText::FromString("2"));
+			DO->AddDynamicOptions(TEXT("3"), FText::FromString("3"));
+			DO->AddDynamicOptions(TEXT("4"), FText::FromString("4"));
+			
+			Tab1Collection->AddChildListData(DO);
+		}
+		
+		{
+			UPxiiListDataObjectScalar* DO = NewObject<UPxiiListDataObjectScalar>();
+			DO->SetDataID(FName("Slider1"));
+			DO->SetDataDisplayName(FText::FromString("Slider1"));
+			DO->SetDescriptionRichText(FText::FromString("This is description for slider 1"));
+			DO->SetDisplayValueRange(TRange<float>(0.f, 1.f));
+			DO->SetOutputValueRange(TRange<float>(0.f, 2.f));
+			DO->SetSliderStepSize(0.01f);
+			DO->SetDefaultValueFromString(LexToString(1.f));
+			DO->SetDisplayNumericType(ECommonNumericType::Percentage);
+			DO->SetNumericFormattingOptions(UPxiiListDataObjectScalar::NoDecimal());
+			
+			//TODO: Set data dynamic getter and setter
+			
+			Tab1Collection->AddChildListData(DO);
+		}
 	}
 
 	RegisteredTabsCollections.Add(Tab1Collection);

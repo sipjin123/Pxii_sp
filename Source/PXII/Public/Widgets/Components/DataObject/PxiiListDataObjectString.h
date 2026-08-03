@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/Components/DataObject/PxiiListDataObjectBase.h"
+#include "PxiiListDataObjectValue.h"
 #include "PxiiListDataObjectString.generated.h"
 
 /**
  *
  */
 UCLASS()
-class PXII_API UPxiiListDataObjectString : public UPxiiListDataObjectBase
+class PXII_API UPxiiListDataObjectString : public UPxiiListDataObjectValue
 {
 	GENERATED_BODY()
 
