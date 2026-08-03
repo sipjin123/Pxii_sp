@@ -10,9 +10,6 @@ class PXII_API UPxiiGameplayAbilityHold : public UPxiiGameplayAbilityBase
 public:
 
 	UPROPERTY(EditDefaultsOnly)
-	bool LogData = false;
-	
-	UPROPERTY(EditDefaultsOnly)
 	bool EndAbilityOnRelease = true;
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* OwnerInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
