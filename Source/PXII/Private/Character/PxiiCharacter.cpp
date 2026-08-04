@@ -68,8 +68,9 @@ APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee()
 
 void APxiiCharacter::ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource)
 {
-	EPxiiYinYangType YinYangType = static_cast<EPxiiYinYangType>(FMath::RoundToInt(DamageSource));
-	UE_LOG(LogTempCharacter, Log, TEXT("Dmg_LOG:: DMG: %f"), Damage);
+	EDamageSource DamageSourceType = static_cast<EDamageSource>(FMath::RoundToInt(DamageSource));
+	EPxiiYinYangType YinYangType = DamageSourceType == EDamageSource::Melee ? EPxiiYinYangType::Yin : EPxiiYinYangType::Yang;//static_cast<EPxiiYinYangType>(FMath::RoundToInt(DamageSource));
+	//UE_LOG(LogTempCharacter, Log, TEXT("Dmg_LOG:: DMG: %f"), Damage);
 	Cast<UPxiiPlayerCombatComponent>(CombatComponent)->GrantYinYang(YinYangType, Damage, false);
 	Super::ProcessDamageData_Implementation(SourceActor, Damage, DamageSource);
 }

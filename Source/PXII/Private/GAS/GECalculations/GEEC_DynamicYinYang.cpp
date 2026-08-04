@@ -54,7 +54,6 @@ void UGEEC_DynamicYinYang::Execute_Implementation(const FGameplayEffectCustomExe
 	EvalParams.SourceTags = SourceTags;
 	EvalParams.TargetTags = TargetTags;
 
-	UE_LOG(LogGEECYinYang, Warning, TEXT("GEEC Start"));
 	// Capture relevant attributes
 	float CurrentYin = 0.0f;
 	float CurrentYang = 0.0f;
@@ -70,9 +69,8 @@ void UGEEC_DynamicYinYang::Execute_Implementation(const FGameplayEffectCustomExe
 	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UPxiiAttributeSet* AttrSet = SourceASC->GetSet<UPxiiAttributeSet>();
 
-	UE_LOG(LogTemp, Warning, TEXT("Direct: Type=%f AMT=%f Percent=%f"), Type, Amount, bPercent ? 1.0f : 0.f);
-	UE_LOG(LogTemp, Warning, TEXT("Direct: Health=%f Yin=%f Yang=%f"), AttrSet->GetHealth(), AttrSet->GetYin(), AttrSet->GetYang());
-
+	//UE_LOG(LogTemp, Warning, TEXT("Direct: Type=%f AMT=%f Percent=%f"), Type, Amount, bPercent ? 1.0f : 0.f);
+	//UE_LOG(LogTemp, Warning, TEXT("Direct: Health=%f Yin=%f Yang=%f"), AttrSet->GetHealth(), AttrSet->GetYin(), AttrSet->GetYang());
 
 	bool UseTagsFromBP = false;
 	if (UseTagsFromBP)
@@ -93,10 +91,9 @@ void UGEEC_DynamicYinYang::Execute_Implementation(const FGameplayEffectCustomExe
 		UE_LOG(LogTemp, Warning, TEXT("Capture Attribute = %s"), *GetYinYangCapture().YinDef.AttributeToCapture.GetName());
 		UE_LOG(LogTemp, Warning, TEXT("bYin=%d Value=%f"), bYin, CurrentYin);
 		
-		UE_LOG(LogGEECYinYang, Warning, TEXT("Yin Value is: %f Yang is: %f :: HP: %f Dmg: %f Source: %f"), CurrentYin, CurrentYang, CurrentHealth, IncomingDamage, DamageSource);
+		//UE_LOG(LogGEECYinYang, Warning, TEXT("Yin Value is: %f Yang is: %f :: HP: %f Dmg: %f Source: %f"), CurrentYin, CurrentYang, CurrentHealth, IncomingDamage, DamageSource);
 		//float IncomingDamage = 5.f;
 		//-------------------------------------------------------------
-		IncomingDamage = 10;
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YangProperty, EGameplayModOp::Additive, IncomingDamage));
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YinProperty, EGameplayModOp::Additive, IncomingDamage));
 	}
@@ -105,11 +102,19 @@ void UGEEC_DynamicYinYang::Execute_Implementation(const FGameplayEffectCustomExe
 		EPxiiYinYangType YinYangType = static_cast<EPxiiYinYangType>(FMath::RoundToInt(Type));
 		if (YinYangType == EPxiiYinYangType::Yin)
 		{
-			OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YinProperty, EGameplayModOp::Additive, Amount));
+			if (CurrentYang - Amount > 0)
+			{
+				OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YinProperty, EGameplayModOp::Additive, Amount));
+				OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YangProperty, EGameplayModOp::Additive, -Amount));
+			}
 		}
 		else
 		{
-			OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YangProperty, EGameplayModOp::Additive, Amount));
+			if (CurrentYin - Amount > 0)
+			{
+				OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YangProperty, EGameplayModOp::Additive, Amount));
+				OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetYinYangCapture().YinProperty, EGameplayModOp::Additive, -Amount));
+			}
 		}
 	}
 }
