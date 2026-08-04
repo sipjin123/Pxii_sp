@@ -174,11 +174,11 @@ void APxiiPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	if(!InputSubsystem->GetAbilityRouterManager()->HandleInputPressed(InputTag))
 	{
 		InputSubsystem->GetInputBufferManager()->BufferInput(InputTag);
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Buffered"))
+		//UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Buffered"))
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Consumed"));
+		//UE_LOG(LogTemp, Log, TEXT("DZ_LOG:: Input Consumed"));
 	}
 	
 }
