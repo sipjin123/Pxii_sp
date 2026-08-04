@@ -264,7 +264,7 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 				if (CharRef)
 				{
 					//for (int i = 0; i < 10 ; i++) // Simulating Spamming in network
-					ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, 0.f);
+					ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
 					//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
 				}
 				else
@@ -282,7 +282,7 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 	}
 }
 
-void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, float DamageSource)
+void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, EDamageSource DamageSource)
 {
 	if (TargetUnit == nullptr || GetOwner() == nullptr)
 	{
@@ -334,7 +334,7 @@ void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc,
 					Hit.Damage = TotalDamage;
 					Hit.Flags  = 1;
 					Hit.HitCoord = HitLoc;
-					Hit.DamageSource = EDamageSource::Melee;
+					Hit.DamageSource = DamageSource;
 
 					CombatSubsystem->EnqueueDamage(GetOwner(), Hit);
 					HasValidHit = true;

@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "Character/PxiiCharacterBase.h"
+#include "Enum/PxiiDamageType.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PxiiCombatComponent.generated.h"
 
@@ -59,7 +60,7 @@ public:
 	void ProcessDepthSlash(FVector EndLoc);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, float DamageSource);
+	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, EDamageSource DamageSource);
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> HitTracedActors;

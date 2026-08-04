@@ -5,6 +5,7 @@
 #include "Character/PxiiCharacter.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
+#include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
@@ -236,7 +237,7 @@ void UPxiiGA_Fire::FireProjectile(APxiiCharacter* Character)
                     {
                         if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
                         {
-                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, OutHitResult.ImpactPoint, 5.f, 1.0f);
+                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, OutHitResult.ImpactPoint, 5.f, EDamageSource::Range);
                         }
                         const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
                         UE_LOG(LogFireProjectile, Warning, TEXT("---------------- I Damage: {%f}"), AttributeSet->Health.GetCurrentValue());

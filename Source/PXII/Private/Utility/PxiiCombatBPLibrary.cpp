@@ -8,6 +8,7 @@
 #include "Interface/PxiiCombatInterface.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Data/PxiiTags.h"
+#include "Enum/PxiiDamageType.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
 void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName MuzzleSocketName)
@@ -106,7 +107,7 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
                     {
                         if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
                         {
-                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, SocketHit.ImpactPoint, 5.f, 1.0f);
+                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, SocketHit.ImpactPoint, 5.f,  EDamageSource::Range);
                         }
                         const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
                         UE_LOG(LogTemp, Warning, TEXT("---------------- I Damage: {%f}"), AttributeSet->Health.GetCurrentValue());
