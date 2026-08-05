@@ -60,11 +60,9 @@ public:
 	UFUNCTION()
 	void SetIsObstructed(bool bCond) { bIsObstructed = bCond; }
 
-	UFUNCTION(BlueprintCallable)
-	APxiiWeaponRange* GetWeaponRanged();
-
-	UFUNCTION(BlueprintCallable)
-	APxiiWeaponMelee* GetWeaponBaseMelee();
+	virtual APxiiWeaponRange* GetWeaponBaseRange_Implementation() override;
+	
+	virtual APxiiWeaponMelee* GetWeaponBaseMelee_Implementation() override;
 
 	UPROPERTY(BlueprintReadWrite)
 	APxiiWeaponRange* CurrentWeaponRanged;

@@ -142,14 +142,39 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 
 	// Result
 	TArray<FHitResult> OutHits;
-	
-	UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
-		StartLoc, EndLoc, Radius, ObjectTypes,
-		false,
-		ActorsToIgnore, DrawDebugTrace, OutHits, true,
-		GetOwner()->HasAuthority() ? FColor::Green : FColor::Cyan,
-		GetOwner()->HasAuthority() ? FColor::Red :FColor::Orange, TraceDuration
-	);
+
+	bool UseSphere = false;
+	if (UseSphere)
+	{
+		UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
+			StartLoc, EndLoc, Radius, ObjectTypes, false,
+			ActorsToIgnore, DrawDebugTrace, OutHits, true,
+			FColor::Green, FColor::Red, TraceDuration);
+	}
+	else
+	{
+		FVector BoxHalfExtent = FVector(50.f, 5.f, 2.f); // long, thin, flat — sword-shaped
+		//FVector BoxHalfExtent = FVector(Radius, Radius, Radius);
+		FRotator BoxOrientation = GetOwner()->GetActorRotation();
+		if (GetOwner()->Implements<UPxiiCombatInterface>())
+		{
+			APxiiWeaponMelee* MeleeRef = IPxiiCombatInterface::Execute_GetWeaponBaseMelee(GetOwner());
+			if (MeleeRef)
+			{
+				BoxOrientation = MeleeRef->GetActorRotation();
+			}
+		}
+		
+		UKismetSystemLibrary::BoxTraceMultiForObjects(
+			GetOwner(),
+			StartLoc, EndLoc,
+			BoxHalfExtent,        // FVector, replaces Radius
+			BoxOrientation,       // FRotator, new param — box needs an orientation
+			ObjectTypes, false,
+			ActorsToIgnore, DrawDebugTrace, OutHits, true,
+			FColor::Green, FColor::Red, TraceDuration
+		);
+	}
 	SlashDataArray = OutHits;
 
 	// Handles depth slash logic and adds to SlashDataArray

@@ -16,12 +16,12 @@ void UPxiiGA_HoldFire::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	AActor* Avatar = ActorInfo->AvatarActor.Get();
     
 	APxiiCharacter* SelfCharacter = Cast<APxiiCharacter>(Avatar);
-	if (SelfCharacter)
+	if (SelfCharacter && SelfCharacter->Implements<UPxiiCombatInterface>())
 	{
-		APxiiWeaponBase* WeaponRef = SelfCharacter->GetWeaponRanged();
+		APxiiWeaponRange* WeaponRef = IPxiiCombatInterface::Execute_GetWeaponBaseRange(SelfCharacter);
 		if (WeaponRef)
 		{
-			UPxiiGameplayEffectCooldown* GECooldownRef = SelfCharacter->GetWeaponRanged()->GEFireRateCooldown;
+			UPxiiGameplayEffectCooldown* GECooldownRef = WeaponRef->GEFireRateCooldown;
 			// Note(Burlin): Maybe add scaling cooldown here in the future
 		}
 		else

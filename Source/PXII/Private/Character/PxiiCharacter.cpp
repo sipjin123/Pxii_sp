@@ -39,6 +39,16 @@ USkeletalMeshComponent* APxiiCharacter::GetMesh()
 	return MeshRef;
 }
 
+APxiiWeaponRange* APxiiCharacter::GetWeaponBaseRange_Implementation()
+{
+	return CurrentWeaponRanged;
+}
+
+APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee_Implementation()
+{
+	return CurrentWeaponMelee;
+}
+
 void APxiiCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -54,16 +64,6 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 			TraceTarget.Broadcast(SocketLocation);
 		});
 	}
-}
-
-APxiiWeaponRange* APxiiCharacter::GetWeaponRanged()
-{
-	return CurrentWeaponRanged;
-}
-
-APxiiWeaponMelee* APxiiCharacter::GetWeaponBaseMelee()
-{
-	return CurrentWeaponMelee;
 }
 
 void APxiiCharacter::ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource)

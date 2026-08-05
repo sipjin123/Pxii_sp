@@ -17,11 +17,14 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     {
         return false;
     }
-    
-    if (character->GetWeaponRanged() && character->GetWeaponRanged()->SKWeapon)
+    if (character->Implements<UPxiiCombatInterface>())
     {
-        OutTransform = character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName);
-        return true;
+        APxiiWeaponRange* RangeWeapon = IPxiiCombatInterface::Execute_GetWeaponBaseRange(character);
+        if (RangeWeapon && RangeWeapon->SKWeapon)
+        {
+            OutTransform = RangeWeapon->SKWeapon->GetSocketTransform(MuzzleSocketName);
+            return true;
+        }
     }
 
     return false;
@@ -227,12 +230,17 @@ bool UPxiiCombatBPLibrary::DoSocketTrace(APxiiCharacter* character, FName socket
     }
     
     FVector TraceStart = character->GetActorLocation();
-    if (character->GetWeaponRanged() && character->GetWeaponRanged()->SKWeapon)
+    if (character->Implements<UPxiiCombatInterface>())
     {
-        TraceStart = character->GetWeaponRanged()->SKWeapon->GetSocketTransform(socketName).GetLocation();
-    } else
-    {
-        UE_LOG(LogTemp, Error, TEXT("[Firing] I Have No Weapon"));
+        APxiiWeaponRange* RangeWeapon = IPxiiCombatInterface::Execute_GetWeaponBaseRange(character);
+        if (RangeWeapon && RangeWeapon->SKWeapon)
+        {
+            TraceStart = RangeWeapon->SKWeapon->GetSocketTransform(socketName).GetLocation();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("[Firing] I Have No Weapon"));
+        }
     }
 
     UWorld* world = character->GetWorld();

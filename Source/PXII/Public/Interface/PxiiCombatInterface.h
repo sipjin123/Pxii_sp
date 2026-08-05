@@ -92,4 +92,10 @@ public:
 	bool IsHostileTo(AActor* Other);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	int32 GetAvailableAggroSlots();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	APxiiWeaponMelee* GetWeaponBaseMelee();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	APxiiWeaponRange* GetWeaponBaseRange();
 };
