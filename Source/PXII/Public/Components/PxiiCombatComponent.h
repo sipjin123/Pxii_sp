@@ -42,7 +42,7 @@ public:
 	bool ShowDebugLine;
 	
 	UFUNCTION(BlueprintCallable)
-	void InitializeHitTrace(FVector SocketLoc);
+	void InitializeHitTrace(FVector SocketLoc, float LengthOverride);
 
 	UFUNCTION(BlueprintCallable)
 	void ProcessHitTrace(FVector SocketLoc);
@@ -109,4 +109,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Debug")
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugTrace = EDrawDebugTrace::None;
+
+	UPROPERTY(EditAnywhere)
+	FVector BoxExtent = FVector(50.f, 5.f, 2.f);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float LengthExtension = 0.f;
 };

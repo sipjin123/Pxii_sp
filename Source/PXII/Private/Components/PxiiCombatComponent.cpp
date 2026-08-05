@@ -105,12 +105,13 @@ void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector 
 }
 
 
-void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc)
+void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride)
 {
 	HitTracedActors.Empty();
 	TraceIndex = 0;
 	HasValidHit = false;
 	HasHitReaction = false;
+	LengthExtension = LengthOverride;
 	if (CharacterRef && CharacterRef->Implements<UPxiiCombatInterface>())
 	{
 		IPxiiCombatInterface::Execute_EnableAttackState(CharacterRef);
@@ -153,7 +154,7 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 	}
 	else
 	{
-		FVector BoxHalfExtent = FVector(50.f, 5.f, 2.f); // long, thin, flat — sword-shaped
+		FVector BoxHalfExtent = BoxExtent + FVector(0.f,0.f,LengthExtension);//FVector(50.f, 5.f, 2.f); // long, thin, flat — sword-shaped
 		//FVector BoxHalfExtent = FVector(Radius, Radius, Radius);
 		FRotator BoxOrientation = GetOwner()->GetActorRotation();
 		if (GetOwner()->Implements<UPxiiCombatInterface>())
@@ -164,6 +165,11 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 				BoxOrientation = MeleeRef->GetActorRotation();
 			}
 		}
+		
+
+		// NOW compute the tip, using whichever orientation actually ended up correct
+		FVector TipLocation = StartLoc + (BoxOrientation.RotateVector(FVector::UpVector) * BoxHalfExtent.Z);
+		DrawDebugSphere(GetWorld(), TipLocation, 10.f, 12, FColor::Yellow, false, TraceDuration);
 		
 		UKismetSystemLibrary::BoxTraceMultiForObjects(
 			GetOwner(),
@@ -188,6 +194,7 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 
 void UPxiiCombatComponent::EndHitTrace()
 {
+	LengthExtension = 0.f;
 	if (CharacterRef && CharacterRef->Implements<UPxiiCombatInterface>())
 	{
 		IPxiiCombatInterface::Execute_DisableAttackState(CharacterRef);
@@ -208,12 +215,40 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 	if (Mesh)
 	{
 		FVector HandLocation = Mesh->GetSocketLocation(TEXT("palm_r_Socket"));
-		UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
-			HandLocation, EndLoc, DepthRadius, ObjectTypes,
-			false, ActorsToIgnore, DrawDebugTrace,
-			DepthOutHits, true,
-			FColor::Blue,FColor::Red, TraceDuration
-		);
+		bool UseSphere = false;
+		if (UseSphere)
+		{
+			UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
+				HandLocation, EndLoc, DepthRadius, ObjectTypes,
+				false, ActorsToIgnore, DrawDebugTrace,
+				DepthOutHits, true,
+				FColor::Blue,FColor::Red, TraceDuration
+			);
+		}
+		else
+		{
+			FVector BoxHalfExtent = BoxExtent + FVector(0.f,0.f,LengthExtension);;//FVector(50.f, 5.f, 2.f); // long, thin, flat — sword-shaped
+			//FVector BoxHalfExtent = FVector(Radius, Radius, Radius);
+			FRotator BoxOrientation = GetOwner()->GetActorRotation();
+			if (GetOwner()->Implements<UPxiiCombatInterface>())
+			{
+				APxiiWeaponMelee* MeleeRef = IPxiiCombatInterface::Execute_GetWeaponBaseMelee(GetOwner());
+				if (MeleeRef)
+				{
+					BoxOrientation = MeleeRef->GetActorRotation();
+				}
+			}
+		
+			UKismetSystemLibrary::BoxTraceMultiForObjects(
+				GetOwner(),
+				HandLocation, EndLoc,
+				BoxHalfExtent,        // FVector, replaces Radius
+				BoxOrientation,       // FRotator, new param — box needs an orientation
+				ObjectTypes, false,
+				ActorsToIgnore, DrawDebugTrace, DepthOutHits, true,
+				FColor::Cyan, FColor::Emerald, TraceDuration
+			);
+		}
 	}
 	for (FHitResult OutHitParam : DepthOutHits)
 	{
