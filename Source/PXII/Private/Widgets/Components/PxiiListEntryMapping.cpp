@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widgets/Components/DataAssetListEntryMapping.h"
+#include "Widgets/Components/PxiiListEntryMapping.h"
 #include "Utility/PXIILogUtility.h"
 
-TSubclassOf<UPxiiListEntryBase> UDataAssetListEntryMapping::FindListEntryClassByDataObject(UPxiiListDataObjectBase* InDataObject) const
+TSubclassOf<UPxiiListEntryBase> UPxiiListEntryMapping::FindListEntryClassByDataObject(UPxiiListDataObjectBase* InDataObject) const
 {
 	if(!IsValid(InDataObject))
 	{

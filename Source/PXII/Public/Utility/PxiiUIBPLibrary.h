@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GameplayTagContainer.h"
 #include "CommonUI/PxiiActivatableWidget.h"
+#include "Subsystem/PxiiUISubsystem.h"
 #include "PxiiUIBPLibrary.generated.h"
 
 /**
@@ -16,7 +17,7 @@ class PXII_API UPxiiUIBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
-public:
-	UFUNCTION(BlueprintPure, Category = "UI | BP Function Library")
-	static TSoftClassPtr<UPxiiActivatableWidget> GetWidgetSoftClassByTag(UPARAM(meta = (Categories = "Pxii.UI.Widget")) const FGameplayTag InWidgetTag);
+// public:
+// 	UFUNCTION(BlueprintPure, Category = "UI | BP Function Library")
+// 	static TSoftClassPtr<UPxiiActivatableWidget> GetWidgetSoftClassByTag(const UObject* WorldContextObject, UPARAM(meta = (Categories = "Pxii.UI.Widget")) const FGameplayTag InWidgetTag);
 };

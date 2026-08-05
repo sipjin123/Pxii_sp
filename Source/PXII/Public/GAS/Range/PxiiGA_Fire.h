@@ -20,24 +20,28 @@ public:
 	UPxiiGA_Fire();
 
 	// Override the activation function
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData) override;
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	UFUNCTION()
-	void RequestProjectileHit(APxiiCharacter* PxiiCharacter, const FVector& Vector, const FVector& ImpactPoint);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void RequestProjectile(const FVector& projectilDir);
+
+	void RequestProjectile_Implementation(const FVector& projectilDir);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FireProjectile(APxiiCharacter* Character);
 
-	// The name of the socket on the weapon's mesh from which the projectile should spawn
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
-	FName MuzzleSocketName;
+	void FireProjectile_Implementation(APxiiCharacter* Character);
+	
+	
+private :
 
 	UPROPERTY()
 	APxiiCharacter* SelfCharacter;
-public:
+	
 	UPROPERTY(EditAnywhere)
 	float DrawDuration = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
+	FName MuzzleSocketName;
 };

@@ -19,6 +19,11 @@ UPxiiUISubsystem* UPxiiUISubsystem::Get(const UObject* WorldContextObject)
 	return nullptr;
 }
 
+void UPxiiUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+}
+
 bool UPxiiUISubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
 	if(!CastChecked<UGameInstance>(Outer)->IsDedicatedServerInstance())
@@ -86,4 +91,20 @@ void UPxiiUISubsystem::PushSoftWidgetToStackAsync(const FGameplayTag & InStackTa
 			}
 		)
 	);
+}
+
+TSoftClassPtr<UPxiiActivatableWidget> UPxiiUISubsystem::GetWidgetSoftClassByTag(const FGameplayTag InWidgetTag)
+{
+	if (DataMap)
+	{
+		if(!DataMap->UIClassesMap.Contains(InWidgetTag))
+		{
+			PXII_LOG(ELogCategory::UI, Warning, TEXT("[%s]: Widget class %s is not assigned in %s"), *ThisClass::StaticClass()->GetName(), *InWidgetTag.ToString(), *DataMap->GetName());
+			return nullptr;
+		}
+	
+		return DataMap->UIClassesMap.FindRef(InWidgetTag);
+	}
+	
+	return nullptr;
 }

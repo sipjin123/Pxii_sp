@@ -31,7 +31,13 @@ void UPxiiGA_HoldFire::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 }
 
-void UPxiiGA_HoldFire::FireProjectile(APxiiCharacter* character)
+void UPxiiGA_HoldFire::FireProjectile_Implementation(APxiiCharacter* Character)
 {
-	UPxiiCombatBPLibrary::StartProjectileTrace(character);
+	FVector TraceDir;
+	UPxiiCombatBPLibrary::StartProjectileTrace(Character, TraceDir, MuzzleSocketName);
+	RequestProjectile(TraceDir);
+}
+
+void UPxiiGA_HoldFire::RequestProjectile_Implementation(const FVector& projectilDir)
+{
 }

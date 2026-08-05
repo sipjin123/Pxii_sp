@@ -173,7 +173,7 @@ TSoftClassPtr<APxiiProjectileBase> UProjectileSubsystem::GetSoftProjectileClassB
 {
 	if(!DataMap->ProjectileClassesMap.Contains(InTag))
 	{
-		PXII_LOG(ELogCategory::Combat, Warning, TEXT("[%s]: Projectile class %s is not assigned in Developer Settings"), *ThisClass::StaticClass()->GetName(), *InTag.ToString());
+		PXII_LOG(ELogCategory::Combat, Warning, TEXT("[%s]: Projectile class %s is not assigned in %s"), *ThisClass::StaticClass()->GetName(), *InTag.ToString(), *DataMap->GetName());
 		return nullptr;
 	}
 

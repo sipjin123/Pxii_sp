@@ -25,13 +25,16 @@ class PXII_API UPxiiCombatBPLibrary : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable)
-	static void StartProjectileTrace(APxiiCharacter* character, FName MuzzleSocketName = "Muzzle");
+	static void StartProjectileTrace(APxiiCharacter* character, FVector& TraceDirection, FName MuzzleSocketName = "Muzzle");
 
 	static bool DoCameraTrace(APxiiCharacter* character, float TraceDistance, FHitResult& HitResult, FVector& TraceEnd, bool DrawTrace);
 
 	static bool DoSocketTrace(APxiiCharacter* character, FName socketName, FVector aimPoint, FHitInformation& HitResult, bool DrawTrace);
 
 	static bool GetCameraViewPoint(APxiiCharacter* character, FVector& OutLoc, FVector& OutDir);
+
+	UFUNCTION(BlueprintPure)
+	static bool GetWeaponSocketTransform(APxiiCharacter* character, FName MuzzleSocketName, FTransform& OutTransform);
 	
 	UFUNCTION(BlueprintCallable)
 	static void PauseAI(AAIController* AICon, const FString& Reason = "Paused")

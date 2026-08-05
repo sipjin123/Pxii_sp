@@ -11,7 +11,23 @@
 #include "Enum/PxiiDamageType.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
-void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName MuzzleSocketName)
+bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, FName MuzzleSocketName, FTransform& OutTransform)
+{
+    if(!character)
+    {
+        return false;
+    }
+    
+    if (character->GetWeaponRanged() && character->GetWeaponRanged()->SKWeapon)
+    {
+        OutTransform = character->GetWeaponRanged()->SKWeapon->GetSocketTransform(MuzzleSocketName);
+        return true;
+    }
+
+    return false;
+}
+
+void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVector& TraceDirection, FName MuzzleSocketName)
 {
     bool isHeadshot = false;
     bool DrawTraces = true;
@@ -54,7 +70,9 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FName
     FHitInformation SocketHitInfo;
     FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraTraceEnd;
     bool hit = DoSocketTrace(Character, MuzzleSocketName, AimPoint, SocketHitInfo, DrawTraces);
-
+    
+    TraceDirection = (SocketHitInfo.TraceEnd - SocketHitInfo.TraceStart).GetSafeNormal();
+    
     FHitResult SocketHit = SocketHitInfo.HitResult;
 
     if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))

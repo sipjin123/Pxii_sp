@@ -4,6 +4,7 @@
 #include "Widgets/Components/PxiiButtonBase.h"
 #include "CommonTextBlock.h"
 #include "Components/OverlaySlot.h"
+#include "Subsystem/PxiiUISubsystem.h"
 
 void UPxiiButtonBase::SetButtonText(const FText& InButtonText)
 {
@@ -52,11 +53,21 @@ void UPxiiButtonBase::NativeOnCurrentTextStyleChanged()
 void UPxiiButtonBase::NativeOnHovered()
 {
 	Super::NativeOnHovered();
+	
+	if (!ButtonDescriptionText.IsEmpty())
+	{
+		UPxiiUISubsystem::Get(this)->OnButtonTextDescriptionUpdated.Broadcast(this, ButtonDescriptionText);
+	}
 }
 
 void UPxiiButtonBase::NativeOnUnhovered()
 {
 	Super::NativeOnUnhovered();
+	
+	if (!ButtonDescriptionText.IsEmpty())
+	{
+		UPxiiUISubsystem::Get(this)->OnButtonTextDescriptionUpdated.Broadcast(this, FText::GetEmpty());
+	}
 }
 
 void UPxiiButtonBase::NativePreConstruct()

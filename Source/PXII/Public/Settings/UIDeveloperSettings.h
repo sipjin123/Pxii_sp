@@ -15,8 +15,4 @@ UCLASS(Config = Game, defaultconfig, meta = (DisplayName = "UI Developer Setting
 class PXII_API UUIDeveloperSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
-	
-public:
-	UPROPERTY(Config, EditAnywhere, Category = "UI | UI Classes Soft Reference", meta = (ForceInlineRow, Categories = "Pxii.UI.Widget"))
-	TMap<FGameplayTag, TSoftClassPtr<UPxiiActivatableWidget>> UIClassesMap;
 };

@@ -25,6 +25,7 @@ public class PXII : ModuleRules
 			"GameplayTasks",
 			"DeveloperSettings",
 			"Mover",
+			"PropertyPath",
 			
 			// UI
 			"UMG",

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "CommonButtonBase.h"
 #include "Components/PxiiAimAssistComponent.h"
+
+#include "GameFramework/PlayerController.h"
 #include "Input/PxiiPlayerInputConfig.h"
 #include "Math/Vector2D.h"
 #include "Subsystem/PlayerInputSubsystem.h"

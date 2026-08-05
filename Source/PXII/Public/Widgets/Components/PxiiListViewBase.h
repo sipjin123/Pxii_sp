@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonListView.h"
-#include "DataAssetListEntryMapping.h"
+#include "PxiiListEntryMapping.h"
 #include "PxiiListViewBase.generated.h"
 
 /**
@@ -28,5 +28,5 @@ private:
 	//~ End UWidget Interface
 
 	UPROPERTY(EditAnywhere, Category = "UI | List View")
-	UDataAssetListEntryMapping* ListEntryMapping;
+	UPxiiListEntryMapping* ListEntryMapping;
 };

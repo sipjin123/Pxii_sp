@@ -13,6 +13,17 @@ public:
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void FireProjectile(APxiiCharacter* character);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FireProjectile(APxiiCharacter* character);
+	
+	void FireProjectile_Implementation(APxiiCharacter* Character);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void RequestProjectile(const FVector& projectilDir);
+
+	void RequestProjectile_Implementation(const FVector& projectilDir);	
+	
+private:
+	
+	FName MuzzleSocketName;
 };

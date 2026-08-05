@@ -2,6 +2,7 @@
 #include "Subsystem/PxiiUISubsystem.h"
 #include "Utility/PXIILogUtility.h"
 #include "CommonUI/PxiiActivatableWidget.h"
+#include "Engine/GameInstance.h"
 
 void APxiiHUDBase::BeginPlay()
 {
@@ -35,12 +36,7 @@ void APxiiHUDBase::CacheReferences()
 
 	if (PlayerController)
 	{
-		PlayerCharacter = Cast<APxiiCharacter>(PlayerController->GetPawn());
-	}
-
-	if(PlayerCharacter)
-	{
-		UISubsystem = PlayerCharacter->GetGameInstance()->GetSubsystem<UPxiiUISubsystem>();
+		UISubsystem = PlayerController->GetGameInstance()->GetSubsystem<UPxiiUISubsystem>();
 
 		if(!UISubsystem)
 		{

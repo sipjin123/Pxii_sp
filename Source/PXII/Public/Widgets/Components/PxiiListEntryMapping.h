@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "ListEntries/PxiiListEntryBase.h"
 #include "DataObject/PxiiListDataObjectBase.h"
-#include "DataAssetListEntryMapping.generated.h"
+#include "PxiiListEntryMapping.generated.h"
 
 /**
  *
  */
 UCLASS()
-class PXII_API UDataAssetListEntryMapping : public UDataAsset
+class PXII_API UPxiiListEntryMapping : public UDataAsset
 {
 	GENERATED_BODY()
 

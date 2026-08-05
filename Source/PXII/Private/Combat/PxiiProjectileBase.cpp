@@ -2,6 +2,9 @@
 
 
 #include "Combat/PxiiProjectileBase.h"
+
+#include "AbilitySystemInterface.h"
+#include "Components/SphereComponent.h"
 #include "Subsystem/ProjectileSubsystem.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -11,8 +14,23 @@ APxiiProjectileBase::APxiiProjectileBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	ProjectileRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileRoot"));
+	RootComponent = ProjectileRoot;
 
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->ProjectileGravityScale = 0.0f; // override per-weapon in BP (0 for hitscan-like lasers)
+	ProjectileMovement->MaxSpeed = 0.0f;
+
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	CollisionComponent->OnComponentHit.AddDynamic(this, &APxiiProjectileBase::OnHit);
+	CollisionComponent->InitSphereRadius(8.0f);
+}
+
+bool APxiiProjectileBase::GetIsInUse()
+{
+	return bIsInUse;
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +38,151 @@ void APxiiProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnTrailEffects();
+
+	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &APxiiProjectileBase::OnLifetimeExpired, Lifetime, false);
+}
+
+void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
+{
+	if(!DamageGE || !InstigatorASC)
+	{
+		return;
+	}
+
+	if(ExplosionRadius > 0.0f)
+	{
+		TArray<FOverlapResult> Overlaps;
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(ExplosionRadius);
+
+		GetWorld()->OverlapMultiByChannel(Overlaps, Hit.ImpactPoint, FQuat::Identity, ECC_Pawn, Sphere);
+		for (const FOverlapResult& Overlap : Overlaps)
+		{
+			if (AActor* OverlapActor = Overlap.GetActor())
+			{
+				ApplyDamageEffectToActor(OverlapActor, Hit);
+			}
+		}
+	}
+	else
+	{
+		ApplyDamageEffectToActor(HitActor, Hit);
+	}
+}
+
+void APxiiProjectileBase::SpawnImpactEffects_Implementation(const FHitResult& Hit)
+{
+	if(ImpactEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			ImpactEffect,
+			Hit.ImpactPoint,
+			Hit.ImpactNormal.Rotation(),
+			FVector(1.0f),
+			true,            
+			true,            
+			ENCPoolMethod::AutoRelease, 
+			true             
+		);
+	}
+	
+}
+
+void APxiiProjectileBase::SpawnTrailEffects_Implementation()
+{
+	if(TrailEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			TrailEffect,
+			GetRootComponent(),
+			TrailSocket,
+			TrailLocationOffset,
+			TrailRotationOffset,
+			EAttachLocation::KeepRelativeOffset,
+			true);
+	}
+}
+
+void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed,
+	AActor* InInstigator, AActor* InWeaponOwner)
+{
+	InstigatorActor = InInstigator;
+	WeaponOwner = InWeaponOwner;
+	BaseDMG = BaseDamage;
+
+	InstigatorASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InWeaponOwner);
+
+	FVector NormalizedDir = Direction.GetSafeNormal();
+	SetActorRotation(NormalizedDir.Rotation());
+	
+	ProjectileMovement->Velocity = NormalizedDir * Speed;
+	ProjectileMovement->InitialSpeed = Speed;
+	ProjectileMovement->MaxSpeed = Speed;
+
+	if (InstigatorActor)
+	{
+		CollisionComponent->IgnoreActorWhenMoving(InstigatorActor, true);
+	}
+	if (WeaponOwner && WeaponOwner != InstigatorActor)
+	{
+		CollisionComponent->IgnoreActorWhenMoving(WeaponOwner, true);
+	}
+}
+
+void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
+{
+	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+	if (!TargetASI)
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+	if (!TargetASC)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	ContextHandle.AddHitResult(result);
+	ContextHandle.AddInstigator(InstigatorActor, WeaponOwner);
+
+	if(!overrideEffect)
+	{
+		FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(DamageGE, 1.0f, ContextHandle);
+
+		if (SpecHandle.IsValid())
+		{
+			// Falloff example: scale damage by distance for AoE explosions
+			if (ExplosionRadius > 0.0f)
+			{
+				float Distance = FVector::Dist(result.ImpactPoint, TargetActor->GetActorLocation());
+				if(EnableDamageFalloff)
+				{
+					float FalloffScalar = FMath::Clamp(1.0f - (Distance / ExplosionRadius), 0.0f, 1.0f);
+					SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), FalloffScalar);				
+				}
+			}
+
+			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+		}
+	}
+	else
+	{
+		FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(OverrideDamageClass->StaticClass(), 1.0f, ContextHandle);
+		if(SpecHandle.IsValid())
+		{
+			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+		}
+	}
+}
+
+void APxiiProjectileBase::SetDamageClass_Implementation(UGameplayEffect* effect)
+{
+	OverrideDamageClass = effect;
+	overrideEffect  = true;
 }
 
 void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
@@ -64,11 +227,21 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 	}
 }
 
-void APxiiProjectileBase::OnProjectileHit()
+void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (bIsDestroyAfterHit)
+	if (OtherActor == this || OtherActor == InstigatorActor)
 	{
-		SetIsInUse(false);
+		return;
 	}
+
+	ApplyDamage(OtherActor, Hit);
+	SpawnImpactEffects(Hit);
+	Destroy();
+}
+
+void APxiiProjectileBase::OnLifetimeExpired()
+{
+	Destroy();
 }
 
