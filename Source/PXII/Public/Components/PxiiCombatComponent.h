@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "Character/PxiiCharacterBase.h"
+#include "Combat/PxiiDpsProjectile.h"
 #include "Enum/PxiiDamageType.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PxiiCombatComponent.generated.h"
@@ -65,6 +66,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, EDamageSource DamageSource);
 
+	UFUNCTION(BlueprintCallable)
+	void ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, const FDpsData& Damage, EDamageSource DamageSource);
+	
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> HitTracedActors;
 	
@@ -86,7 +90,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FVector PreviousSocketLocation;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float TraceDuration = 3.f;
 
 	UPROPERTY(BlueprintReadWrite)

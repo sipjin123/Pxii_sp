@@ -59,6 +59,8 @@ public:
 	void ProcessDamageRegistry(const FQueuedDamage& DamageEntry);
 	void ApplySingleDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords,
 								 EHitEffectType HitEffectType, EDamageSource DamageSource);
+	void ApplyDPSDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords, float period,
+								float duration, EHitEffectType HitEffectType, EDamageSource DamageSource);
 
 public:
 	FTimerHandle ProcessTimer;
@@ -72,6 +74,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UGameplayEffect> GenericDamageEffect;
 	TSubclassOf<UGameplayEffect> GetGenericDamageEffect() const { return GenericDamageEffect; }
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGameplayEffect> GenericDPSEffect;
+	TSubclassOf<UGameplayEffect> GetGenericDPSEffect() const { return GenericDPSEffect; }
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UGameplayEffect> KnockbackEffect;

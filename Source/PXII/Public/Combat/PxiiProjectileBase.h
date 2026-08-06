@@ -13,6 +13,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PxiiProjectileBase.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnReturnToPool, APxiiProjectileBase*);
+
 UCLASS()
 class PXII_API APxiiProjectileBase : public AActor
 {
@@ -21,6 +23,8 @@ class PXII_API APxiiProjectileBase : public AActor
 public:	
 
 	APxiiProjectileBase();
+
+	FOnReturnToPool OnReturnToPool;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Projectile")
 	AActor* InstigatorActor;
@@ -55,7 +59,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ReturnProjecileToPool();
-	void ReturnProjecileToPool_Implementation();
+	virtual void ReturnProjecileToPool_Implementation();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ApplyDamage(AActor* HitActor, const FHitResult& Hit);
@@ -75,12 +79,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void InitializeProjectile(float BaseDamage, const FVector& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
 
-	void InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
+	virtual void InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ApplyDamageEffectToActor(AActor* TargetActor, const FHitResult& result);
 	
-	void ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result);
+	virtual void ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result);
+
+	void SetProjectileTag(FGameplayTag inTag);
+
+	FGameplayTag GetPoolTag();
 
 protected:
 	
@@ -125,4 +133,7 @@ private:
 	bool bIsInUse = false;
 
 	FTimerHandle LifetimeTimerHandle;
+
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	FGameplayTag PoolTag;
 };

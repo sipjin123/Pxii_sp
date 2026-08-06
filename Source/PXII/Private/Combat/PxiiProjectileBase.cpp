@@ -244,6 +244,16 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 	//*/
 }
 
+void APxiiProjectileBase::SetProjectileTag(FGameplayTag inTag)
+{
+	PoolTag = inTag;
+}
+
+FGameplayTag APxiiProjectileBase::GetPoolTag()
+{
+	return PoolTag;
+}
+
 void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 {
 	PXII_LOG(ELogCategory::Projectile, Log, TEXT("SET TO USE[%s] : %s "), *GetName(), InIsInUse ? TEXT("TRUE") : TEXT("FALSE"));
@@ -317,18 +327,6 @@ void APxiiProjectileBase::ReturnProjecileToPool_Implementation()
 	
 	SetIsInUse(false);
 
-	UProjectileSubsystem* ProjectileSubsystem = this->GetWorld()->GetSubsystem<UProjectileSubsystem>();
-				
-	if (ProjectileSubsystem)
-	{
-		if(ProjectileSubsystem->bPrintDebugLog)
-		{
-			PXII_LOG(ELogCategory::Combat, Log, TEXT("Projectile returned to pool"));
-		}
-
-		// Debug
-		ProjectileSubsystem->OnProjectileReturnPool.Broadcast();
-		// Debug
-	}
+	OnReturnToPool.Broadcast(this);
 }
 

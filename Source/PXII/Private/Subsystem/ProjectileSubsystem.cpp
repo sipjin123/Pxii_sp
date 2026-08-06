@@ -17,15 +17,17 @@ void UProjectileSubsystem::Initialize(FSubsystemCollectionBase& collection)
 void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
-
-	///////////////////
-	//// For debug purpose only
-	InitializePool(GetSoftProjectileClassByTag(Projectiles::Pxii_Projectiles_Basic), Projectiles::Pxii_Projectiles_Basic, 20, 50);
-	///////////////////
+	for(TPair<FGameplayTag, TSoftClassPtr<APxiiProjectileBase>>& Pair : DataMap->ProjectileClassesMap)
+	{
+		
+		InitializePool(GetSoftProjectileClassByTag(Pair.Key), Pair.Key, 5, 256);
+	}
 }
 
 void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize)
 {
+	PXII_LOG(ELogCategory::Projectile, Warning, TEXT("Initializing Pool: %s"), *ClassTag.GetTagName().ToString());
+	
 	if (ProjectileClass.IsNull())
 	{
 		if(bPrintDebugLog)
@@ -56,7 +58,9 @@ void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> Pro
 				if (!ProjectilePool.IsMaxAlready())
 				{
 					APxiiProjectileBase* SpawnedProjectile = GetWorld()->SpawnActor<APxiiProjectileBase>(LoadedProjectileClass, Location, Rotation, SpawnParams);
+					SpawnedProjectile->SetProjectileTag(ClassTag);
 					SpawnedProjectile->SetIsInUse(false);
+					SpawnedProjectile->OnReturnToPool.AddUObject(this, &UProjectileSubsystem::ReturnProjectileToPool);
 					ProjectilePool.AvailableProjectiles.AddUnique(SpawnedProjectile);
 				}
 				else 
@@ -75,6 +79,7 @@ void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> Pro
 APxiiProjectileBase* UProjectileSubsystem::SpawnProjectileFromPool(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ProjectileTag, FTransform SpawnTransform)
 {
 	APxiiProjectileBase* SpawnedProjectile = FindAvalaibleProjectileInPool(ProjectileTag);
+
 	if (!SpawnedProjectile) 
 	{
 		if(bPrintDebugLog)
@@ -96,6 +101,24 @@ APxiiProjectileBase* UProjectileSubsystem::SpawnProjectileFromPool(UPARAM(meta =
 	return SpawnedProjectile;
 }
 
+void UProjectileSubsystem::ReturnProjectileToPool(APxiiProjectileBase* projectile)
+{
+	FProjectilePool* FoundProjectilePool = ProjectilesMap.Find(projectile->GetPoolTag());
+	if (!FoundProjectilePool) 
+	{
+		if(bPrintDebugLog)
+		{
+			PXII_LOG(ELogCategory::Combat, Warning, TEXT("Cant find desired pool in the map"));
+		}
+		return;
+	}
+
+	PXII_LOG(ELogCategory::Combat, Warning, TEXT("Returning projectile to pool"));
+
+	FoundProjectilePool->UsedProjectiles.Remove(projectile);
+	FoundProjectilePool->AvailableProjectiles.AddUnique(projectile);
+}
+
 TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInPool(FGameplayTag InTag)
 {
 	FProjectilePool* FoundProjectilePool = ProjectilesMap.Find(InTag);
@@ -108,10 +131,12 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 		return nullptr;
 	}
 
-	if (FoundProjectilePool->IsCurrentPoolUsedUp()) 
+	if (FoundProjectilePool->IsCurrentPoolSizeLow()) 
 	{
-		if (FoundProjectilePool->AvailableProjectiles.Num() < FoundProjectilePool->MaxPoolSize) 
+		if (FoundProjectilePool->GetTotalPoolSize() < FoundProjectilePool->MaxPoolSize) 
 		{
+			PXII_LOG(ELogCategory::Projectile, Warning, TEXT("Adding more pool item"));
+
 			AddMoreProjectilesToPoolAsNeeded(FoundProjectilePool, InTag, 1);
 		}
 		else
@@ -120,25 +145,22 @@ TObjectPtr<APxiiProjectileBase> UProjectileSubsystem::FindAvalaibleProjectileInP
 			{
 				PXII_LOG(ELogCategory::Combat, Warning, TEXT("Current Projectile Pool Reached Max"));
 			}
-		}
 			return nullptr;
+		}
 	}
 
-	for (APxiiProjectileBase* AvailableProjectile : FoundProjectilePool->AvailableProjectiles)
+	if(!FoundProjectilePool->AvailableProjectiles.IsEmpty())
 	{
-		if (AvailableProjectile->GetIsInUse()) 
-		{
-			continue;
-		}
-		else 
-		{
-			return AvailableProjectile;
-		}
+		APxiiProjectileBase* target = FoundProjectilePool->AvailableProjectiles[0];
+		FoundProjectilePool->UsedProjectiles.AddUnique(target);
+		FoundProjectilePool->AvailableProjectiles.Remove(target);
+		
+		return target; 
 	}
 
 	if (bPrintDebugLog)
 	{
-		PXII_LOG(ELogCategory::Combat, Warning, TEXT("Current Projectile Pool Used Up"));
+		PXII_LOG(ELogCategory::Projectile, Warning, TEXT("Current Projectile Pool Used Up"));
 	}
 
 	return nullptr;
@@ -160,6 +182,8 @@ void UProjectileSubsystem::AddMoreProjectilesToPoolAsNeeded(FProjectilePool* Pro
 		{
 			APxiiProjectileBase* SpawnedProjectile = GetWorld()->SpawnActor<APxiiProjectileBase>(LoadedProjectileClass, Location, Rotation, SpawnParams);
 			SpawnedProjectile->SetIsInUse(false);
+			SpawnedProjectile->SetProjectileTag(ProjectileTag);
+			SpawnedProjectile->OnReturnToPool.AddUObject(this, &UProjectileSubsystem::ReturnProjectileToPool);
 			ProjectilePool->AvailableProjectiles.AddUnique(SpawnedProjectile);
 		}
 		else

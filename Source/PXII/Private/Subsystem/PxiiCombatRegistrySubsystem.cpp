@@ -97,7 +97,7 @@ void UPxiiCombatRegistrySubsystem::ManualTick()
 		AActor* Source = Entry.Source.Get();
 		AActor* Target = Entry.HitData.Target.Get();
 
-		if (!Source || !Target)
+		if (!Source || !Target) 
 		{
 			continue;
 		}
@@ -229,5 +229,56 @@ void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActo
 					break;
 			}
 		}*/
+	}
+}
+
+void UPxiiCombatRegistrySubsystem::ApplyDPSDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords,
+	float period, float duration, EHitEffectType HitEffectType, EDamageSource DamageSource)
+{
+	
+	UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Source);
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+	if (!SourceASC || !TargetASC) return;
+	
+	const UWorld* World = Source->GetWorld();
+	if (!World) return;
+	
+	//const UPxiiCombatRegistrySubsystem* CombatRegistry = World->GetSubsystem<UPxiiCombatRegistrySubsystem>();
+	//if (!CombatRegistry) return;
+	
+	const TSubclassOf<UGameplayEffect> DamageEffect = GetGenericDPSEffect(); // CombatRegistry->
+	if (!DamageEffect) return;
+
+	// ---------------------------------------------
+
+	// Create effect context
+	FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
+	EffectContext.AddSourceObject(SourceASC);
+	EffectContext.AddOrigin(HitCoords);
+	
+	const FGameplayEffectSpecHandle DPSSpec = SourceASC->MakeOutgoingSpec(DamageEffect, 1.0f, EffectContext);
+
+	if (FGameplayEffectSpec* Spec = DPSSpec.Data.Get())
+	{
+		Spec->SetDuration(duration, true);
+
+		// Modify the period
+		Spec->Period = period;
+
+		// Add the magnitude value as a tag with payload.
+		const FGameplayTag DamageTag = FGameplayTag::RequestGameplayTag(FName("Combat.Damage"));
+		DPSSpec.Data->SetSetByCallerMagnitude(DamageTag, Damage);
+
+		const FGameplayTag HitTypeTag = FGameplayTag::RequestGameplayTag(FName("Combat.HitType"));
+		DPSSpec.Data->SetSetByCallerMagnitude(HitTypeTag, static_cast<float>(HitEffectType));
+
+		const FGameplayTag DamageSourceTag = FGameplayTag::RequestGameplayTag(FName("Combat.DamageSource"));
+		DPSSpec.Data->SetSetByCallerMagnitude(DamageSourceTag, static_cast<float>(DamageSource));
+		
+		// Apply to Target
+		if (bLogFlow)
+			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d -------------------------------------- Damage Applied, Remain {%d} INDEX: {%d} --  {%d}"), CurrentTickIndex, DamageQueue.Num(), DamageSource, HitEffectType);
+
+		SourceASC->ApplyGameplayEffectSpecToTarget(*DPSSpec.Data.Get(), TargetASC);
 	}
 }

@@ -23,6 +23,9 @@ public:
 	TArray<TObjectPtr<APxiiProjectileBase>> AvailableProjectiles;
 
 	UPROPERTY(BlueprintReadOnly)
+	TArray<TObjectPtr<APxiiProjectileBase>> UsedProjectiles;
+
+	UPROPERTY(BlueprintReadOnly)
 	int32 InitialPoolSize;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -30,42 +33,28 @@ public:
 
 	bool IsMaxAlready() 
 	{
-		return AvailableProjectiles.Num() >= MaxPoolSize;
+		return GetTotalPoolSize() >= MaxPoolSize;
+	}
+
+	bool IsCurrentPoolSizeLow() 
+	{
+		return AvailableProjectiles.Num() < 3;
 	}
 
 	bool IsCurrentPoolUsedUp() 
 	{
-		bool bIsUsedUp = false;
-		for (APxiiProjectileBase* Projectile : AvailableProjectiles) 
-		{
-			// If there is one unused projectile then means no used up yet
-			if (!Projectile->GetIsInUse()) 
-			{
-				bIsUsedUp = false;
-				break;
-			}
-			else
-			{
-				bIsUsedUp = true;
-			}
-		}
-
-		return bIsUsedUp;
+		return AvailableProjectiles.IsEmpty();
 	}
 
 	int32 UnusedProjectileCount() 
 	{
-		int32 Count = 0;
-
-		for (APxiiProjectileBase* Projectile : AvailableProjectiles)
-		{
-			if (!Projectile->GetIsInUse()) 
-			{
-				Count++;
-			}
-		}
-
+		int32 Count = AvailableProjectiles.Num();
 		return Count;
+	}
+
+	int32 GetTotalPoolSize()
+	{
+		return AvailableProjectiles.Num() + UsedProjectiles.Num();
 	}
 };
 
@@ -89,13 +78,16 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile Subsystem")
-	void InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize);
-
-	UFUNCTION(BlueprintPure, Category = "Projectile Subsystem")
-	TMap<FGameplayTag, FProjectilePool> GetProjectilesMap() { return ProjectilesMap; }
+	void InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize);
 
 	UFUNCTION(BlueprintCallable, Category = "Projectile Subsystem")
-	APxiiProjectileBase* SpawnProjectileFromPool(UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ProjectileTag, FTransform SpawnTransform);
+	APxiiProjectileBase* SpawnProjectileFromPool(UPARAM(meta = (Categories = "Pxii.Projectiles"))FGameplayTag ProjectileTag, FTransform SpawnTransform);
+
+	UFUNCTION()
+	void ReturnProjectileToPool(APxiiProjectileBase* projectile);
+	
+	UFUNCTION(BlueprintPure, Category = "Projectile Subsystem")
+	TMap<FGameplayTag, FProjectilePool> GetProjectilesMap() { return ProjectilesMap; }
 
 	// Debug
 	UPROPERTY(BlueprintAssignable, Category = "Projectile Subsystem | Debug")

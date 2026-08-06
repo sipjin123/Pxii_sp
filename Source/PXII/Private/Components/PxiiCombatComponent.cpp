@@ -407,3 +407,34 @@ void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc,
 		}
 	}
 }
+
+void UPxiiCombatComponent::ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, const FDpsData& dpsData, EDamageSource DamageSource)
+{
+	if (TargetUnit == nullptr || GetOwner() == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MISSING Target or Owner!"));
+		return;
+	}
+
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MISSING Ability System Component!"));
+		return;
+	}
+
+	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(TargetUnit))
+	{
+		FDpsData data = dpsData;
+	
+		// This Should be sent to RPC Manager
+		const UWorld* World = GetWorld();
+		if (World)
+		{
+			if (UPxiiCombatRegistrySubsystem* CombatSubsystem = World->GetSubsystem<UPxiiCombatRegistrySubsystem>())
+			{
+				CombatSubsystem->ApplyDPSDamageEffect(GetOwner(), TargetUnit, dpsData.DamagePerPeriod, HitLoc,
+					dpsData.Period, dpsData.Duration, dpsData.HitEffectType, DamageSource);
+			}
+		}
+	}
+}
