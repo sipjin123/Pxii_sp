@@ -6,6 +6,7 @@
 #include "Widgets/CommonActivatableWidgetContainer.h"
 #include "Utility/PXIILogUtility.h"
 #include "CommonUI/PxiiActivatableWidget.h"
+#include "Settings/UIDeveloperSettings.h"
 
 UPxiiUISubsystem* UPxiiUISubsystem::Get(const UObject* WorldContextObject)
 {
@@ -22,6 +23,11 @@ UPxiiUISubsystem* UPxiiUISubsystem::Get(const UObject* WorldContextObject)
 void UPxiiUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	
+	if (const UUIDeveloperSettings* Settings = GetDefault<UUIDeveloperSettings>())
+	{
+		DataMap = Settings->DataMap.LoadSynchronous();
+	}
 }
 
 bool UPxiiUISubsystem::ShouldCreateSubsystem(UObject* Outer) const

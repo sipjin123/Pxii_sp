@@ -30,9 +30,8 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     return false;
 }
 
-void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVector& TraceDirection, FName MuzzleSocketName)
+void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVector& TraceDirection, bool processDamage, FName MuzzleSocketName)
 {
-    bool isHeadshot = false;
     bool DrawTraces = true;
     if (!Character)
     {
@@ -80,11 +79,6 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVect
 
     if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))
     {
-        UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(MainCharacter);
-        if (!SelfCombatComp)
-        {
-            return;   
-        }
         if (MainCharacter->GetIsObstructed())
         {
             return;   
@@ -92,75 +86,11 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVect
         
         if (hit)
         {
-            isHeadshot = SocketHit.BoneName == FName("head");
-            UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(SocketHit.GetActor()), *SocketHit.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
-
-            if (isHeadshot)
-            {
-                if (UWorldSpawnerSubsystem* Spawner = MainCharacter->GetWorld()->GetSubsystem<UWorldSpawnerSubsystem>())
-                {
-                    FVector spawnLoc = SocketHit.GetActor()->GetActorLocation() + FVector(0.f, 0.f, 100.f);
-                    FText NewText = FText::FromString(TEXT("HeadShot!"));
-                    Spawner->OnSpawnMessageText.Broadcast(spawnLoc, NewText, FColor::Red);
-                }
-            }
-            
-            if (!bUseSphereTrace)
-            {
-                SelfCombatComp->TriggerProjectileTrace(SocketHit.ImpactNormal, SocketHitInfo.TraceEnd);
-            }
-            if (SocketHit.GetActor())
-            {
-                //TODO[BURLIN]: Hit TraceLogic without Server
-                UE_LOG(LogTemp, Warning, TEXT("---------------- I HIT: {%s}"), *SocketHit.GetActor()->GetName());
-
-                AActor* CurrHitActor = SocketHit.GetActor();
-                const ACharacter* CharHitRef = Cast<ACharacter>(CurrHitActor);
-                if (const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
-                {
-                    //const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
-                    const bool IsBossUnit = false;
-                    if (IsBossUnit)
-                    {
-                        // Process Body Part
-                    }
-                    else
-                    {
-                        if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
-                        {
-                            PlayerCombatComp->ProcessUnitDamage(CurrHitActor, SocketHit.ImpactPoint, 5.f,  EDamageSource::Range);
-                        }
-                        const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
-                        UE_LOG(LogTemp, Warning, TEXT("---------------- I Damage: {%f}"), AttributeSet->Health.GetCurrentValue());
-                    }
-                }
-            }
+            ProcessTraceHit(MainCharacter, SocketHit, processDamage);
         }
         else
         {
-            // MISSED, Hit no Valid Target
-
-            UE_LOG(LogTemp, Warning, TEXT("---------------- I MISS"));
-            
-            if (bUseSphereTrace)
-            {
-                FVector Start = SocketHitInfo.TraceStart;
-                FVector End = SocketHitInfo.TraceEnd;
-
-                float Distance = FVector::Dist(Start, SocketHit.ImpactPoint);
-
-                // Scale height: 500 height per 1000 units
-                float ArcHeight = (Distance / 1000.f) * 250.f;
-
-                // Clamp if you don’t want absurdly tall arcs
-                ArcHeight = FMath::Clamp(ArcHeight, 200.f, 3000.f);
-
-                SelfCombatComp->TriggerProjectileTraceArc(SocketHit.ImpactNormal, End, ArcHeight);
-            }
-            else
-            {
-                SelfCombatComp->TriggerProjectileTrace(SocketHit.ImpactNormal, SocketHitInfo.TraceEnd);
-            }
+            ProcessTraceMissed(MainCharacter, SocketHitInfo);
         }
 
         // TODO[BURLIN]: Use this for Destructibles
@@ -176,6 +106,91 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVect
     } else
     {
         UE_LOG(LogTemp, Warning, TEXT("---------------- FAILED TO FIRE"));
+    }
+}
+
+void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult HitResult, bool processDamage)
+{
+    UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(character);
+    if (!SelfCombatComp)
+    {
+        return;   
+    }
+
+    bool isHeadshot = HitResult.BoneName == FName("head");
+    PXII_LOG(ELogCategory::Trace, Warning, TEXT("Hit Actor: %s | Bone: %s :: %s"), *GetNameSafe(HitResult.GetActor()), *HitResult.BoneName.ToString(), isHeadshot ? TEXT("Headshot") : TEXT("Normal"));
+
+    if (isHeadshot)
+    {
+        if (UWorldSpawnerSubsystem* Spawner = character->GetWorld()->GetSubsystem<UWorldSpawnerSubsystem>())
+        {
+            FVector spawnLoc = HitResult.GetActor()->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+            FText NewText = FText::FromString(TEXT("HeadShot!"));
+            Spawner->OnSpawnMessageText.Broadcast(spawnLoc, NewText, FColor::Red);
+        }
+    }
+
+    if(!processDamage)
+    {
+        return;
+    }
+    
+    if (HitResult.GetActor())
+    {
+        PXII_LOG(ELogCategory::Trace, Warning, TEXT("TRACE HIT: {%s}"), *HitResult.GetActor()->GetName());
+
+        AActor* CurrHitActor = HitResult.GetActor();
+        const ACharacter* CharHitRef = Cast<ACharacter>(CurrHitActor);
+        if (const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
+        {
+            //const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
+            const bool IsBossUnit = false;
+            if (IsBossUnit)
+            {
+
+            }
+            else
+            {
+                if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
+                {
+                    PlayerCombatComp->ProcessUnitDamage(CurrHitActor, HitResult.ImpactPoint, 5.f,  EDamageSource::Range);
+                }
+                const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
+                PXII_LOG(ELogCategory::Trace, Warning, TEXT("TRACE HIT Damage: {%f}"), AttributeSet->Health.GetCurrentValue());
+            }
+        }
+    }
+}
+
+void UPxiiCombatBPLibrary::ProcessTraceMissed(APxiiCharacter* character, FHitInformation TraceInfo)
+{
+    UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(character);
+    if (!SelfCombatComp)
+    {
+        return;   
+    }
+    PXII_LOG(ELogCategory::Trace, Log, TEXT("NO Trace HIT"));
+    
+    FHitResult SocketHit = TraceInfo.HitResult;
+    bool bUseSphereTrace = false;
+    if (bUseSphereTrace)
+    {
+        FVector Start = TraceInfo.TraceStart;
+        FVector End = TraceInfo.TraceEnd;
+
+        float Distance = FVector::Dist(Start, SocketHit.ImpactPoint);
+
+        // Scale height: 500 height per 1000 units
+        float ArcHeight = (Distance / 1000.f) * 250.f;
+
+        // Clamp if you don’t want absurdly tall arcs
+        ArcHeight = FMath::Clamp(ArcHeight, 200.f, 3000.f);
+
+        SelfCombatComp->TriggerProjectileTraceArc(SocketHit.ImpactNormal, End, ArcHeight);
+    }
+    else
+    {
+        SelfCombatComp->TriggerProjectileTrace(SocketHit.ImpactNormal, TraceInfo.TraceEnd);
     }
 }
 

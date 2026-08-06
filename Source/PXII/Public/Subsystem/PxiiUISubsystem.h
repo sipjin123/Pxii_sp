@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnButtonDescriptionTextUpdated, UP
 /**
  * 
  */
-UCLASS(Abstract, Blueprintable)
+UCLASS()
 class PXII_API UPxiiUISubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -31,7 +31,7 @@ class PXII_API UPxiiUISubsystem : public UGameInstanceSubsystem
 public:
 	static UPxiiUISubsystem* Get(const UObject* WorldContextObject);
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPxiiUIClassesMapping> DataMap;
 	
 	UPROPERTY(BlueprintAssignable)

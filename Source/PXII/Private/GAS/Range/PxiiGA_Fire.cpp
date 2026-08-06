@@ -53,7 +53,7 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 void UPxiiGA_Fire::FireProjectile_Implementation(APxiiCharacter* Character)
 {
 	FVector TraceDirection;
-    UPxiiCombatBPLibrary::StartProjectileTrace(SelfCharacter, TraceDirection, MuzzleSocketName);
+    UPxiiCombatBPLibrary::StartProjectileTrace(SelfCharacter, TraceDirection, TraceProcessDamage,   MuzzleSocketName);
 	RequestProjectile(TraceDirection);
 }
 

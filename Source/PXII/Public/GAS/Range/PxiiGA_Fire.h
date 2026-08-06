@@ -43,5 +43,8 @@ private :
 	float DrawDuration = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
+	bool TraceProcessDamage = false;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
 	FName MuzzleSocketName;
 };

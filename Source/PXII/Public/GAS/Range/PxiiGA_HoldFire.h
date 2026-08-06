@@ -25,5 +25,9 @@ public:
 	
 private:
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
+	bool TraceProcessDamage = false;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
 	FName MuzzleSocketName;
 };

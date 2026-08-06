@@ -39,7 +39,9 @@ enum class ELogCategory : uint8
 	Objective,
 	Controls,
 	UI,
-	Aim
+	Aim,
+	Trace,
+	Projectile
 };
 
 class PXII_API PXIILogUtility

@@ -6,6 +6,7 @@
 #include "Engine/DeveloperSettings.h"
 #include "GameplayTagContainer.h"
 #include "CommonUI\PxiiActivatableWidget.h"
+#include "Widgets/Components/PxiiUIClassesMapping.h"
 #include "UIDeveloperSettings.generated.h"
 
 /**
@@ -15,4 +16,8 @@ UCLASS(Config = Game, defaultconfig, meta = (DisplayName = "UI Developer Setting
 class PXII_API UUIDeveloperSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(Config, EditAnywhere, Category = "UI | Classes Mapping Data")
+	TSoftObjectPtr<UPxiiUIClassesMapping> DataMap;
 };

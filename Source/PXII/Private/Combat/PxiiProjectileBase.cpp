@@ -4,6 +4,8 @@
 #include "Combat/PxiiProjectileBase.h"
 
 #include "AbilitySystemInterface.h"
+#include "Components/PxiiCombatComponent.h"
+#include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SphereComponent.h"
 #include "Subsystem/ProjectileSubsystem.h"
 #include "Utility/PXIILogUtility.h"
@@ -13,19 +15,17 @@ APxiiProjectileBase::APxiiProjectileBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
-	ProjectileRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileRoot"));
-	RootComponent = ProjectileRoot;
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	CollisionComponent->OnComponentHit.AddDynamic(this, &APxiiProjectileBase::OnHit);
+	CollisionComponent->InitSphereRadius(8.0f);
+	RootComponent = CollisionComponent;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.0f; // override per-weapon in BP (0 for hitscan-like lasers)
 	ProjectileMovement->MaxSpeed = 0.0f;
-
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	CollisionComponent->OnComponentHit.AddDynamic(this, &APxiiProjectileBase::OnHit);
-	CollisionComponent->InitSphereRadius(8.0f);
+	ProjectileMovement->UpdatedComponent = CollisionComponent;
 }
 
 bool APxiiProjectileBase::GetIsInUse()
@@ -45,7 +45,7 @@ void APxiiProjectileBase::BeginPlay()
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
 {
-	if(!DamageGE || !InstigatorASC)
+	if(DamageGE && !InstigatorASC)
 	{
 		return;
 	}
@@ -132,17 +132,50 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
-	IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
-	if (!TargetASI)
+	if(DamageGE == nullptr)
 	{
-		return;
+		UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(WeaponOwner);
+		if (!SelfCombatComp)
+		{
+			return;   
+		}
+	
+		if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
+		{
+			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, 5.f,  EDamageSource::Range);
+		}
+	}
+	else
+	{
+		FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(this);
+		ContextHandle.AddHitResult(result);
+		ContextHandle.AddInstigator(InstigatorActor, WeaponOwner);
+		
+		IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+		if (!TargetASI)
+		{
+			return;
+		}
+
+		UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+		if (!TargetASC)
+		{
+			return;
+		}
+		
+		FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(DamageGE->StaticClass(), 1.0f, ContextHandle);
+		if(SpecHandle.IsValid())
+		{
+			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+		}
 	}
 
-	UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
-	if (!TargetASC)
-	{
-		return;
-	}
+	/* DZ - Reapply this to combat registry
+	const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
+	PXII_LOG(ELogCategory::Trace, Warning, TEXT("TRACE HIT Damage: {%f}"), AttributeSet->Health.GetCurrentValue());
+	
+
 
 	FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
 	ContextHandle.AddSourceObject(this);
@@ -177,12 +210,7 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 		}
 	}
-}
-
-void APxiiProjectileBase::SetDamageClass_Implementation(UGameplayEffect* effect)
-{
-	OverrideDamageClass = effect;
-	overrideEffect  = true;
+	//*/
 }
 
 void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
@@ -230,6 +258,9 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT"));
+	
 	if (OtherActor == this || OtherActor == InstigatorActor)
 	{
 		return;

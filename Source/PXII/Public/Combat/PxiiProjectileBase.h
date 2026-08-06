@@ -36,7 +36,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
 	float ExplosionRadius = 0.0f;
 
-	FORCEINLINE bool GetIsInUse();
+	bool GetIsInUse();
 
 	virtual void BeginPlay() override;
 	
@@ -77,15 +77,7 @@ public:
 	
 	void ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
-	void SetDamageClass(UGameplayEffect* effect);
-	
-	void SetDamageClass_Implementation(UGameplayEffect* effect);
-
 protected:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* ProjectileRoot;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
@@ -121,12 +113,6 @@ protected:
 	float ProjectileSpeed;
 	
 private:
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UGameplayEffect> OverrideDamageClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	bool overrideEffect = false;
 
 	UPROPERTY(EditDefaultsOnly)
 	float BaseDMG;
