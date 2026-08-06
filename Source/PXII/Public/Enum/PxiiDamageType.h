@@ -56,6 +56,8 @@ enum class EHitEffectType : uint8 {
 	Slow = 7	UMETA(DisplayName = "Slow"),
 	Freeze = 8	UMETA(DisplayName = "Freeze"),
 	Timestop = 9	UMETA(DisplayName = "Timestop"),
+	FlyAway = 10	UMETA(DisplayName = "FlyAway"),
+	StandingUp = 11	UMETA(DisplayName = "StandingUp"),
 };
 
 UENUM(BlueprintType)

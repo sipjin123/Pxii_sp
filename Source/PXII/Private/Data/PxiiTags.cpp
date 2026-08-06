@@ -17,6 +17,8 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Data_IsPercent, "Data.IsPercent");
 namespace Projectiles
 {
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_Projectiles_Basic, "Pxii.Projectiles.Basic");
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_Projectiles_AOE, "Pxii.Projectiles.AOE");
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_Projectiles_DPS, "Pxii.Projectiles.DPS");
 }
 
 namespace UI

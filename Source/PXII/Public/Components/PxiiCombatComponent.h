@@ -42,8 +42,11 @@ public:
 	bool ShowDebugLine;
 	
 	UFUNCTION(BlueprintCallable)
-	void InitializeHitTrace(FVector SocketLoc, float LengthOverride);
+	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType);
 
+	UPROPERTY(BlueprintReadWrite)
+	EHitEffectType HitEffectType;
+	
 	UFUNCTION(BlueprintCallable)
 	void ProcessHitTrace(FVector SocketLoc);
 

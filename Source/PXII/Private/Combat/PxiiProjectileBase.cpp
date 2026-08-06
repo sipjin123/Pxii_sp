@@ -4,6 +4,7 @@
 #include "Combat/PxiiProjectileBase.h"
 
 #include "AbilitySystemInterface.h"
+#include "TimerManager.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SphereComponent.h"
@@ -40,11 +41,13 @@ void APxiiProjectileBase::BeginPlay()
 	
 	SpawnTrailEffects();
 
-	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &APxiiProjectileBase::OnLifetimeExpired, Lifetime, false);
+	// GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &APxiiProjectileBase::OnLifetimeExpired, Lifetime, false);
 }
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
 {
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Damage"));
+	
 	if(DamageGE && !InstigatorASC)
 	{
 		return;
@@ -52,14 +55,26 @@ void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHi
 
 	if(ExplosionRadius > 0.0f)
 	{
+		PXII_LOG(ELogCategory::Projectile, Log, TEXT("AOE DETECTED getting actor within impact radius"));
+
+		FCollisionQueryParams collisionParam;
+		collisionParam.AddIgnoredActor(WeaponOwner);
+		
 		TArray<FOverlapResult> Overlaps;
 		FCollisionShape Sphere = FCollisionShape::MakeSphere(ExplosionRadius);
 
-		GetWorld()->OverlapMultiByChannel(Overlaps, Hit.ImpactPoint, FQuat::Identity, ECC_Pawn, Sphere);
+		GetWorld()->OverlapMultiByChannel(Overlaps, Hit.ImpactPoint, FQuat::Identity, ECC_Pawn, Sphere, collisionParam);
 		for (const FOverlapResult& Overlap : Overlaps)
 		{
 			if (AActor* OverlapActor = Overlap.GetActor())
 			{
+				if(OverlapActor == WeaponOwner)
+				{
+					PXII_LOG(ELogCategory::Projectile, Log, TEXT("Skipping owner in radius damage"));
+					continue;
+				}
+				
+				PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Damage to Target: %s"), *GetNameSafe(OverlapActor));
 				ApplyDamageEffectToActor(OverlapActor, Hit);
 			}
 		}
@@ -107,6 +122,7 @@ void APxiiProjectileBase::SpawnTrailEffects_Implementation()
 void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed,
 	AActor* InInstigator, AActor* InWeaponOwner)
 {
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("INITALIZED: %s"), *GetName());
 	InstigatorActor = InInstigator;
 	WeaponOwner = InWeaponOwner;
 	BaseDMG = BaseDamage;
@@ -142,7 +158,22 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 	
 		if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
 		{
-			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, 5.f,  EDamageSource::Range);
+			float dist = FVector::Dist(result.ImpactPoint, TargetActor->GetActorLocation());
+			float fallOffModifier = 1.0f;
+			if (ExplosionRadius > 0.0f)
+			{
+				DrawDebugSphere(GetWorld(), result.ImpactPoint, ExplosionRadius, 32, FColor::Red,
+					false, 2.0f, 0, 1.0f);
+				if(EnableDamageFalloff)
+				{
+					fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
+				}
+			}
+			
+			const float finalDMG = BaseDMG * fallOffModifier;
+			
+			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
+			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, finalDMG,  EDamageSource::Range);
 		}
 	}
 	else
@@ -215,11 +246,28 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 
 void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 {
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("SET TO USE[%s] : %s "), *GetName(), InIsInUse ? TEXT("TRUE") : TEXT("FALSE"));
+
 	bIsInUse = InIsInUse;
 
-	this->SetActorEnableCollision(bIsInUse);
-	this->SetActorHiddenInGame(!bIsInUse);
-	this->SetActorTickEnabled(bIsInUse);
+	SetActorEnableCollision(bIsInUse);
+	SetActorHiddenInGame(!bIsInUse);
+	SetActorTickEnabled(bIsInUse);
+	
+	if(!bIsInUse)
+	{
+		CollisionComponent->ClearMoveIgnoreActors();
+		ProjectileMovement->StopMovementImmediately();
+	}
+	else
+	{
+		PXII_LOG(ELogCategory::Projectile, Warning, TEXT("UpdatedComponent: %s"),*GetNameSafe(ProjectileMovement->UpdatedComponent));
+		ProjectileMovement->SetUpdatedComponent(CollisionComponent);
+		PXII_LOG(ELogCategory::Projectile, Warning, TEXT("POST UpdatedComponent: %s"),*GetNameSafe(ProjectileMovement->UpdatedComponent));
+
+		ProjectileMovement->SetComponentTickEnabled(true);
+		ProjectileMovement->SetActive(true);
+	}
 
 	// Always make sure timer is clear, no matter true or false
 	if (LifetimeTimerHandle.IsValid() && GetWorldTimerManager().IsTimerActive(LifetimeTimerHandle))
@@ -230,24 +278,11 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 	// Only start timer when needed
 	if (bIsInUse)
 	{
+		GetWorldTimerManager().ClearTimer(LifetimeTimerHandle);
 		GetWorldTimerManager().SetTimer(
-			LifetimeTimerHandle,
-			[this]() {
-				this->SetIsInUse(false);
-
-				UProjectileSubsystem* ProjectileSubsystem = this->GetWorld()->GetSubsystem<UProjectileSubsystem>();
-				
-				if (ProjectileSubsystem)
-				{
-					if(ProjectileSubsystem->bPrintDebugLog)
-					{
-						PXII_LOG(ELogCategory::Combat, Log, TEXT("Projectile returned to pool"));
-					}
-
-					// Debug
-					ProjectileSubsystem->OnProjectileReturnPool.Broadcast();
-					// Debug
-				}
+			LifetimeTimerHandle,[this]
+			{
+				ReturnProjecileToPool();	
 			},
 			Lifetime,
 			false
@@ -259,7 +294,7 @@ void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AAc
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT"));
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT: %s"), *GetName());
 	
 	if (OtherActor == this || OtherActor == InstigatorActor)
 	{
@@ -268,11 +303,32 @@ void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AAc
 
 	ApplyDamage(OtherActor, Hit);
 	SpawnImpactEffects(Hit);
-	Destroy();
+	ReturnProjecileToPool();
 }
 
 void APxiiProjectileBase::OnLifetimeExpired()
 {
-	Destroy();
+	// ReturnProjecileToPool(); 
+}
+
+void APxiiProjectileBase::ReturnProjecileToPool_Implementation()
+{
+	GetWorldTimerManager().ClearTimer(LifetimeTimerHandle);
+	
+	SetIsInUse(false);
+
+	UProjectileSubsystem* ProjectileSubsystem = this->GetWorld()->GetSubsystem<UProjectileSubsystem>();
+				
+	if (ProjectileSubsystem)
+	{
+		if(ProjectileSubsystem->bPrintDebugLog)
+		{
+			PXII_LOG(ELogCategory::Combat, Log, TEXT("Projectile returned to pool"));
+		}
+
+		// Debug
+		ProjectileSubsystem->OnProjectileReturnPool.Broadcast();
+		// Debug
+	}
 }
 

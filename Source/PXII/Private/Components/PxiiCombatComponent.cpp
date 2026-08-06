@@ -105,8 +105,9 @@ void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector 
 }
 
 
-void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride)
+void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType)
 {
+	HitEffectType = NewHitEffectType;
 	HitTracedActors.Empty();
 	TraceIndex = 0;
 	HasValidHit = false;
@@ -392,7 +393,7 @@ void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc,
 					FDamageHit Hit;
 					Hit.Target = TargetUnit;
 					Hit.Damage = TotalDamage;
-					Hit.Flags  = 1;
+					Hit.Flags  = static_cast<uint8>(HitEffectType);
 					Hit.HitCoord = HitLoc;
 					Hit.DamageSource = DamageSource;
 

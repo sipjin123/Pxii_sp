@@ -69,6 +69,14 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		0.0f // Default value if not found
 	);
 
+	const float HitTypeValue = GESpec.GetSetByCallerMagnitude(
+		FGameplayTag::RequestGameplayTag(FName("Combat.HitType")),
+		false,
+		0.0f
+	);
+
+	const EHitEffectType HitEffectType = static_cast<EHitEffectType>(static_cast<uint8>(HitTypeValue));
+	
 	bool BlockDamageProcessing = false;
 	static const FGameplayTag BlockingTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.Blocking"));
 	static const FGameplayTag PerfectDodgeTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.PerfectDodgeWindow"));
@@ -113,6 +121,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		NewPayload.bIsCritical = isCritical;
 		NewPayload.DamageMagnitude = IncomingDamage;
 		NewPayload.TargetActor = TargetActor;
+		NewPayload.HitType = HitEffectType;
 		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, NewPayload);
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));

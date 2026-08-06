@@ -18,6 +18,9 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Data_IsPercent);
 namespace Projectiles
 {
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Projectiles_Basic);
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Projectiles_AOE);
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Projectiles_DPS);
+
 	//Extend more projectile tags here
 	//Using Projectiles namespace for better organization and to avoid name conflicts
 }

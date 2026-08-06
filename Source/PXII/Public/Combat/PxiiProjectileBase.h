@@ -9,6 +9,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/OverlapResult.h"
+#include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PxiiProjectileBase.generated.h"
 
@@ -52,6 +53,10 @@ public:
 	UFUNCTION()
 	void OnLifetimeExpired();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
+	void ReturnProjecileToPool();
+	void ReturnProjecileToPool_Implementation();
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ApplyDamage(AActor* HitActor, const FHitResult& Hit);
 	

@@ -11,6 +11,11 @@ DECLARE_LOG_CATEGORY_EXTERN(PXIIAbilityLogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIIEquipmentLogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIISkilltreeLogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIIObjectiveLogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIIControlsLogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIIUILogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIIAimLogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIITraceLogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIIProjectileLogs, Log, All);
 
 UENUM()
 enum class EPXIILogVerbosity : uint8
@@ -69,6 +74,12 @@ public:
 		case ELogCategory::Equipment:	return PXIIEquipmentLogs;
 		case ELogCategory::SkillTree:	return PXIISkilltreeLogs;
 		case ELogCategory::Objective:	return PXIIObjectiveLogs;
+
+		case ELogCategory::Controls:	return PXIIControlsLogs;
+		case ELogCategory::UI:			return PXIIUILogs;
+		case ELogCategory::Trace:		return PXIITraceLogs;
+		case ELogCategory::Projectile:	return PXIIProjectileLogs;
+		case ELogCategory::Aim:			return PXIIAimLogs;
 		default:                         return PXIILog;
 		}
 	}
@@ -110,6 +121,21 @@ do { \
 			case ELogCategory::Objective: \
 				UE_LOG(PXIIObjectiveLogs, Verbosity, Format, ##__VA_ARGS__); \
 				break; \
+			case ELogCategory::Controls: \
+				UE_LOG(PXIIControlsLogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
+			case ELogCategory::UI: \
+				UE_LOG(PXIIUILogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
+			case ELogCategory::Trace: \
+				UE_LOG(PXIITraceLogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
+			case ELogCategory::Aim: \
+				UE_LOG(PXIIAimLogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
+			case ELogCategory::Projectile: \
+				UE_LOG(PXIIProjectileLogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
 			default: \
 				UE_LOG(LogTemp, Verbosity, Format, ##__VA_ARGS__); \
 				break; \

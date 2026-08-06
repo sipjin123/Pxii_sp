@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "Enum/PxiiDamageType.h"
 #include "PxiiCombatPayloads.generated.h"
 
 /**
@@ -23,6 +24,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsCritical = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	EHitEffectType HitType;
 };
 
 UCLASS()

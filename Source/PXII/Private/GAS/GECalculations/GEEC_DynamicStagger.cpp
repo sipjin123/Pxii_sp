@@ -55,7 +55,7 @@ void UGEEC_DynamicStagger::Execute_Implementation(const FGameplayEffectCustomExe
 		false, 0.0f);
 
 	auto CurrMeter = Cast<APxiiNPC>(TargetActor)->GetAttributeSet()->GetStaggerMeter();
-	UE_LOG(LogGEECStagger, Warning, TEXT("GEEC Stagger Dmg :: Name: {%s} ToApply: {%f} Curr: {%f}"), *TargetActor->GetName(), TargetStaggerMeter, CurrMeter);
+	//UE_LOG(LogGEECStagger, Warning, TEXT("GEEC Stagger Dmg :: Name: {%s} ToApply: {%f} Curr: {%f}"), *TargetActor->GetName(), TargetStaggerMeter, CurrMeter);
 
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetStaggerStatCapture().StaggerMeterProperty, EGameplayModOp::Additive, TargetStaggerMeter));
 }
