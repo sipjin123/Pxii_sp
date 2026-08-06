@@ -38,10 +38,6 @@ bool APxiiProjectileBase::GetIsInUse()
 void APxiiProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SpawnTrailEffects();
-
-	// GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &APxiiProjectileBase::OnLifetimeExpired, Lifetime, false);
 }
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
@@ -89,33 +85,26 @@ void APxiiProjectileBase::SpawnImpactEffects_Implementation(const FHitResult& Hi
 {
 	if(ImpactEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			ImpactEffect,
-			Hit.ImpactPoint,
-			Hit.ImpactNormal.Rotation(),
-			FVector(1.0f),
-			true,            
-			true,            
-			ENCPoolMethod::AutoRelease, 
-			true             
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect,	Hit.ImpactPoint,
+			Hit.ImpactNormal.Rotation(), FVector(1.0f),	true, true,  
+			ENCPoolMethod::AutoRelease, true             
 		);
 	}
-	
 }
 
 void APxiiProjectileBase::SpawnTrailEffects_Implementation()
 {
-	if(TrailEffect)
+	if(TrailEffect && !TrailComp)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			TrailEffect,
-			GetRootComponent(),
-			TrailSocket,
-			TrailLocationOffset,
-			TrailRotationOffset,
-			EAttachLocation::KeepRelativeOffset,
-			true);
+		TrailComp = UNiagaraFunctionLibrary::SpawnSystemAttached(TrailEffect, GetRootComponent(), TrailSocket,
+			TrailLocationOffset, TrailRotationOffset, EAttachLocation::KeepRelativeOffset,true);
+
+		FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+		TrailComp->AttachToComponent(RootComponent, rules);
+		TrailComp->SetRelativeLocation(FVector::ZeroVector);
+		
+		TrailComp->Deactivate();
+		TrailComp->ResetSystem();
 	}
 }
 
@@ -247,6 +236,7 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 void APxiiProjectileBase::SetProjectileTag(FGameplayTag inTag)
 {
 	PoolTag = inTag;
+	SpawnTrailEffects();
 }
 
 FGameplayTag APxiiProjectileBase::GetPoolTag()
@@ -271,12 +261,11 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 	}
 	else
 	{
-		PXII_LOG(ELogCategory::Projectile, Warning, TEXT("UpdatedComponent: %s"),*GetNameSafe(ProjectileMovement->UpdatedComponent));
 		ProjectileMovement->SetUpdatedComponent(CollisionComponent);
-		PXII_LOG(ELogCategory::Projectile, Warning, TEXT("POST UpdatedComponent: %s"),*GetNameSafe(ProjectileMovement->UpdatedComponent));
-
 		ProjectileMovement->SetComponentTickEnabled(true);
 		ProjectileMovement->SetActive(true);
+		TrailComp->ReinitializeSystem();
+		TrailComp->Activate(true);
 	}
 
 	// Always make sure timer is clear, no matter true or false
@@ -324,7 +313,13 @@ void APxiiProjectileBase::OnLifetimeExpired()
 void APxiiProjectileBase::ReturnProjecileToPool_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(LifetimeTimerHandle);
-	
+
+	if(TrailComp)
+	{
+		TrailComp->Deactivate();
+		TrailComp->ResetSystem();		
+	}
+
 	SetIsInUse(false);
 
 	OnReturnToPool.Broadcast(this);
