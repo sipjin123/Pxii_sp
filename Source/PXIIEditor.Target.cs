@@ -11,5 +11,11 @@ public class PXIIEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V7;
 
 		ExtraModuleNames.AddRange( new string[] { "PXII" } );
+		RegisterModulesCreatedByRider();
+	}
+
+	private void RegisterModulesCreatedByRider()
+	{
+		ExtraModuleNames.AddRange(new string[] { "LoadingScreenModule" });
 	}
 }

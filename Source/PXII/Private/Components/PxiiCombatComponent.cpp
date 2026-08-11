@@ -55,9 +55,12 @@ void UPxiiCombatComponent::TriggerProjectileTraceArc(FVector ImpactNormal, FVect
 	
 }
 
-void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation)
+void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation, bool drawTrace)
 {
-	UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, ImpactLocation, 50.f, FLinearColor::Blue, TraceDuration);
+	if(drawTrace)
+	{
+		UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, ImpactLocation, 50.f, FLinearColor::Blue, TraceDuration);
+	}
 	/*
 	FTransform MuzzleTransform = SMWeapon->GetSocketTransform(MuzzleSocketName);
 	FTransform SocketTransform = MuzzleTransform;
@@ -131,7 +134,7 @@ void UPxiiCombatComponent::ProcessHitTrace(FVector SocketLoc)
 	PreviousSocketLocation = SocketLoc;
 }
 
-void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc)
+void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc, bool drawTrace )
 {
 	if (LogSlashLogic)
 		UE_LOG(LogTemp, Warning, TEXT("Slash Trace: TraceLogic Index:%d"), TraceIndex);
@@ -170,7 +173,10 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 
 		// NOW compute the tip, using whichever orientation actually ended up correct
 		FVector TipLocation = StartLoc + (BoxOrientation.RotateVector(FVector::UpVector) * BoxHalfExtent.Z);
-		DrawDebugSphere(GetWorld(), TipLocation, 10.f, 12, FColor::Yellow, false, TraceDuration);
+		if(drawTrace)
+		{
+			DrawDebugSphere(GetWorld(), TipLocation, 10.f, 12, FColor::Yellow, false, TraceDuration);
+		}
 		
 		UKismetSystemLibrary::BoxTraceMultiForObjects(
 			GetOwner(),

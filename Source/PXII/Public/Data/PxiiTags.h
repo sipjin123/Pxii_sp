@@ -39,3 +39,10 @@ namespace UI
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_TitleScreen_Start);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_TitleScreen_Main);
 }
+
+namespace GameLevels
+{
+	// Game Levels
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Level_Title);
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_Level_DevGym);
+}

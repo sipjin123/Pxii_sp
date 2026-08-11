@@ -145,6 +145,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	UNiagaraComponent* TrailComp;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	bool DrawDebug;
 
 	UPROPERTY(EditDefaultsOnly)
 	float BaseDMG;

@@ -24,6 +24,16 @@ void UProjectileSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 	}
 }
 
+void UProjectileSubsystem::Deinitialize()
+{
+	if (InitializeHandle.IsValid())
+	{
+		InitializeHandle->CancelHandle();
+		InitializeHandle.Reset();
+	}
+	Super::Deinitialize();
+}
+
 void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> ProjectileClass, UPARAM(meta = (Categories = "Pxii.Projectiles")) FGameplayTag ClassTag, int32 InitialPoolSize, int32 MaxPoolSize)
 {
 	PXII_LOG(ELogCategory::Projectile, Warning, TEXT("Initializing Pool: %s"), *ClassTag.GetTagName().ToString());
@@ -38,6 +48,7 @@ void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> Pro
 		return;
 	}
 
+	InitializeHandle = 
 	UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
 		ProjectileClass.ToSoftObjectPath(),
 		[this, ProjectileClass, ClassTag, InitialPoolSize, MaxPoolSize]() {

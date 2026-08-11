@@ -27,8 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static void StartProjectileTrace(APxiiCharacter* character, FHitInformation& TraceInformation, bool processDamage = false, FName MuzzleSocketName = "Muzzle", bool drawDebugTrace = true);
 
-	static void ProcessTraceHit(APxiiCharacter* character, FHitResult HitResult, bool processDamage);
-	static void ProcessTraceMissed(APxiiCharacter* character, FHitInformation TraceInfo);
+	static void ProcessTraceHit(APxiiCharacter* character, FHitResult HitResult, bool processDamage, bool DrawTrace);
+	static void ProcessTraceMissed(APxiiCharacter* character, FHitInformation TraceInfo, bool DrawTrace);
 	
 	static bool DoCameraTrace(APxiiCharacter* character, float TraceDistance, FHitResult& HitResult, FVector& TraceEnd, bool DrawTrace);
 

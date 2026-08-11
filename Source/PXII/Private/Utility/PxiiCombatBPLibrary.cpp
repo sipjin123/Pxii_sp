@@ -85,11 +85,11 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FHitI
         
         if (hit)
         {
-            ProcessTraceHit(MainCharacter, SocketHit, processDamage);
+            ProcessTraceHit(MainCharacter, SocketHit, processDamage, DrawTraces);
         }
         else
         {
-            ProcessTraceMissed(MainCharacter, SocketHitInfo);
+            ProcessTraceMissed(MainCharacter, SocketHitInfo, DrawTraces);
         }
 
         // TODO[BURLIN]: Use this for Destructibles
@@ -108,7 +108,7 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FHitI
     }
 }
 
-void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult HitResult, bool processDamage)
+void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult HitResult, bool processDamage, bool DrawTrace)
 {
     UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(character);
     if (!SelfCombatComp)
@@ -161,7 +161,7 @@ void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult
     }
 }
 
-void UPxiiCombatBPLibrary::ProcessTraceMissed(APxiiCharacter* character, FHitInformation TraceInfo)
+void UPxiiCombatBPLibrary::ProcessTraceMissed(APxiiCharacter* character, FHitInformation TraceInfo, bool DrawTrace)
 {
     UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(character);
     if (!SelfCombatComp)
@@ -189,7 +189,7 @@ void UPxiiCombatBPLibrary::ProcessTraceMissed(APxiiCharacter* character, FHitInf
     }
     else
     {
-        SelfCombatComp->TriggerProjectileTrace(SocketHit.ImpactNormal, TraceInfo.TraceEnd);
+        SelfCombatComp->TriggerProjectileTrace(SocketHit.ImpactNormal, TraceInfo.TraceEnd, DrawTrace);
     }
 }
 

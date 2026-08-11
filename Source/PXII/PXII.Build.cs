@@ -26,6 +26,7 @@ public class PXII : ModuleRules
 			"DeveloperSettings",
 			"Mover",
 			"PropertyPath",
+			"LoadingScreenModule",
 			
 			// UI
 			"UMG",
@@ -39,6 +40,7 @@ public class PXII : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
+			"LoadingScreenModule",
 		});
 
 		PublicIncludePaths.AddRange(new string[]

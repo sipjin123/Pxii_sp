@@ -250,8 +250,11 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 		{
 			if (ExplosionRadius > 0.0f)
 			{
-				DrawDebugSphere(GetWorld(), result.ImpactPoint, ExplosionRadius, 32, FColor::Red,
-					false, 2.0f, 0, 1.0f);
+				if(DrawDebug)
+				{
+					DrawDebugSphere(GetWorld(), result.ImpactPoint, ExplosionRadius, 32, FColor::Red,
+						false, 2.0f, 0, 1.0f);
+				}
 			}
 			float finalDMG = GetDamage(result);
 			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);

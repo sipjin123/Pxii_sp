@@ -36,7 +36,7 @@ public:
 	void TriggerProjectileTraceArc(FVector ImpactNormal, FVector ImpactLocation, float ArcHeight);
 
 	UFUNCTION(BlueprintCallable, Category="Combat")
-	void TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation);
+	void TriggerProjectileTrace(FVector ImpactNormal, FVector ImpactLocation, bool drawTrace = false);
 	
 	// Line Trace Debug Parameters
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -52,7 +52,7 @@ public:
 	void ProcessHitTrace(FVector SocketLoc);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc);
+	void ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc, bool drawTrace = false);
 
 	UFUNCTION(BlueprintCallable)
 	void FinalizeHitTraceLogic();

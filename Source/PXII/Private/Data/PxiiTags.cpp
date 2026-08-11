@@ -35,3 +35,10 @@ namespace UI
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_TitleScreen_Start, "Pxii.UI.Widget.TitleScreen.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_TitleScreen_Main, "Pxii.UI.Widget.TitleScreen.Main");
 }
+
+namespace GameLevels
+{
+	// Game Levels
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_Level_Title, "Pxii.Level.Title");
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_Level_DevGym, "Pxii.Level.DevGym");
+}

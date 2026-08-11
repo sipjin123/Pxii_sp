@@ -74,6 +74,7 @@ protected:
 	// ~Begin UWorldSubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
+	virtual void Deinitialize() override;
 	// ~End UWorldSubsystem interface
 
 public:
@@ -108,4 +109,6 @@ private:
 	void AddMoreProjectilesToPoolAsNeeded(FProjectilePool* ProjectilePool, FGameplayTag ProjectileTag, const int32 NumOfProjectileToAdd);
 
 	TSoftClassPtr<APxiiProjectileBase> GetSoftProjectileClassByTag(FGameplayTag InTag);
+	
+	TSharedPtr<FStreamableHandle> InitializeHandle;
 };
