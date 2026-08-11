@@ -26,4 +26,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	APawn* GetPawnOwner();
 
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void ApplyDamage(AActor* Source, float Magnitude, int32 Payload);
+	
 };

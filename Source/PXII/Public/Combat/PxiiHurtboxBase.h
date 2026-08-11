@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/PxiiDamageableInterface.h"
 #include "PxiiHurtboxBase.generated.h"
 
 UCLASS()
-class PXII_API APxiiHurtboxBase : public AActor
+class PXII_API APxiiHurtboxBase : public AActor, public IPxiiDamageableInterface
 {
 	GENERATED_BODY()
 	
@@ -23,4 +24,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void ApplyDamage_Implementation(AActor* Source, float Magnitude, int32 Payload) override;
 };

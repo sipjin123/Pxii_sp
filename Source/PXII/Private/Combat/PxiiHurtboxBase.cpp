@@ -15,7 +15,8 @@ APxiiHurtboxBase::APxiiHurtboxBase()
 void APxiiHurtboxBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Owner = GetParentActor();
+	UE_LOG(LogTemp, Log, TEXT("Hurtbox Owner is: %s"), *Owner.GetName());
 }
 
 // Called every frame
@@ -23,5 +24,11 @@ void APxiiHurtboxBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APxiiHurtboxBase::ApplyDamage_Implementation(AActor* Source, float Magnitude, int32 Payload)
+{
+	IPxiiDamageableInterface::ApplyDamage_Implementation(Source, Magnitude, Payload);
+	UE_LOG(LogTemp, Log, TEXT("Apply Damage Interface: %f - %d"), Magnitude, Payload);
 }
 
