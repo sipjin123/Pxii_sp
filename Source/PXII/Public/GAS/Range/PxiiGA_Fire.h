@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/PxiiCharacter.h"
+#include "Components/PxiiAimComponent.h"
 #include "GAS/PxiiGA_OneshotBase.h"
 #include "PxiiGA_Fire.generated.h"
 
@@ -24,9 +25,9 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void RequestProjectile(const FVector& projectilDir);
+	void RequestProjectile(const FHitInformation& projectilDir);
 
-	void RequestProjectile_Implementation(const FVector& projectilDir);
+	void RequestProjectile_Implementation(const FHitInformation& projectilDir);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FireProjectile(APxiiCharacter* Character);
@@ -41,6 +42,9 @@ private :
 	
 	UPROPERTY(EditAnywhere)
 	float DrawDuration = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
+	bool DrawDebugTrace = true;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability", meta=(AllowPrivateAccess = true))
 	bool TraceProcessDamage = false;

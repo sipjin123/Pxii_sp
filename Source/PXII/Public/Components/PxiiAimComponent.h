@@ -31,11 +31,14 @@ struct FHitInformation
 	
 	UPROPERTY(BlueprintReadOnly)
 	FVector TraceEnd = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector TraceDirection = FVector::ZeroVector;
 	
 	FHitInformation() = default;
 	
-	FHitInformation(const FHitResult& InHitResult, const FVector& InTraceStart, const FVector& InTraceEnd)
-		: HitResult(InHitResult), TraceStart(InTraceStart), TraceEnd(InTraceEnd)
+	FHitInformation(const FHitResult& InHitResult, const FVector& InTraceStart, const FVector& InTraceEnd, const FVector& InTraceDir)
+		: HitResult(InHitResult), TraceStart(InTraceStart), TraceEnd(InTraceEnd), TraceDirection(InTraceDir)
 	{
 		
 	}

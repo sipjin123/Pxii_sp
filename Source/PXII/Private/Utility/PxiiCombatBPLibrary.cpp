@@ -30,9 +30,9 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     return false;
 }
 
-void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVector& TraceDirection, bool processDamage, FName MuzzleSocketName)
+void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FHitInformation& TraceInformation, bool processDamage, FName MuzzleSocketName, bool drawDebugTrace)
 {
-    bool DrawTraces = true;
+    bool DrawTraces = drawDebugTrace;
     if (!Character)
     {
         return;
@@ -73,10 +73,9 @@ void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FVect
     FVector AimPoint = CameraHit.bBlockingHit ? CameraHit.ImpactPoint : CameraTraceEnd;
     bool hit = DoSocketTrace(Character, MuzzleSocketName, AimPoint, SocketHitInfo, DrawTraces);
     
-    TraceDirection = (SocketHitInfo.TraceEnd - SocketHitInfo.TraceStart).GetSafeNormal();
-    
     FHitResult SocketHit = SocketHitInfo.HitResult;
-
+    TraceInformation = SocketHitInfo;
+    
     if (APxiiCharacter* MainCharacter = Cast<APxiiCharacter>(Character))
     {
         if (MainCharacter->GetIsObstructed())
@@ -266,7 +265,9 @@ bool UPxiiCombatBPLibrary::DoSocketTrace(APxiiCharacter* character, FName socket
     
     const FVector TraceEnd = aimPoint + (aimPoint - TraceStart).GetSafeNormal() * 100.f;
     FCollisionQueryParams WeaponParams;
+    WeaponParams.bReturnPhysicalMaterial = true;
     WeaponParams.AddIgnoredActor(character);
+    
     FHitResult HitData;
     bool isHit = world->LineTraceSingleByChannel(HitData, TraceStart, TraceEnd, ECC_Visibility, WeaponParams);
     
@@ -290,8 +291,9 @@ bool UPxiiCombatBPLibrary::DoSocketTrace(APxiiCharacter* character, FName socket
             UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(world, TraceEnd,7.f, FColor::Cyan, debugDuration);
         }
     }
-    
-    HitResult = FHitInformation(HitData, TraceStart, TraceEnd);
+    FVector TraceDir = (TraceEnd - TraceStart).GetSafeNormal();
+
+    HitResult = FHitInformation(HitData, TraceStart, TraceEnd, TraceDir);
     return isHit;
 }
 

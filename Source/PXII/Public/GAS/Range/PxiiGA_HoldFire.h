@@ -19,9 +19,9 @@ public:
 	void FireProjectile_Implementation(APxiiCharacter* Character);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void RequestProjectile(const FVector& projectilDir);
+	void RequestProjectile(const FHitInformation& projectilDir);
 
-	void RequestProjectile_Implementation(const FVector& projectilDir);	
+	void RequestProjectile_Implementation(const FHitInformation& projectilDir);	
 	
 private:
 	

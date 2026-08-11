@@ -5,9 +5,13 @@
 
 #include "AbilitySystemInterface.h"
 #include "TimerManager.h"
+#include "Character/PxiiNPC.h"
+#include "Components/PxiiAimComponent.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SphereComponent.h"
+#include "HUD/PxiiHUDBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Subsystem/ProjectileSubsystem.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -81,15 +85,109 @@ void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHi
 	}
 }
 
+void APxiiProjectileBase::SpawnHitEffect_Implementation(const FHitResult& HitResult)
+{
+	if(!HitFeedback)
+	{
+		return;
+	}
+
+	HitFeedbackType = EHitFeedbackType::Standard;
+	APxiiNPC* character = Cast<APxiiNPC>(HitResult.GetActor());
+	if(!character)
+	{
+		return;	
+	}
+
+	if(HitResult.BoneName == FName("head"))
+	{
+		HitFeedbackType = EHitFeedbackType::Critical;
+	}
+
+	float remLife = character->GetAbilitySystemComponent()->GetNumericAttribute(UPxiiAttributeSet::GetHealthAttribute());
+	if(remLife - GetDamage(HitResult) <= 0.0f)
+	{
+		HitFeedbackType = EHitFeedbackType::Kill;
+	}
+	
+	if(!HitFeedback->HasFeedback(HitFeedbackType))
+	{
+		return;
+	}
+
+	const FHitFeedbackEntry* feedbackEntry = HitFeedback->GetFeedback(HitFeedbackType);
+	if(feedbackEntry->HitmarkerSfx)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), feedbackEntry->HitmarkerSfx, HitResult.ImpactPoint,
+		feedbackEntry->HitmarkerSfxVolumeMultiplier);
+	}
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		APxiiHUDBase* baseHUD = Cast<APxiiHUDBase>(PC->GetHUD());
+		UPxiiHUD* HUD = baseHUD->HUDLayout;
+		if(HUD)
+		{
+			HUD->ShowHitMarkers(feedbackEntry->Hitmarkers, feedbackEntry->HitmarkerScale,
+				feedbackEntry->HitmarkerDuration, feedbackEntry->HitmarkerColor);
+		}
+		
+		if(feedbackEntry->ShooterCameraShake)
+		{
+			if (APlayerCameraManager* CameraManager = PC->PlayerCameraManager)
+			{
+				CameraManager->StartCameraShake(feedbackEntry->ShooterCameraShake,1.0f);
+			}
+		}
+	}
+}
+
 void APxiiProjectileBase::SpawnImpactEffects_Implementation(const FHitResult& Hit)
 {
-	if(ImpactEffect)
+	if(!ImpactEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect,	Hit.ImpactPoint,
-			Hit.ImpactNormal.Rotation(), FVector(1.0f),	true, true,  
-			ENCPoolMethod::AutoRelease, true             
-		);
+		return;
 	}
+
+	const FImpactEffectData effectData = ImpactEffect->GetEffectForSurface(TargetSurfaceType);
+
+	if(effectData.ImpactEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), effectData.ImpactEffect,	Hit.ImpactPoint,
+		Hit.ImpactNormal.Rotation(), FVector(1.0f),	true, true,  
+		ENCPoolMethod::AutoRelease, true);		
+	}
+	
+	if (!effectData.ImpactSfx.IsEmpty())
+	{
+		int32 index = 0;
+		if(effectData.ImpactSfx.Num() > 1)
+		{
+			index = FMath::RandRange(0, effectData.ImpactSfx.Num() - 1);
+		}
+
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), effectData.ImpactSfx[index], Hit.ImpactPoint,
+				effectData.SoundVolumeMultiplier);
+	}
+
+	if(Hit.GetActor())
+	{
+		if(!Hit.GetActor()->IsA<APawn>())
+		{	
+			if (effectData.DecalMaterial)
+			{
+				UGameplayStatics::SpawnDecalAtLocation(GetWorld(), effectData.DecalMaterial, effectData.DecalSize,
+					Hit.ImpactPoint, Hit.ImpactNormal.Rotation(), effectData.DecalLifetime);			
+			}
+		}
+		else
+		{
+			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Playing feedback effect"));
+			SpawnHitEffect(Hit);
+		}		
+	}
+
 }
 
 void APxiiProjectileBase::SpawnTrailEffects_Implementation()
@@ -108,7 +206,7 @@ void APxiiProjectileBase::SpawnTrailEffects_Implementation()
 	}
 }
 
-void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed,
+void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, const FHitInformation& HitInformation, float Speed,
 	AActor* InInstigator, AActor* InWeaponOwner)
 {
 	PXII_LOG(ELogCategory::Projectile, Log, TEXT("INITALIZED: %s"), *GetName());
@@ -116,9 +214,12 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 	WeaponOwner = InWeaponOwner;
 	BaseDMG = BaseDamage;
 
+	TraceInformation = HitInformation;
+	
+	TargetSurfaceType = GetSurfaceType(HitInformation.HitResult);
 	InstigatorASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InWeaponOwner);
 
-	FVector NormalizedDir = Direction.GetSafeNormal();
+	FVector NormalizedDir = HitInformation.TraceDirection.GetSafeNormal();
 	SetActorRotation(NormalizedDir.Rotation());
 	
 	ProjectileMovement->Velocity = NormalizedDir * Speed;
@@ -147,20 +248,12 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 	
 		if (UPxiiPlayerCombatComponent* PlayerCombatComp = Cast<UPxiiPlayerCombatComponent>(SelfCombatComp))
 		{
-			float dist = FVector::Dist(result.ImpactPoint, TargetActor->GetActorLocation());
-			float fallOffModifier = 1.0f;
 			if (ExplosionRadius > 0.0f)
 			{
 				DrawDebugSphere(GetWorld(), result.ImpactPoint, ExplosionRadius, 32, FColor::Red,
 					false, 2.0f, 0, 1.0f);
-				if(EnableDamageFalloff)
-				{
-					fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
-				}
 			}
-			
-			const float finalDMG = BaseDMG * fallOffModifier;
-			
+			float finalDMG = GetDamage(result);
 			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
 			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, finalDMG,  EDamageSource::Range);
 		}
@@ -233,6 +326,23 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 	//*/
 }
 
+float APxiiProjectileBase::GetDamage(const FHitResult& result)
+{
+	if(!result.GetActor())
+	{
+		return 0.0f;
+	}
+	
+	float fallOffModifier = 1.0f;
+	if(EnableDamageFalloff)
+	{
+		float dist = FVector::Dist(result.ImpactPoint, result.GetActor()->GetActorLocation());
+		fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
+	}
+
+	return BaseDMG * fallOffModifier;
+}
+
 void APxiiProjectileBase::SetProjectileTag(FGameplayTag inTag)
 {
 	PoolTag = inTag;
@@ -242,6 +352,15 @@ void APxiiProjectileBase::SetProjectileTag(FGameplayTag inTag)
 FGameplayTag APxiiProjectileBase::GetPoolTag()
 {
 	return PoolTag;
+}
+
+EPhysicalSurface APxiiProjectileBase::GetSurfaceType(const FHitResult& hit)
+{
+	if (hit.PhysMaterial.IsValid())
+	{
+		return hit.PhysMaterial->SurfaceType;
+	}
+	return SurfaceType_Default;
 }
 
 void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
@@ -300,8 +419,8 @@ void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AAc
 		return;
 	}
 
-	ApplyDamage(OtherActor, Hit);
-	SpawnImpactEffects(Hit);
+	ApplyDamage(OtherActor, TraceInformation.HitResult);
+	SpawnImpactEffects(TraceInformation.HitResult);
 	ReturnProjecileToPool();
 }
 

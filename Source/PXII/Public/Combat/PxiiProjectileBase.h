@@ -10,7 +10,10 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
+#include "Components/PxiiAimComponent.h"
+#include "Data/PxiiHitFeedbackData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Data/ImpactData.h"
 #include "PxiiProjectileBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReturnToPool, APxiiProjectileBase*);
@@ -65,6 +68,11 @@ public:
 	void ApplyDamage(AActor* HitActor, const FHitResult& Hit);
 	
 	virtual void ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
+	void SpawnHitEffect(const FHitResult& HitResult);
+
+	void SpawnHitEffect_Implementation(const FHitResult& HitResult);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void SpawnImpactEffects(const FHitResult& Hit);
@@ -77,18 +85,23 @@ public:
 	virtual void SpawnTrailEffects_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
-	void InitializeProjectile(float BaseDamage, const FVector& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
+	void InitializeProjectile(float BaseDamage, const FHitInformation& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
 
-	virtual void InitializeProjectile_Implementation(float BaseDamage, const FVector& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
+	virtual void InitializeProjectile_Implementation(float BaseDamage, const FHitInformation& Direction, float Speed, AActor* InInstigator, AActor* InWeaponOwner);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ApplyDamageEffectToActor(AActor* TargetActor, const FHitResult& result);
 	
 	virtual void ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result);
 
+	UFUNCTION(BlueprintPure, Category = "Projectile")
+	float GetDamage(const FHitResult& result);
+
 	void SetProjectileTag(FGameplayTag inTag);
 
 	FGameplayTag GetPoolTag();
+
+	
 
 protected:
 	
@@ -108,7 +121,10 @@ protected:
 	bool EnableDamageFalloff = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|VFX", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNiagaraSystem> ImpactEffect;
+	TObjectPtr<UPxiiHitFeedbackData> HitFeedback;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|VFX", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UImpactData> ImpactEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|VFX", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraSystem> TrailEffect;
@@ -135,8 +151,18 @@ private:
 	
 	bool bIsInUse = false;
 
+	FHitInformation TraceInformation;
+	
 	FTimerHandle LifetimeTimerHandle;
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	TEnumAsByte<EPhysicalSurface> TargetSurfaceType;
+
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	EHitFeedbackType HitFeedbackType = EHitFeedbackType::Standard;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	FGameplayTag PoolTag;
+
+	EPhysicalSurface GetSurfaceType(const FHitResult& hit);
 };
