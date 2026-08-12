@@ -17,6 +17,7 @@ void UPxiiGA_InflictionBase::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	const FGameplayAbilityActorInfo* OwnerInfo, const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogTemp, Log, TEXT("BLOG::Activate"));
 	Super::ActivateAbility(Handle, OwnerInfo, ActivationInfo, TriggerEventData);
 }
 

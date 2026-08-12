@@ -1,6 +1,8 @@
 ﻿#include "GameInstance/PxiiGameInstance.h"
 
+#if WITH_EDITOR
 #include "DataTableEditorUtils.h"
+#endif
 #include "Engine/AssetManager.h"
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"

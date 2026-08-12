@@ -2,15 +2,6 @@
 #include "Engine/Engine.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(PXIILoadingScreenLog, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIISocketLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIILobbyLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIIInventoryLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIIAILogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIICombatLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIIAbilityLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIIEquipmentLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIISkilltreeLogs, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(PXIIObjectiveLogs, Log, All);
 
 UENUM()
 enum class EPXIILoadingScreenLogVerbosity : uint8
@@ -28,18 +19,6 @@ UENUM()
 enum class ELoadingScreenLogCategory : uint8
 {
 	General,
-	Socket,
-	Lobby,
-	Inventory,
-	AI,
-	Combat,
-	Ability,
-	Equipment,
-	SkillTree,
-	Objective,
-	Controls,
-	UI,
-	Aim
 };
 
 class LOADINGSCREENMODULE_API PXIILoadingScreenLogUtility
@@ -57,17 +36,8 @@ public:
 	{
 		switch (category)
 		{
-		case ELoadingScreenLogCategory::General:     return PXIILoadingScreenLog;
-		case ELoadingScreenLogCategory::Socket:      return PXIISocketLogs;
-		case ELoadingScreenLogCategory::Lobby:		return PXIILobbyLogs;
-		case ELoadingScreenLogCategory::Inventory:	return PXIIInventoryLogs;
-		case ELoadingScreenLogCategory::AI:			return PXIIAILogs;
-		case ELoadingScreenLogCategory::Combat:		return PXIICombatLogs;
-		case ELoadingScreenLogCategory::Ability:		return PXIIAbilityLogs;
-		case ELoadingScreenLogCategory::Equipment:	return PXIIEquipmentLogs;
-		case ELoadingScreenLogCategory::SkillTree:	return PXIISkilltreeLogs;
-		case ELoadingScreenLogCategory::Objective:	return PXIIObjectiveLogs;
-		default:                         return PXIILoadingScreenLog;
+			case ELoadingScreenLogCategory::General:    return PXIILoadingScreenLog;
+			default:									return PXIILoadingScreenLog;
 		}
 	}
 };
@@ -80,33 +50,6 @@ do { \
 		{ \
 			case ELoadingScreenLogCategory::General: \
 				UE_LOG(PXIILoadingScreenLog, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Socket: \
-				UE_LOG(PXIISocketLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Lobby: \
-				UE_LOG(PXIILobbyLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Inventory: \
-				UE_LOG(PXIIInventoryLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::AI: \
-				UE_LOG(PXIIAILogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Combat: \
-				UE_LOG(PXIICombatLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Ability: \
-				UE_LOG(PXIIAbilityLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Equipment: \
-				UE_LOG(PXIIEquipmentLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::SkillTree: \
-				UE_LOG(PXIISkilltreeLogs, Verbosity, Format, ##__VA_ARGS__); \
-				break; \
-			case ELoadingScreenLogCategory::Objective: \
-				UE_LOG(PXIIObjectiveLogs, Verbosity, Format, ##__VA_ARGS__); \
 				break; \
 			default: \
 				UE_LOG(LogTemp, Verbosity, Format, ##__VA_ARGS__); \
