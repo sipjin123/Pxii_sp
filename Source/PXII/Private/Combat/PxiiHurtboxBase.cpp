@@ -29,6 +29,7 @@ void APxiiHurtboxBase::Tick(float DeltaTime)
 void APxiiHurtboxBase::ApplyDamage_Implementation(AActor* Source, float Magnitude, int32 Payload)
 {
 	IPxiiDamageableInterface::ApplyDamage_Implementation(Source, Magnitude, Payload);
+	OnPartHit.Broadcast(Source,Magnitude,Payload);
 	UE_LOG(LogTemp, Log, TEXT("Apply Damage Interface: %f - %d"), Magnitude, Payload);
 }
 

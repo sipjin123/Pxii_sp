@@ -240,8 +240,11 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
 	PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()));
-	if (result.GetActor()->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
+
+	auto NewHitActor = TargetActor;
+	if (NewHitActor && NewHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
 	{
+		IPxiiDamageableInterface::Execute_ApplyDamage(NewHitActor, GetOwner(), GetDamage(result), 0);
 		PXII_LOG(ELogCategory::Projectile, Log, TEXT("NEW TArget is a BODY PART"));
 	}
 	if(DamageGE == nullptr)

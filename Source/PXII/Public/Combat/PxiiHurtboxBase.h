@@ -7,6 +7,7 @@
 #include "Interface/PxiiDamageableInterface.h"
 #include "PxiiHurtboxBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPartHit, AActor*, Source, float, Magnitude, int32, Payload);
 UCLASS()
 class PXII_API APxiiHurtboxBase : public AActor, public IPxiiDamageableInterface
 {
@@ -25,4 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void ApplyDamage_Implementation(AActor* Source, float Magnitude, int32 Payload) override;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnPartHit OnPartHit;
 };
