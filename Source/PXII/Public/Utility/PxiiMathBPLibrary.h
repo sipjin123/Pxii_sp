@@ -17,6 +17,10 @@ class PXII_API UPxiiMathBPLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static FVector GetLocationInFrontOfActor(const AActor* Actor, float Distance);
+	
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static FVector GetLocationInFrontOfActorCam(const AActor* Actor, const FRotator& CameraRotation, float Distance);
+	
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static FVector GetLocationTopOfActor(const AActor* Actor, float Distance);
 

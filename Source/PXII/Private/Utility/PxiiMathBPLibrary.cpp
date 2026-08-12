@@ -14,6 +14,17 @@ FVector UPxiiMathBPLibrary::GetLocationInFrontOfActor(const AActor* Actor, float
 	return Actor->GetActorLocation() + Actor->GetActorForwardVector() * Distance;
 }
 
+FVector UPxiiMathBPLibrary::GetLocationInFrontOfActorCam(const AActor* Actor, const FRotator& CameraRotation, float Distance)
+{
+	if (!Actor)
+		return FVector::ZeroVector;
+
+	FRotator Rotation = Actor->GetActorRotation();
+	Rotation.Yaw = CameraRotation.Yaw;
+	const FVector Forward = Rotation.Vector();
+	return Actor->GetActorLocation() + Forward * Distance;
+}
+
 FVector UPxiiMathBPLibrary::GetLocationTopOfActor(const AActor* Actor, float Distance)
 {
 	if (!Actor) return FVector::ZeroVector;
