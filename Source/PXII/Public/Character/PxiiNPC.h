@@ -84,6 +84,11 @@ public:
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHitTarget TraceTarget;
+
+	UPROPERTY(BlueprintReadWrite)
+	AActor* LastKnownAttacker;
+
+	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")

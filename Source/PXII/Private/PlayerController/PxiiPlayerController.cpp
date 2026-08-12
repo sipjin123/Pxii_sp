@@ -58,6 +58,9 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 	ASC = Cast<UPxiiAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(InPawn));
 	AimAssistComp = InPawn->GetComponentByClass<UPxiiAimAssistComponent>();
 	AimComp = InPawn->GetComponentByClass<UPxiiAimComponent>();
+
+	ActiveMapContext = DefaultMappingContext.GetName();
+	OnControlMappingUpdate();
 }
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -199,17 +202,56 @@ void APxiiPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void APxiiPlayerController::OnInputMethodChanged(ECommonInputType inputType)
 {
-	FName NewGamepadName = CommonInput->GetCurrentGamepadName();
-	
+	CurrentInputType = inputType;	
 	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
 	{
 		InputSubsystem->GetInputMapManager()->ClearAllMappings();
 		InputSubsystem->GetInputMapManager()->AddMappingContext(MappingContext[inputType], 0);
 
-		bool isUpdated = InputSubsystem->GetInputMapManager()->HasMappingContext(MappingContext[inputType]);
+		auto& keyboardMap = MappingContext[inputType];
+		bool isUpdated = InputSubsystem->GetInputMapManager()->HasMappingContext(keyboardMap);			
+		ActiveMapContext = keyboardMap.GetName();
+
 		PXII_LOG(ELogCategory::Controls, Warning, TEXT("Input method changed: Mapping %s Success: %s"), *UEnum::GetValueAsString(inputType),
-			isUpdated ? TEXT("TRUE") : TEXT("FALSE"));
+				isUpdated ? TEXT("TRUE") : TEXT("FALSE"));
+
+		if(CurrentInputType == ECommonInputType::MouseAndKeyboard)
+		{
+			CurrentKeyboardMap = 0;
+		}
+		OnControlMappingUpdate();
 	}
+}
+
+void APxiiPlayerController::SwitchMappingControls_Implementation(int32 mapIndex)
+{
+	if(CurrentInputType != ECommonInputType::MouseAndKeyboard)
+	{
+		return;
+	}
+
+	if (UPlayerInputSubsystem* InputSubsystem = GetPlayerInputSubsystem())
+	{
+		int32 maxVal = KeyboardMapContext.Num();
+		CurrentKeyboardMap = FMath::Clamp(CurrentKeyboardMap + mapIndex, 0, maxVal - 1);
+		auto& keyboardMap = KeyboardMapContext[CurrentKeyboardMap];
+
+		InputSubsystem->GetInputMapManager()->ClearAllMappings();
+		InputSubsystem->GetInputMapManager()->AddMappingContext(keyboardMap, 0);
+
+		ActiveMapContext = keyboardMap.GetName();
+		OnControlMappingUpdate();
+	}
+}
+
+void APxiiPlayerController::OnControlMappingUpdate_Implementation()
+{
+	
+}
+
+FString APxiiPlayerController::GetActiveMapDisplayName()
+{
+	return ActiveMapContext;
 }
 
 UPlayerInputSubsystem* APxiiPlayerController::GetPlayerInputSubsystem() const

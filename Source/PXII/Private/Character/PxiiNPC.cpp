@@ -148,3 +148,9 @@ void APxiiNPC::DisableAttackState_Implementation()
 	IsAttacking = false;
 	OnAttackState.Broadcast(false, 0);
 }
+
+void APxiiNPC::RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage)
+{
+	IPxiiCombatInterface::RegisterLastKnownAttacker_Implementation(Target, Damage);
+	LastKnownAttacker = Target;
+}

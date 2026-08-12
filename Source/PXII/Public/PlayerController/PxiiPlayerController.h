@@ -26,7 +26,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputAction> LookInput;
-	
+
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -75,6 +75,17 @@ protected:
 
 	UFUNCTION()
 	void OnInputMethodChanged(ECommonInputType inputType);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SwitchMappingControls(int32 mapIndex = 1);
+	void SwitchMappingControls_Implementation(int32 mapIndex = 1);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnControlMappingUpdate();
+	void OnControlMappingUpdate_Implementation();
+
+	UFUNCTION(BlueprintPure)
+	FString GetActiveMapDisplayName();
 	
 private:
 
@@ -86,6 +97,15 @@ private:
 	TObjectPtr<UPxiiAimComponent> AimComp;
 	UPROPERTY()
 	TObjectPtr<UCommonInputSubsystem> CommonInput;
+	UPROPERTY()
+	ECommonInputType CurrentInputType = ECommonInputType::MouseAndKeyboard;
+	UPROPERTY()
+	int32 CurrentKeyboardMap = 0;
+	UPROPERTY()
+	FString ActiveMapContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<UInputMappingContext>> KeyboardMapContext;
 	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);

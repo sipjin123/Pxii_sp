@@ -82,6 +82,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void NotifyHitTarget(AActor* Target, FDamageNotifPayload Payload);
 
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void RegisterLastKnownAttacker(AActor* Target, float Damage);
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	void ReleaseAggro();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
