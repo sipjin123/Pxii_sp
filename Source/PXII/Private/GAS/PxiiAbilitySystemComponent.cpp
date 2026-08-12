@@ -11,7 +11,7 @@ DEFINE_LOG_CATEGORY(LogTempAbilityComp);
 
 UPxiiAbilitySystemComponent::UPxiiAbilitySystemComponent()
 {
-	InputBlockTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.InputTag.Block")));
+	InputBlockTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Pxii.InputTag.BlockInput")));
 }
 
 void UPxiiAbilitySystemComponent::BeginPlay()
