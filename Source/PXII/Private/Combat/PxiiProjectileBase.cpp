@@ -11,6 +11,7 @@
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SphereComponent.h"
 #include "HUD/PxiiHUDBase.h"
+#include "Interface/PxiiDamageableInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/ProjectileSubsystem.h"
 #include "Utility/PXIILogUtility.h"
@@ -46,7 +47,7 @@ void APxiiProjectileBase::BeginPlay()
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Damage"));
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Projectile Damage: {%s} -- {%s}"), *GetNameSafe(HitActor), *GetNameSafe(Hit.GetActor()));
 	
 	if(DamageGE && !InstigatorASC)
 	{
@@ -238,6 +239,11 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()));
+	if (result.GetActor()->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
+	{
+		PXII_LOG(ELogCategory::Projectile, Log, TEXT("NEW TArget is a BODY PART"));
+	}
 	if(DamageGE == nullptr)
 	{
 		UPxiiCombatComponent* SelfCombatComp = IPxiiCombatInterface::Execute_GetCombatComponent(WeaponOwner);
@@ -259,6 +265,9 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 			float finalDMG = GetDamage(result);
 			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
 			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, finalDMG,  EDamageSource::Range);
+		} else
+		{
+			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Player is not using Combat Component!"));
 		}
 	}
 	else
@@ -415,7 +424,7 @@ void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AAc
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT: %s"), *GetName());
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT: %s -- %s -- %s -- %s"), *GetName(), *OtherComp->GetName(), *GetNameSafe(Hit.GetActor()), *GetNameSafe(Hit.GetComponent()));
 	
 	if (OtherActor == this || OtherActor == InstigatorActor)
 	{

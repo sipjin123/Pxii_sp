@@ -9,6 +9,7 @@
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Data/PxiiTags.h"
 #include "Enum/PxiiDamageType.h"
+#include "Interface/PxiiDamageableInterface.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
 bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, FName MuzzleSocketName, FTransform& OutTransform)
@@ -131,6 +132,7 @@ void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult
 
     if(!processDamage)
     {
+        UE_LOG(LogTemp, Warning, TEXT("---------------- Skip Process"));
         return;
     }
     
@@ -142,6 +144,7 @@ void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult
         const ACharacter* CharHitRef = Cast<ACharacter>(CurrHitActor);
         if (const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
         {
+            UE_LOG(LogTemp, Warning, TEXT("---------------- Hit Entity"));
             //const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
             const bool IsBossUnit = false;
             if (IsBossUnit)
@@ -157,6 +160,11 @@ void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult
                 const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
                 PXII_LOG(ELogCategory::Trace, Warning, TEXT("TRACE HIT Damage: {%f}"), AttributeSet->Health.GetCurrentValue());
             }
+        }
+
+        if (const bool ImplementsDamageableInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("---------------- Hit BODY PART"));
         }
     }
 }
