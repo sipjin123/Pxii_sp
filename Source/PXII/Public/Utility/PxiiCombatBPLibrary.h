@@ -61,4 +61,7 @@ public:
 			}
 		}
 	}
+
+	UFUNCTION(BlueprintCallable)
+	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude);
 };

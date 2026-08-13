@@ -141,7 +141,6 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 				{
 					const FVector HitLocation = Context.GetOrigin();
 					//UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
-					FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 					Spawner->OnSpawnDamageText.Broadcast(HitLocation, IncomingDamage, bIsCritical);
 				}
 			}

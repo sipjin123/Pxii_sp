@@ -10,6 +10,7 @@
 #include "Data/PxiiTags.h"
 #include "Enum/PxiiDamageType.h"
 #include "Interface/PxiiDamageableInterface.h"
+#include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
 bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, FName MuzzleSocketName, FTransform& OutTransform)
@@ -29,6 +30,49 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     }
 
     return false;
+}
+
+void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude)
+{
+    UAbilitySystemComponent* InstigatorASC = nullptr;
+    if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(SourceActor))
+    {
+        InstigatorASC = ASI->GetAbilitySystemComponent();
+        FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
+        ContextHandle.AddSourceObject(SourceActor);
+        ContextHandle.AddHitResult(result);
+        ContextHandle.AddOrigin(result.ImpactPoint);
+        ContextHandle.AddInstigator(SourceActor, SourceActor);
+		
+        IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+        if (!TargetASI)
+        {
+            return;
+        }
+
+        UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+        if (!TargetASC)
+        {
+            return;
+        }
+		
+        if (UPxiiCombatRegistrySubsystem* Spawner = SourceActor->GetWorld()->GetSubsystem<UPxiiCombatRegistrySubsystem>())
+        {
+            FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(Spawner->GetGenericDamageEffect(), 1.0f, ContextHandle);
+            if(SpecHandle.IsValid())
+            {
+                // Add the magnitude value as a tag with payload.
+                const FGameplayTag DamageTag = FGameplayTag::RequestGameplayTag(FName("Combat.Damage"));
+                SpecHandle.Data->SetSetByCallerMagnitude(DamageTag, Magnitude);
+
+                InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+            }
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("---------------- FAILED TO Register Hit"));
+    }
 }
 
 void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FHitInformation& TraceInformation, bool processDamage, FName MuzzleSocketName, bool drawDebugTrace)

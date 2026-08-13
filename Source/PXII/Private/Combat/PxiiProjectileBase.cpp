@@ -14,6 +14,7 @@
 #include "Interface/PxiiDamageableInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/ProjectileSubsystem.h"
+#include "Utility/PxiiDebugTraceBPLibrary.h"
 #include "Utility/PXIILogUtility.h"
 
 // Sets default values
@@ -245,6 +246,8 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 	{
 		IPxiiDamageableInterface::Execute_ApplyDamage(NewHitActor, GetOwner(), GetDamage(result), 0);
 		PXII_LOG(ELogCategory::Projectile, Log, TEXT("NEW TArget is a BODY PART"));
+		UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, result.ImpactPoint, 25.f, FLinearColor::Blue, 2.f);
+		return;
 	}
 	if(DamageGE == nullptr)
 	{
