@@ -90,7 +90,7 @@ void APxiiNPC::BeginPlay()
 
 void APxiiNPC::OnStaggerMeterChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Warning, TEXT("StaggerMeter: %f -> %f"), Data.OldValue, Data.NewValue);
+	//UE_LOG(LogTemp, Warning, TEXT("StaggerMeter: %f -> %f"), Data.OldValue, Data.NewValue);
 	if (Data.NewValue >= 100.f)
 	{
 		OnHitEffectType.Broadcast(EHitEffectType::Stagger, 0);

@@ -135,9 +135,15 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		{
 			if (UWorldSpawnerSubsystem* Spawner = World->GetSubsystem<UWorldSpawnerSubsystem>())
 			{
-				//UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
-				FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
-				Spawner->OnSpawnDamageText.Broadcast(spawnLoc, IncomingDamage, bIsCritical);
+				const FGameplayEffectContextHandle& Context = GESpec.GetContext();
+
+				if (Context.IsValid())
+				{
+					const FVector HitLocation = Context.GetOrigin();
+					//UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
+					FVector spawnLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+					Spawner->OnSpawnDamageText.Broadcast(HitLocation, IncomingDamage, bIsCritical);
+				}
 			}
 		}
 	}

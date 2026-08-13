@@ -98,13 +98,18 @@ void UPxiiGA_ADS::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 	{
 		CurrentPlayerCharacter->SetIsADSEnabled(false);
 	}
-
-	APxiiHUDBase* PXIIHUD = Cast<APxiiHUDBase>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (PXIIHUD)
+	if (UWorld* World = GetWorld())
 	{
-		if(PXIIHUD->HUDLayout)
+		if (World->GetFirstPlayerController() && World->GetFirstPlayerController()->GetHUD())
 		{
-			PXIIHUD->HUDLayout->ToggleADS(false);
+			APxiiHUDBase* PXIIHUD = Cast<APxiiHUDBase>(World->GetFirstPlayerController()->GetHUD());
+			if (PXIIHUD)
+			{
+				if(PXIIHUD->HUDLayout)
+				{
+					PXIIHUD->HUDLayout->ToggleADS(false);
+				}
+			}
 		}
 	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
