@@ -54,8 +54,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsObstructed() { return bIsObstructed; }
 
-	UFUNCTION()
-	void SetIsADSEnabled(bool bCond) { bIsADSActive = bCond; }
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetIsADSEnabled(bool isEnabled); 
+
+	void SetIsADSEnabled_Implementation(bool isEnabled);
 	
 	UFUNCTION()
 	void SetIsObstructed(bool bCond) { bIsObstructed = bCond; }

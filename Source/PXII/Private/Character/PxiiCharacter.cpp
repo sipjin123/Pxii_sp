@@ -39,6 +39,11 @@ USkeletalMeshComponent* APxiiCharacter::GetMesh()
 	return MeshRef;
 }
 
+void APxiiCharacter::SetIsADSEnabled_Implementation(bool isEnabled)
+{
+	bIsADSActive = isEnabled; 
+}
+
 APxiiWeaponRange* APxiiCharacter::GetWeaponBaseRange_Implementation()
 {
 	return CurrentWeaponRanged;

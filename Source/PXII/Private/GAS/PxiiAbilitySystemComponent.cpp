@@ -19,6 +19,7 @@ void UPxiiAbilitySystemComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OnAbilityEnded.AddUObject(this, &UPxiiAbilitySystemComponent::HandleAbilityEnded);
+
 }
 
 void UPxiiAbilitySystemComponent::GrantAbilityByRow(FName RowName)
@@ -44,6 +45,11 @@ void UPxiiAbilitySystemComponent::GrantAbilityByRow(FName RowName)
 	GiveAbility(Spec);
 }
 
+void UPxiiAbilitySystemComponent::CancelAllPendingAbilities()
+{
+	CancelAllAbilities();
+}
+
 void UPxiiAbilitySystemComponent::GrantAllAbilities()
 {
 	if(!AbilityData)
@@ -52,24 +58,13 @@ void UPxiiAbilitySystemComponent::GrantAllAbilities()
 	}
 
 	static const FString Context(TEXT("GrantAllAbilities"));
-
-	for(FAbilityData Row : AbilityData->PlayerGrantedAbilities)
-	{
-		if(!Row.AbilityClass)
-		{
-			continue;	
-		}
-		
-		if (LogAbilityInit)
-		{
-			UE_LOG(LogTempAbilityComp,Warning,TEXT("GiveAbility: %s"),*Row.Name.ToString());
-		}
-
-		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row.AbilityClass, Row.Level,INDEX_NONE);
-		Spec.GetDynamicSpecSourceTags().AddTag(Row.InputTag);
-		
-		GiveAbility(Spec);
-	}
+	
+	GrantAbilities(AbilityData->PlayerGrantedAbilities);
+	GrantAbilities(AbilityData->Blessings);
+	GrantAbilities(AbilityData->BlasterAbilities);
+	GrantAbilities(AbilityData->MeleeCombos);
+	GrantAbilities(AbilityData->CharacterUtilities);
+	GrantAbilities(AbilityData->MeleeAbilities);
 }
 
 void UPxiiAbilitySystemComponent::GrantAllPlayerEffects()
@@ -78,7 +73,7 @@ void UPxiiAbilitySystemComponent::GrantAllPlayerEffects()
 	{
 		return;	
 	}
-
+	
 	if(AbilityData->PlayerGrantedAbilities.IsEmpty())
 	{
 		return;
@@ -106,6 +101,27 @@ void UPxiiAbilitySystemComponent::GrantAllPlayerEffects()
 		{
 			ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
+	}
+}
+
+void UPxiiAbilitySystemComponent::GrantAbilities(const TArray<FAbilityData>& Abilities)
+{
+	for(FAbilityData Row : Abilities)
+	{
+		if(!Row.AbilityClass)
+		{
+			continue;	
+		}
+		
+		if (LogAbilityInit)
+		{
+			UE_LOG(LogTempAbilityComp,Warning,TEXT("GiveAbility: %s"),*Row.Name.ToString());
+		}
+
+		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row.AbilityClass, Row.Level,INDEX_NONE);
+		Spec.GetDynamicSpecSourceTags().AddTag(Row.InputTag);
+		
+		GiveAbility(Spec);
 	}
 }
 

@@ -71,6 +71,21 @@ class PXII_API UPxiiAbilityData : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TArray<FAbilityData> PlayerGrantedAbilities;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	TArray<FAbilityData> Blessings;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	TArray<FAbilityData> MeleeAbilities;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	TArray<FAbilityData> MeleeCombos;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	TArray<FAbilityData> BlasterAbilities;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	TArray<FAbilityData> CharacterUtilities;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TArray<FGameplayEffectData> PlayerGrantedEffect;

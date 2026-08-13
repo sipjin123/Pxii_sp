@@ -26,10 +26,16 @@ public:
 	void GrantAbilityByRow(FName RowName);
 
 	UFUNCTION(BlueprintCallable,Category="Ability")
+	void CancelAllPendingAbilities();
+	
+	UFUNCTION(BlueprintCallable,Category="Ability")
 	void GrantAllAbilities();
 
 	UFUNCTION(BlueprintCallable,Category="Ability")
 	void GrantAllPlayerEffects();
+
+	UFUNCTION(BlueprintCallable,Category="Ability")
+	void GrantAbilities(const TArray<FAbilityData>& Abilities);
 
 	UPROPERTY(EditAnywhere)
 	bool LogAbilityInit;
