@@ -29,4 +29,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void ApplyDamage(AActor* Source, float Magnitude, int32 Payload);
 	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	EDamagePart GetPartType();
 };

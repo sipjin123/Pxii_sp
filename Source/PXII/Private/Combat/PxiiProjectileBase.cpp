@@ -210,7 +210,6 @@ void APxiiProjectileBase::SpawnTrailEffects_Implementation()
 void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, const FHitInformation& HitInformation, float Speed,
 	AActor* InInstigator, AActor* InWeaponOwner)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("INITALIZED: %s"), *GetName());
 	InstigatorActor = InInstigator;
 	WeaponOwner = InWeaponOwner;
 	BaseDMG = BaseDamage;

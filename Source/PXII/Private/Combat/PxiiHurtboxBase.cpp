@@ -33,3 +33,8 @@ void APxiiHurtboxBase::ApplyDamage_Implementation(AActor* Source, float Magnitud
 	UE_LOG(LogTemp, Log, TEXT("Apply Damage Interface: %f - %d"), Magnitude, Payload);
 }
 
+EDamagePart APxiiHurtboxBase::GetPartType_Implementation()
+{
+	return DamagePart;
+}
+

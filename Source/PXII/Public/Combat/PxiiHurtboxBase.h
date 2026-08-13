@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Enum/PxiiDamageType.h"
 #include "Interface/PxiiDamageableInterface.h"
 #include "PxiiHurtboxBase.generated.h"
 
@@ -27,6 +28,11 @@ public:
 
 	virtual void ApplyDamage_Implementation(AActor* Source, float Magnitude, int32 Payload) override;
 
+	virtual EDamagePart GetPartType_Implementation() override;
+	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnPartHit OnPartHit;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EDamagePart DamagePart;
 };

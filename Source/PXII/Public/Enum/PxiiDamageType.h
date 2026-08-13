@@ -45,6 +45,20 @@ enum class EDamageSource:uint8
 };
 
 UENUM(BlueprintType)
+enum class EDamagePart:uint8
+{
+	None=0 UMETA(DisplayName="None"),
+
+	// Physical
+	Head=1 UMETA(DisplayName="Head"),
+	Weakness=2 UMETA(DisplayName="Weakness"),
+	Body=3 UMETA(DisplayName="Body"),
+	Resistance=4 UMETA(DisplayName="Resistance"),
+	Armor=5 UMETA(DisplayName="Armor"),
+	Invulnerable=6 UMETA(DisplayName="Invulnerable"),
+};
+
+UENUM(BlueprintType)
 enum class EHitEffectType : uint8 {
 	Default = 0			UMETA(DisplayName = "Default"),
 	Flinch = 1		UMETA(DisplayName = "Flinch"),
