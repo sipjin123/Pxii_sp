@@ -37,4 +37,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static bool GetRandomNavigablePointInRing(UObject* WorldContextObject, const FVector& Origin, float InnerRadius, float OuterRadius,
 		TSubclassOf<UNavigationQueryFilter> FilterClass, FVector& OutLocation, int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug = false, float Duration = 2.f);
+	
+	UFUNCTION(BlueprintCallable, Category="PXII|Math")
+	static bool GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation);
 };

@@ -35,4 +35,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EDamagePart DamagePart;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName BoneName;
 };

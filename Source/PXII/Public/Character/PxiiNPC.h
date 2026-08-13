@@ -88,6 +88,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	AActor* LastKnownAttacker;
 
+	UPROPERTY(BlueprintReadWrite)
+	AActor* LastKnownTarget;
+
 	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
 	

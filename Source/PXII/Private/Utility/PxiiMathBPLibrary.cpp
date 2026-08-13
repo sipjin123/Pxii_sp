@@ -127,3 +127,91 @@ bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObje
 
 	return false;
 }
+
+bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation)
+{
+	OutLocation = FVector::ZeroVector;
+
+	if (!Actor || TraceCount <= 0 || DistanceBehind <= 0.f || ConeAngle <= 0.f)
+	{
+		return false;
+	}
+
+	UWorld* World = Actor->GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	const FVector Origin = Actor->GetActorLocation() + Offset;
+	const FVector Backward = -Actor->GetActorForwardVector();
+	const FRotator BackwardRotation = Backward.Rotation();
+
+	TArray<FVector> ValidLocations;
+	ValidLocations.Reserve(TraceCount);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(Actor);
+
+	const float HalfConeAngle = ConeAngle * 0.5f;
+	for (int32 i = 0; i < TraceCount; ++i)
+	{
+		const float Alpha = TraceCount == 1 ? 0.5f : static_cast<float>(i) / (TraceCount - 1);
+		const float Angle = FMath::Lerp(-HalfConeAngle, HalfConeAngle, Alpha);
+
+		const FVector Direction = BackwardRotation.RotateVector(FVector::ForwardVector).RotateAngleAxis(Angle, FVector::UpVector);
+		const FVector CandidateLocation = Origin + Direction * DistanceBehind;
+
+		FHitResult HitResult;
+
+		const bool bHit = World->SweepSingleByChannel(HitResult, CandidateLocation, CandidateLocation, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), QueryParams);
+
+		DrawDebugSphere(World, CandidateLocation, SphereRadius, 12, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 2.0f);
+		DrawDebugLine(World, Origin, CandidateLocation, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 1.0f);
+
+		if (bHit)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[CRS] ----------------------------Hit: %s"), HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("None"));
+			continue;
+		}
+
+		// No obstruction, trace downward to find the ground.
+		const FVector GroundTraceStart = CandidateLocation + FVector(0.f, 0.f, 50.f);
+		const FVector GroundTraceEnd = CandidateLocation - FVector(0.f, 0.f, 500.f);
+
+		FHitResult GroundHit;
+
+		const bool bGroundHit = World->LineTraceSingleByChannel(GroundHit, GroundTraceStart, GroundTraceEnd, ECC_Visibility, QueryParams);
+
+		DrawDebugLine(World, GroundTraceStart, GroundTraceEnd, bGroundHit ? FColor::Blue : FColor::Yellow, false, 5.0f, 0, 1.0f);
+
+		if (!bGroundHit)
+		{
+			continue;
+		}
+
+		const FVector GroundLocation = GroundHit.Location;
+
+		// Check whether the ground location is on the NavMesh.
+		FNavLocation NavLocation;
+		const UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
+
+		if (!NavSystem || !NavSystem->ProjectPointToNavigation(GroundLocation, NavLocation))
+		{
+			DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Orange, false, 5.0f, 0, 2.0f);
+			continue;
+		}
+
+		DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Green, false, 5.0f, 0, 2.0f);
+
+		ValidLocations.Add(GroundLocation);
+	}
+
+	if (ValidLocations.Num() == 0)
+	{
+		return false;
+	}
+
+	OutLocation = ValidLocations[FMath::RandRange(0, ValidLocations.Num() - 1)];
+	return true;
+}
