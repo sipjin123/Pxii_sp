@@ -6,3 +6,6 @@
 
 void UPxiiDataRegistryBase::InitDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {}
+
+void UPxiiDataRegistryBase::ConstructDataObjectCollection()
+{}

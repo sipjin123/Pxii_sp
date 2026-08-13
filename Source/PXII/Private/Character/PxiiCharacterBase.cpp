@@ -8,6 +8,7 @@
 #include "Components/PxiiAimAssistComponent.h"
 #include "Components/PxiiCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
+#include "Subsystem/PxiiCombatRegistrySubsystem.h"
 
 DEFINE_LOG_CATEGORY(LogTempBaseCharacter);
 // Sets default values
@@ -29,6 +30,9 @@ void APxiiCharacterBase::BeginPlay()
 	{
 		AbilitySystemComponent->GrantAllAbilities();
 		AbilitySystemComponent->GrantAllPlayerEffects();
+
+		UPxiiCombatRegistrySubsystem* combatSubsystem = GetWorld()->GetSubsystem<UPxiiCombatRegistrySubsystem>();
+		combatSubsystem->GiveGlobalAbilitySet(AbilitySystemComponent);
 	}
 	else
 	{

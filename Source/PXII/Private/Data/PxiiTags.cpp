@@ -34,6 +34,7 @@ namespace UI
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_CheatMenu, "Pxii.UI.Widget.CheatMenu");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_TitleScreen_Start, "Pxii.UI.Widget.TitleScreen.Start");
 	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_TitleScreen_Main, "Pxii.UI.Widget.TitleScreen.Main");
+	UE_DEFINE_GAMEPLAY_TAG(Pxii_UI_Widget_OptionsMenu, "Pxii.UI.Widget.OptionsMenu");
 }
 
 namespace GameLevels

@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameplayEffect.h"
+#include "Data/PxiiAbilityData.h"
 #include "Enum/PxiiDamageType.h"
+#include "GAS/PxiiAbilitySystemComponent.h"
 #include "PxiiCombatRegistrySubsystem.generated.h"
 
 /**
@@ -49,8 +51,13 @@ class PXII_API UPxiiCombatRegistrySubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 	
 protected:
+
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
+	
 public:
+
+	void GiveGlobalAbilitySet(UPxiiAbilitySystemComponent* targetASC);
+	
 	// Called by CombatComponent (players & AI)
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void EnqueueDamage(AActor* Source, const FDamageHit& Hit);
@@ -63,6 +70,7 @@ public:
 								float duration, EHitEffectType HitEffectType, EDamageSource DamageSource);
 
 public:
+	
 	FTimerHandle ProcessTimer;
 	bool bProcessingActive = false;
 
@@ -93,10 +101,13 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UGameplayAbility> GA_Stagger;
-	TSubclassOf<UGameplayAbility> GetGAStagger() const { return GA_Stagger; }
+	TSubclassOf<UGameplayAbility> GetGAStagger() const { return GA_Stagger; } 
 	
 private:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPxiiAbilityData> GlobalAbilitySet;
+	
 	// Simple FIFO queue
 	TArray<FQueuedDamage> DamageQueue;
 

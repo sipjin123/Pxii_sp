@@ -74,14 +74,19 @@ void UPxiiAbilitySystemComponent::GrantAllPlayerEffects()
 		return;	
 	}
 	
-	if(AbilityData->PlayerGrantedAbilities.IsEmpty())
+	if(AbilityData->PlayerGrantedEffect.IsEmpty())
 	{
 		return;
 	}
 
 	static const FString Context(TEXT("GrantAllAbilities"));
+	
+	GrantGameplayEffects(AbilityData->PlayerGrantedEffect);
+}
 
-	for(FGameplayEffectData Row : AbilityData->PlayerGrantedEffect)
+void UPxiiAbilitySystemComponent::GrantGameplayEffects(const TArray<FGameplayEffectData>& Abilities)
+{
+	for(FGameplayEffectData Row : Abilities)
 	{
 		if(!Row.EffectClass)
 		{
@@ -120,6 +125,12 @@ void UPxiiAbilitySystemComponent::GrantAbilities(const TArray<FAbilityData>& Abi
 
 		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Row.AbilityClass, Row.Level,INDEX_NONE);
 		Spec.GetDynamicSpecSourceTags().AddTag(Row.InputTag);
+
+		if(FindAbilitySpecFromClass(Row.AbilityClass))
+		{
+			PXII_LOG(ELogCategory::Ability, Warning, TEXT("Skipping Ability: Already exist %s"),*Row.Name.ToString());
+			continue;
+		}
 		
 		GiveAbility(Spec);
 	}

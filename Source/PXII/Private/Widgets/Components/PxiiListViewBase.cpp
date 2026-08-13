@@ -4,6 +4,7 @@
 #include "Widgets/Components/PxiiListViewBase.h"
 #include "Editor/WidgetCompilerLog.h"
 #include "Utility/PXIILogUtility.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
 
 UUserWidget& UPxiiListViewBase::OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable)
 {
@@ -27,6 +28,11 @@ UUserWidget& UPxiiListViewBase::OnGenerateEntryWidgetInternal(UObject* Item, TSu
 	{
 		return Super::OnGenerateEntryWidgetInternal(Item, DesiredEntryClass, OwnerTable);
 	}
+}
+
+bool UPxiiListViewBase::OnIsSelectableOrNavigableInternal(UObject* FirstSelectedItem)
+{
+	return !FirstSelectedItem->IsA<UPxiiListDataObjectCollection>();
 }
 
 #if WITH_EDITOR	

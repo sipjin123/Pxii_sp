@@ -35,6 +35,9 @@ public:
 	void GrantAllPlayerEffects();
 
 	UFUNCTION(BlueprintCallable,Category="Ability")
+	void GrantGameplayEffects(const TArray<FGameplayEffectData>& Abilities);
+
+	UFUNCTION(BlueprintCallable,Category="Ability")
 	void GrantAbilities(const TArray<FAbilityData>& Abilities);
 
 	UPROPERTY(EditAnywhere)

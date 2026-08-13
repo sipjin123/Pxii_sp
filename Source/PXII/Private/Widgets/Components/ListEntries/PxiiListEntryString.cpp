@@ -10,6 +10,12 @@ void UPxiiListEntryString::NativeOnInitialized()
 	
 	Button_Previous->OnClicked().AddUObject(this, &ThisClass::OnPreviousButtonClicked);
 	Button_Next->OnClicked().AddUObject(this, &ThisClass::OnNextButtonClicked);
+	
+	Rotator_Options->OnClicked().AddLambda([this]()
+		{
+			SelectThisEntryWidget();
+		}
+	);
 }
 
 void UPxiiListEntryString::OnOwningListDataObjectSet(UPxiiListDataObjectBase* InOwningListDataObject)
@@ -42,6 +48,8 @@ void UPxiiListEntryString::OnPreviousButtonClicked()
 	{
 		CachedOwningListDataObjectString->PreviousOption();
 	}
+	
+	SelectThisEntryWidget();
 }
 
 void UPxiiListEntryString::OnNextButtonClicked()
@@ -50,4 +58,6 @@ void UPxiiListEntryString::OnNextButtonClicked()
 	{
 		CachedOwningListDataObjectString->NextOption();
 	}
+	
+	SelectThisEntryWidget();
 }

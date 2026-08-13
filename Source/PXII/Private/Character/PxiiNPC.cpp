@@ -8,6 +8,7 @@
 #include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 #include "GAS/PxiiAttributeSet.h"
+#include "Subsystem/PxiiCombatRegistrySubsystem.h"
 
 // Sets default values
 APxiiNPC::APxiiNPC()
@@ -80,6 +81,9 @@ void APxiiNPC::BeginPlay()
 			AbilitySystemComponent->GrantAllPlayerEffects();
 			
 			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPxiiAttributeSet::GetStaggerMeterAttribute()).AddUObject(this, &ThisClass::OnStaggerMeterChanged);
+
+			UPxiiCombatRegistrySubsystem* combatSubsystem = GetWorld()->GetSubsystem<UPxiiCombatRegistrySubsystem>();
+			combatSubsystem->GiveGlobalAbilitySet(AbilitySystemComponent);
 		}
 	}
 	else

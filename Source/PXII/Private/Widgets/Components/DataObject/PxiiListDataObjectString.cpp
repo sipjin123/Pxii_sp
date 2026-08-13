@@ -70,6 +70,29 @@ void UPxiiListDataObjectString::OnDataObjectInitialized()
 	}
 }
 
+bool UPxiiListDataObjectString::CanResetBackToDefaultValue() const
+{
+	return HasDefaultValue() && CurrentStringValue != GetDefaultValueFromString();
+}
+
+bool UPxiiListDataObjectString::TryResetBackToDefaultValue()
+{
+	if (CanResetBackToDefaultValue())
+	{
+		CurrentStringValue = GetDefaultValueFromString();
+		TrySetDisplayText(CurrentStringValue);
+		
+		if (DataDynamicSetter)
+		{
+			
+		}
+		
+		return true;
+	}
+	
+	return false;
+}
+
 bool UPxiiListDataObjectString::TrySetDisplayText(const FString& InStringValue)
 {
 	const int Index = AvailableStringValues.IndexOfByKey(InStringValue);

@@ -31,7 +31,6 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		if (WeaponRef)
 		{
 			UPxiiGameplayEffectCooldown* GECooldownRef = WeaponRef->GEFireRateCooldown;
-			// Note(Burlin): Maybe add scaling cooldown here in the future
 		}
 		else
 		{
@@ -44,7 +43,7 @@ void UPxiiGA_Fire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		}
 
 	    Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-		FireProjectile(SelfCharacter);
+		// FireProjectile(SelfCharacter);
 	}
     
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);

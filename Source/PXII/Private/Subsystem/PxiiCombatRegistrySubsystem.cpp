@@ -10,6 +10,7 @@
 #include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
 #include "Enum/PxiiDamageType.h"
+#include "Utility/PXIILogUtility.h"
 
 class UGameplayEffect;
 class IAbilitySystemInterface;
@@ -18,6 +19,26 @@ DEFINE_LOG_CATEGORY(LogCombatRegistrySubsystem);
 void UPxiiCombatRegistrySubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
 	Super::Initialize(collection);
+}
+
+void UPxiiCombatRegistrySubsystem::GiveGlobalAbilitySet(UPxiiAbilitySystemComponent* targetASC)
+{
+	
+	if(!targetASC)
+	{
+		return;
+	}
+	
+	if(!GlobalAbilitySet)
+	{
+		return;
+	}
+
+	PXII_LOG(ELogCategory::Ability, Log, TEXT("Global Ability Set:: Target Owner: %s"), *targetASC->GetOwner()->GetName());
+	
+	targetASC->GrantAbilities(GlobalAbilitySet->PlayerGrantedAbilities);
+	targetASC->GrantAbilities(GlobalAbilitySet->CharacterUtilities);
+	targetASC->GrantGameplayEffects(GlobalAbilitySet->PlayerGrantedEffect);
 }
 
 void UPxiiCombatRegistrySubsystem::EnqueueDamage(AActor* Source, const FDamageHit& Hit)

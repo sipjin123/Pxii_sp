@@ -37,7 +37,7 @@ void UPxiiCheatMenuScreen::NativeOnInitialized()
 	);
 
 	// Bind delegate
-	TabListWidget_CheatTabs->OnTabSelected.AddDynamic(this, &ThisClass::OnTabSelected);
+	TabListWidget_CheatTabs->OnTabSelected.AddUniqueDynamic(this, &ThisClass::OnTabSelected);
 }
 
 void UPxiiCheatMenuScreen::NativeOnActivated()

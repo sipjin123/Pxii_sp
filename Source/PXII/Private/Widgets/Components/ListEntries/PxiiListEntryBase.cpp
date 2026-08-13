@@ -2,12 +2,39 @@
 
 
 #include "Widgets/Components/ListEntries/PxiiListEntryBase.h"
+
+#include "CommonInputSubsystem.h"
+#include "Components/ListView.h"
 #include "Utility/PXIILogUtility.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
+
+void UPxiiListEntryBase::NativeOnListEntryWidgetHovered(bool bWasHovered)
+{
+	BP_OnListEntryWidgetHovered(bWasHovered, IsListItemSelected());
+}
+
+FReply UPxiiListEntryBase::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	UCommonInputSubsystem* CommonInputSubsystem = GetInputSubsystem();
+	
+	if (CommonInputSubsystem && CommonInputSubsystem->GetCurrentInputType() == ECommonInputType::Gamepad)
+	{
+		if (UWidget* WidgetToFocus = BP_GamepadGetWidgetToFocus())
+		{
+			if (TSharedPtr<SWidget> SlateWidgetToFocus = WidgetToFocus->GetCachedWidget())
+			{
+				return FReply::Handled().SetUserFocus(SlateWidgetToFocus.ToSharedRef());
+			}
+		}
+	}
+	
+	return Super::NativeOnFocusReceived(InGeometry,InFocusEvent);
+}
 
 void UPxiiListEntryBase::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
-
+	
 	UPxiiListDataObjectBase* CastedDataObject = Cast<UPxiiListDataObjectBase>(ListItemObject);
 
 	if(!CastedDataObject)
@@ -21,6 +48,15 @@ void UPxiiListEntryBase::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 void UPxiiListEntryBase::OnOwningListDataObjectSet(UPxiiListDataObjectBase* InOwningListDataObject)
 {
+	if (Cast<UPxiiListDataObjectCollection>(InOwningListDataObject))
+	{
+		this->SetVisibility(ESlateVisibility::HitTestInvisible);	
+	}
+	else
+	{
+		this->SetVisibility(ESlateVisibility::Visible);
+	}
+	
 	if(TextBlock_EntryDisplayName)
 	{
 		TextBlock_EntryDisplayName->SetText(InOwningListDataObject->GetDataDisplayName());
@@ -36,4 +72,16 @@ void UPxiiListEntryBase::OnOwningListDataObjectModified(UPxiiListDataObjectBase*
 	EListDataModifyType InModifyType)
 {
 
+}
+
+void UPxiiListEntryBase::SelectThisEntryWidget()
+{
+	UListView* OwningListView = Cast<UListView>(GetOwningListView());
+	
+	if (!OwningListView)
+	{
+		return;
+	}
+	
+	OwningListView->SetSelectedItem(GetListItem());
 }

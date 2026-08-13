@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/PxiiOptionsData.h"
 #include "UObject/Object.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectBase.h"
@@ -19,6 +20,8 @@ class PXII_API UPxiiDataRegistryBase : public UObject
 public:
 	// Called by the screens after the creation of object type UDataRegistry
 	virtual void InitDataRegistry(ULocalPlayer* InOwningLocalPlayer);
+	
+	virtual void ConstructDataObjectCollection();
 
 private:
 	// Create respective tab initialization function in your child based on your need

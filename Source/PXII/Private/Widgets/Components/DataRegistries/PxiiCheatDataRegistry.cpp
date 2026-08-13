@@ -71,6 +71,7 @@ void UPxiiCheatDataRegistry::InitCheatTab1()
 			UPxiiListDataObjectScalar* DO = NewObject<UPxiiListDataObjectScalar>();
 			DO->SetDataID(FName("Slider1"));
 			DO->SetDataDisplayName(FText::FromString("Slider1"));
+			
 			DO->SetDescriptionRichText(FText::FromString("This is description for slider 1"));
 			DO->SetDisplayValueRange(TRange<float>(0.f, 1.f));
 			DO->SetOutputValueRange(TRange<float>(0.f, 2.f));
