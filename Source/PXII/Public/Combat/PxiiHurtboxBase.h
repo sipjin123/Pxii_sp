@@ -33,9 +33,12 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnPartHit OnPartHit;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
 	EDamagePart DamagePart;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
 	FName BoneName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
+	TObjectPtr<UStaticMesh> MeshRef;
 };
