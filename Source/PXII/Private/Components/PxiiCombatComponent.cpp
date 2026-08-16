@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Data/PxiiTags.h"
 #include "Enum/PxiiDamageType.h"
+#include "Interface/PxiiDamageableInterface.h"
 #include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
@@ -189,7 +190,7 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 		);
 	}
 	SlashDataArray = OutHits;
-
+	
 	// Handles depth slash logic and adds to SlashDataArray
 	if (UseDepthSlash)
 	{
@@ -308,11 +309,14 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 		}*/
 		
 		const bool ImplementsCombatInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass());
-		if (!ImplementsCombatInterface)
+		const bool ImplementsDamageableInterface = CurrHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass());
+		if (!ImplementsCombatInterface && !ImplementsDamageableInterface)
 		{
 			//UE_LOG(LogTemp, Log, TEXT("No Interface for Combat! %s"), *CurrHitActor->GetName());
 			return;
 		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("-- Slash Hit Actor: %s"), *OutHitParam.GetActor()->GetName());
 		
 		if (!HitTracedActors.Contains(CurrHitActor))
 		{

@@ -22,3 +22,44 @@ UPxiiGameUserSettings* UPxiiGameUserSettings::Get()
 	
 	return nullptr;
 }
+
+void UPxiiGameUserSettings::Set(FName InCurrentSettingsID)
+{
+	const UEnum* EnumPtr = StaticEnum<EPxiiGameUserSettingsID>();
+	
+	if (!EnumPtr)
+	{
+		return;
+	}
+	
+	CurrentSettingsID = static_cast<EPxiiGameUserSettingsID>(EnumPtr->GetValueByName(InCurrentSettingsID));
+}
+
+FString UPxiiGameUserSettings::GetCurrentGameSettings() const
+{
+	switch (CurrentSettingsID)
+	{
+		case EPxiiGameUserSettingsID::GameDifficulty:
+			return CurrentGameDifficulty;
+		case EPxiiGameUserSettingsID::Overall:
+		case EPxiiGameUserSettingsID::Speech:
+		case EPxiiGameUserSettingsID::Text:
+		default:
+			return FString();
+	}
+}
+
+void UPxiiGameUserSettings::SetCurrentGameSettings(FString InSettingsValue)
+{
+	switch (CurrentSettingsID)
+	{
+	case EPxiiGameUserSettingsID::GameDifficulty:
+		CurrentGameDifficulty = InSettingsValue;
+		break;
+	case EPxiiGameUserSettingsID::Overall:
+	case EPxiiGameUserSettingsID::Speech:
+	case EPxiiGameUserSettingsID::Text:
+	default:
+		break;
+	}
+}

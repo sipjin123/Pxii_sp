@@ -64,6 +64,13 @@ void UPxiiOptionsMenuScreen::NativeOnActivated()
 	}
 }
 
+void UPxiiOptionsMenuScreen::NativeOnDeactivated()
+{
+	Super::NativeOnDeactivated();
+	
+	UPxiiGameUserSettings::Get()->ApplySettings(true);
+}
+
 UPxiiOptionsDataRegistry* UPxiiOptionsMenuScreen::GetOrCreateDataRegistry()
 {
 	if (!CreatedOwningDataRegistry)

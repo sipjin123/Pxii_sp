@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/Texture2D.h"
 #include "UObject/Object.h"
 #include "PxiiListDataObjectBase.generated.h"
 
@@ -48,6 +49,8 @@ public:
 	virtual bool HasDefaultValue() const { return false; }
 	virtual bool CanResetBackToDefaultValue() const { return false; }
 	virtual bool TryResetBackToDefaultValue() { return false; }
+	
+	FORCEINLINE void SetShouldApplyChangeImmediately(bool InShouldApplyChangeImmediately) { bShouldApplyChangeImmediately = InShouldApplyChangeImmediately; };
 
 protected:
 	//Empty in base class. The child classes should override this function to implement their own initialization logic.
@@ -64,4 +67,6 @@ private:
 
 	UPROPERTY(Transient)
 	UPxiiListDataObjectBase* ParentListData;
+	
+	bool bShouldApplyChangeImmediately = false;
 };

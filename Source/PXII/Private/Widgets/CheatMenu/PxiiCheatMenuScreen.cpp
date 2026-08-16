@@ -5,6 +5,7 @@
 #include "Utility/PXIILogUtility.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
+#include "Settings/PxiiGameUserSettings.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectCollection.h"
 #include "Utility/PXIILogUtility.h"
 
@@ -61,6 +62,13 @@ void UPxiiCheatMenuScreen::NativeOnActivated()
 
 		TabListWidget_CheatTabs->RequestRegisterTab(TabDataID, TabCollection->GetDataDisplayName());
 	}
+}
+
+void UPxiiCheatMenuScreen::NativeOnDeactivated()
+{
+	Super::NativeOnDeactivated();
+	
+	UPxiiGameUserSettings::Get()->ApplySettings(true);
 }
 
 UPxiiCheatDataRegistry* UPxiiCheatMenuScreen::GetOrCreateDataRegistry()

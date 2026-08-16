@@ -7,6 +7,9 @@
 #include "Utility/PXIILogUtility.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
 
+#define MAKE_DATA_CONTROL(FuncName) \
+	MakeShared<FPxiiDataInteractionUtility>(GET_FUNCTION_NAME_STRING_CHECKED(UPxiiGameUserSettings, FuncName)) // Retrieve function path (GET_FUNCTION_NAME macro)
+
 void UPxiiCheatDataRegistry::InitDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {
 	InitCheatTab1();
@@ -40,6 +43,7 @@ void UPxiiCheatDataRegistry::InitCheatTab1()
 	Tab1Collection->SetDataDisplayName(FText::FromString(TEXT("Tab 1")));
 
 	// Construct data object
+	//TODO: Make it modular to prevent long list, consider DA
 	{
 		{
 			UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
@@ -50,6 +54,13 @@ void UPxiiCheatDataRegistry::InitCheatTab1()
 			DO->AddDynamicOptions(TEXT("2"), FText::FromString("2"));
 			DO->AddDynamicOptions(TEXT("3"), FText::FromString("3"));
 			DO->AddDynamicOptions(TEXT("4"), FText::FromString("4"));
+			
+			//Use exact same func name from the script you define
+			//DO->SetDataDynamicGetter(MAKE_DATA_CONTROL(GetCurrentGameDifficulty));
+			//DO->SetDataDynamicSetter(MAKE_DATA_CONTROL(SetCurrentGameDifficulty));
+			
+			//Should settings changes be applied immediately
+			DO->SetShouldApplyChangeImmediately(true);
 
 			Tab1Collection->AddChildListData(DO);
 		}
@@ -72,7 +83,7 @@ void UPxiiCheatDataRegistry::InitCheatTab1()
 			DO->SetDataID(FName("Slider1"));
 			DO->SetDataDisplayName(FText::FromString("Slider1"));
 			
-			DO->SetDescriptionRichText(FText::FromString("This is description for slider 1"));
+			//DO->SetDescriptionRichText(FText::FromString("This is description for slider 1"));
 			DO->SetDisplayValueRange(TRange<float>(0.f, 1.f));
 			DO->SetOutputValueRange(TRange<float>(0.f, 2.f));
 			DO->SetSliderStepSize(0.01f);

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "PxiiListDataObjectBase.h"
+#include "Utility/PxiiDataInteractionUtility.h"
 #include "PxiiListDataObjectValue.generated.h"
 
-class FOptionsDataInteractionHelper;
 /**
  * 
  */
@@ -16,8 +16,8 @@ class PXII_API UPxiiListDataObjectValue : public UPxiiListDataObjectBase
 	GENERATED_BODY()
 	
 public:
-	void SetDataDynamicGetter(const TSharedPtr<FOptionsDataInteractionHelper>& InDynamicGetter);
-	void SetDataDynamicSetter(const TSharedPtr<FOptionsDataInteractionHelper>& InDynamicSetter);
+	void SetDataDynamicGetter(const TSharedPtr<FPxiiDataInteractionUtility>& InDynamicGetter);
+	void SetDataDynamicSetter(const TSharedPtr<FPxiiDataInteractionUtility>& InDynamicSetter);
 	
 	FORCEINLINE void SetDefaultValueFromString(const FString& InDefaultValue) { DefaultStringValue = InDefaultValue; }
 	
@@ -28,8 +28,8 @@ public:
 protected:
 	FORCEINLINE FString GetDefaultValueFromString() const { return DefaultStringValue.GetValue(); }
 	
-	TSharedPtr<FOptionsDataInteractionHelper> DataDynamicGetter;
-	TSharedPtr<FOptionsDataInteractionHelper> DataDynamicSetter;;
+	TSharedPtr<FPxiiDataInteractionUtility> DataDynamicGetter;
+	TSharedPtr<FPxiiDataInteractionUtility> DataDynamicSetter;
 	
 private:
 	TOptional<FString> DefaultStringValue;

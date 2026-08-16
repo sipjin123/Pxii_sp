@@ -29,7 +29,16 @@ void UPxiiListDataObjectString::NextOption()
 	}
 	
 	TrySetDisplayText(CurrentStringValue);
-	NotifyListDataModified(this);
+	
+	//Set value to settings
+	if (DataDynamicSetter)
+	{
+		DataDynamicSetter->SetValueAsString(GetDataID(), CurrentStringValue);
+		
+		PxiiLog::PrintOnScreen(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Dynamic setter -> latest value: %s"), *DataDynamicGetter->GetValueAsString(GetDataID())), FColor::Green);
+		
+		NotifyListDataModified(this);
+	}
 }
 
 void UPxiiListDataObjectString::PreviousOption()
@@ -52,7 +61,15 @@ void UPxiiListDataObjectString::PreviousOption()
 	}
 	
 	TrySetDisplayText(CurrentStringValue);
-	NotifyListDataModified(this);
+	
+	if (DataDynamicSetter)
+	{
+		DataDynamicSetter->SetValueAsString(GetDataID(), CurrentStringValue);
+		
+		PxiiLog::PrintOnScreen(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Dynamic setter -> latest value: %s"), *DataDynamicGetter->GetValueAsString(GetDataID())), FColor::Green);
+				
+		NotifyListDataModified(this);
+	}
 }
 
 void UPxiiListDataObjectString::OnDataObjectInitialized()
@@ -62,7 +79,14 @@ void UPxiiListDataObjectString::OnDataObjectInitialized()
 		CurrentStringValue = AvailableStringValues[0];
 	}
 	
-	//TODO: read the saved value to set as current value
+	//Read the saved value to set as current value
+	if (DataDynamicGetter)
+	{
+		if (!DataDynamicGetter->GetValueAsString(GetDataID()).IsEmpty())
+		{
+			CurrentStringValue = DataDynamicGetter->GetValueAsString(GetDataID());
+		}
+	}
 	
 	if (!TrySetDisplayText(CurrentStringValue))
 	{
@@ -84,7 +108,7 @@ bool UPxiiListDataObjectString::TryResetBackToDefaultValue()
 		
 		if (DataDynamicSetter)
 		{
-			
+			DataDynamicSetter->SetValueAsString(GetDataID(), CurrentStringValue);
 		}
 		
 		return true;

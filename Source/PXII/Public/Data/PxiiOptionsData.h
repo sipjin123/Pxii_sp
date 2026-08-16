@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommonNumericTextBlock.h"
 #include "Engine/DataAsset.h"
+#include "Settings/PxiiGameUserSettings.h"
 #include "StructUtils/InstancedStruct.h"
 #include "PxiiOptionsData.generated.h"
 
@@ -29,10 +30,17 @@ public:
 	FText DisplayName;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FDataBase
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	EPxiiGameUserSettingsID DataID { EPxiiGameUserSettingsID::None };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
+	FText DataDisplayName;
 };
 
 USTRUCT(BlueprintType)
@@ -41,16 +49,10 @@ struct FStringData : public FDataBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "String Data")
-	FText DataID;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "String Data")
-	FText DataDisplayName;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "String Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | String", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FText DescriptionRichText;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "String Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | String", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	TArray<FOptionsMap> OptionsSet;
 };
 
@@ -58,6 +60,9 @@ USTRUCT(BlueprintType)
 struct FBooleanData : public FDataBase
 {
 	GENERATED_BODY()
+	
+public:
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Boolean", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 };
 
 USTRUCT(BlueprintType)
@@ -66,31 +71,25 @@ struct FSliderData : public FDataBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data")
-	FText DataID;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data")
-	FText DataDisplayName;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FText DescriptionRichText;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data", meta = (ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (ForceInlineRow, EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FVector2D DisplayValueRange { 0, 1.f };
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data", meta = (ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (ForceInlineRow, EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FVector2D OutputValueRange { 0, 2.f };
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data", meta = (ToolTip = "The precision of the slider"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (ToolTip = "The precision of the slider", EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	float SliderStepSize { 0.01f };
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	ECommonNumericType DisplayNumericType = ECommonNumericType::Percentage;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	bool bShowDecimal { false };
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slider Data", meta = (EditCondition = "bShowDecimal", ToolTip = "How many decimals should show?"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (EditCondition = "bShowDecimal", ToolTip = "How many decimals should show?"))
 	int32 FractionalDigits { 1 };
 };
 

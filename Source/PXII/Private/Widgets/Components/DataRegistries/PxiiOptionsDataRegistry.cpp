@@ -6,6 +6,9 @@
 #include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
 
+#define MAKE_OPTIONS_DATA_CONTROL(FuncName) \
+	MakeShared<FPxiiDataInteractionUtility>(GET_FUNCTION_NAME_STRING_CHECKED(UPxiiGameUserSettings, FuncName))
+
 void UPxiiOptionsDataRegistry::InitDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {
 	ConstructTabs();
@@ -106,7 +109,7 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 				if (const FStringData* Data = OptionsEntry.Data.GetPtr<FStringData>())
 				{
 					UPxiiListDataObjectString* DO = NewObject<UPxiiListDataObjectString>();
-					DO->SetDataID(FName(Data->DataID.ToString()));
+					DO->SetDataID(UEnum::GetValueAsName(Data->DataID));
 					DO->SetDataDisplayName(Data->DataDisplayName);
 					
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
@@ -115,6 +118,11 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					{
 						DO->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName);
 					}
+					
+					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
+					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));
+					
+					DO->SetShouldApplyChangeImmediately(true);
 					
 					CollectionToAdd->AddChildListData(DO);
 				}
@@ -131,7 +139,7 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 				if (const FSliderData* Data = OptionsEntry.Data.GetPtr<FSliderData>())
 				{
 					UPxiiListDataObjectScalar* DO = NewObject<UPxiiListDataObjectScalar>();
-					DO->SetDataID(FName(Data->DataID.ToString()));
+					DO->SetDataID(UEnum::GetValueAsName(Data->DataID));
 					DO->SetDataDisplayName(Data->DataDisplayName);
 						
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
@@ -149,6 +157,11 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					{
 						DO->SetNumericFormattingOptions(UPxiiListDataObjectScalar::WithDecimal(Data->FractionalDigits));
 					}
+					
+					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
+					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));
+					
+					DO->SetShouldApplyChangeImmediately(true);
 					
 					CollectionToAdd->AddChildListData(DO);
 				}

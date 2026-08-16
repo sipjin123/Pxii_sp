@@ -41,4 +41,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
 	TObjectPtr<UStaticMesh> MeshRef;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
+	bool SnapToBone = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
+	bool IsVisible = true;
 };
