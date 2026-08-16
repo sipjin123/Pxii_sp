@@ -316,13 +316,12 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 			return;
 		}
 		
-		UE_LOG(LogTemp, Warning, TEXT("-- Slash Hit Actor: %s"), *OutHitParam.GetActor()->GetName());
-		
-		if (!HitTracedActors.Contains(CurrHitActor))
+		const bool DoesCombatantExist = !HitTracedActors.Contains(CurrHitActor);
+		if (DoesCombatantExist && ImplementsCombatInterface)
 		{
 			if(LogSlashLogic)
 				UE_LOG(LogTemp, Log, TEXT("Trace Check Trace Success! %s"), *CurrHitActor->GetName());
-			//const bool IsBossUnit = UPxiiCombatInterface::Execute_IsBossUnit(CurrHitActor);
+			
 			const bool IsBossUnit = false;
 			const APawn* CharRef = Cast<APawn>(CurrHitActor);
 			if (IsBossUnit)
@@ -344,11 +343,23 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 				}
 			}
 		}
+		else if (ImplementsDamageableInterface)
+		{
+			APawn* PartOwner = IPxiiDamageableInterface::Execute_GetPawnOwner(CurrHitActor);
+			if (!PartOwner) return;
+			
+			if (HitTracedActors.Contains(PartOwner))
+			{
+				return;
+			}
+			HitTracedActors.Add(PartOwner);
+			IPxiiDamageableInterface::Execute_ApplyDamage(CurrHitActor, GetOwner(), 10, 0);
+		}
 		else
 		{
 			int32 newval = HitTracedActors.Contains(CurrHitActor) ? 0 : 1;
 			int32 newval2 = ImplementsCombatInterface;
-			//UE_LOG(LogTemp, Log, TEXT("Loop Trace FAIL: %s %d %d"), *CurrHitActor->GetName(), newval, newval2);
+			UE_LOG(LogTemp, Log, TEXT("Loop Trace FAIL: %s %d %d"), *CurrHitActor->GetName(), newval, newval2);
 		}
 	}
 }

@@ -47,4 +47,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomSettings")
 	bool IsVisible = true;
+	
+	virtual APawn* GetPawnOwner_Implementation() override;
 };

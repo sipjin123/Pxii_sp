@@ -3,6 +3,8 @@
 
 #include "Combat/PxiiHurtboxBase.h"
 
+#include "GameFramework/Pawn.h"
+
 // Sets default values
 APxiiHurtboxBase::APxiiHurtboxBase()
 {
@@ -36,5 +38,10 @@ void APxiiHurtboxBase::ApplyDamage_Implementation(AActor* Source, float Magnitud
 EDamagePart APxiiHurtboxBase::GetPartType_Implementation()
 {
 	return DamagePart;
+}
+
+APawn* APxiiHurtboxBase::GetPawnOwner_Implementation()
+{
+	return Cast<APawn>(GetOwner());
 }
 
