@@ -14,11 +14,16 @@ enum class EPxiiGameUserSettingsID : uint8
 #pragma endregion
 	
 #pragma region Controls
-	
+	KeyboardAndMouse,
+	Gamepad,
+	InvertMouseLook,
 #pragma endregion
 	
 #pragma region Graphics
-	
+	Display,
+	DisplayMode,
+	DisplayResolution,
+	FramerateCap,
 #pragma endregion
 	
 #pragma region Audio

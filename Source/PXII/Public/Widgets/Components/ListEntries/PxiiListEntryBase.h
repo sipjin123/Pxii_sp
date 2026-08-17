@@ -35,9 +35,6 @@ public:
 	
 	void NativeOnListEntryWidgetHovered(bool bWasHovered);
 	
-	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On List Entry Widget Selected"))
-	void BP_OnListEntryWidgetSelected();
-	
 protected:
 	// Child WBP should override this to get gamepad function properly
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Gamepad Get Widget To Focus"))
@@ -45,6 +42,7 @@ protected:
 	
 	//~ Begin IUserObjectListEntry Interface
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	virtual void NativeOnEntryReleased() override;
 	//~ End IUserObjectListEntry Interface
 	
 	//~ Begin UUserWidget Interface

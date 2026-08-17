@@ -1,22 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/Components/ListEntries/PxiiListEntryBase.h"
+#include "PxiiListEntryBase.h"
 #include "Widgets/Components/PxiiButtonBase.h"
 #include "Widgets/Components/PxiiRotatorBase.h"
-#include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
-#include "PxiiListEntryString.generated.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
+#include "PxiiListEntryStringImage.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class PXII_API UPxiiListEntryString : public UPxiiListEntryBase
+class PXII_API UPxiiListEntryStringImage : public UPxiiListEntryBase
 {
 	GENERATED_BODY()
-
+	
 protected:
 	// ~ Begin UUserWidget Interface
 	virtual void NativeOnInitialized() override;
@@ -45,5 +45,5 @@ private:
 #pragma endregion
 	
 	UPROPERTY(Transient)
-	UPxiiListDataObjectString* CachedOwningListDataObjectString;
+	UPxiiListDataObjectStringImage* CachedOwningListDataObjectStringImage;
 };

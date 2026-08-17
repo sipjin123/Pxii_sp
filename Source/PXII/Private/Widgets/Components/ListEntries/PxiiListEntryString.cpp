@@ -2,6 +2,8 @@
 
 
 #include "Widgets/Components/ListEntries/PxiiListEntryString.h"
+
+#include "CommonInputSubsystem.h"
 #include "Utility/PXIILogUtility.h"
 
 void UPxiiListEntryString::NativeOnInitialized()
@@ -16,6 +18,8 @@ void UPxiiListEntryString::NativeOnInitialized()
 			SelectThisEntryWidget();
 		}
 	);
+	
+	Rotator_Options->OnRotatedEvent.AddUObject(this, &UPxiiListEntryString::OnRotatorValueChanged);
 }
 
 void UPxiiListEntryString::OnOwningListDataObjectSet(UPxiiListDataObjectBase* InOwningListDataObject)
@@ -60,4 +64,23 @@ void UPxiiListEntryString::OnNextButtonClicked()
 	}
 	
 	SelectThisEntryWidget();
+}
+
+void UPxiiListEntryString::OnRotatorValueChanged(int32 Value, bool bUserInitiated)
+{
+	if (!CachedOwningListDataObjectString)
+	{
+		return;
+	}
+	
+	UCommonInputSubsystem* CommonInputSubsystem = GetInputSubsystem();
+	if (!CommonInputSubsystem || !bUserInitiated)
+	{
+		return;
+	}
+	
+	if (CommonInputSubsystem->GetCurrentInputType() == ECommonInputType::Gamepad)
+	{
+		CachedOwningListDataObjectString->OnValueChangeByRotator(Rotator_Options->GetSelectedText());
+	}
 }

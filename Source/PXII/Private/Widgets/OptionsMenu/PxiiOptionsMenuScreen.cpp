@@ -71,6 +71,20 @@ void UPxiiOptionsMenuScreen::NativeOnDeactivated()
 	UPxiiGameUserSettings::Get()->ApplySettings(true);
 }
 
+UWidget* UPxiiOptionsMenuScreen::NativeGetDesiredFocusTarget() const
+{
+	// For regaining focus back after reactivate this option screen widget
+	if (UObject* SelectedItem = ListView_OptionsList->GetSelectedItem())
+	{
+		if (UUserWidget* SelectedEntryWidget = ListView_OptionsList->GetEntryWidgetFromItem(SelectedItem))
+		{
+			return SelectedEntryWidget;
+		}
+	}
+	
+	return Super::NativeGetDesiredFocusTarget();
+}
+
 UPxiiOptionsDataRegistry* UPxiiOptionsMenuScreen::GetOrCreateDataRegistry()
 {
 	if (!CreatedOwningDataRegistry)
@@ -93,6 +107,41 @@ void UPxiiOptionsMenuScreen::OnResetBoundActionTriggered()
 {
 	// Reset Settings
 	PxiiLog::Print(ThisClass::StaticClass()->GetName(), TEXT("Reset Triggered"));
+	if (ResettableDataArray.IsEmpty())
+	{
+		return; 
+		// but should not happen when it is empty, cuz the button will be hide from being triggered
+		// this is for double checking
+	}
+	
+	//TODO: Confirmation screen
+	bIsResettingData = true;
+	bool bHasDataFailedToReset = false;
+	for (UPxiiListDataObjectBase* DataToReset : ResettableDataArray)
+	{
+		if (!DataToReset)
+		{
+			continue;
+		}
+		
+		if (DataToReset->TryResetBackToDefaultValue())
+		{
+			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Reset %s"), *DataToReset->GetDataDisplayName().ToString()));
+		}
+		else
+		{
+			bHasDataFailedToReset = true;
+			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Failed to reset %s"), *DataToReset->GetDataDisplayName().ToString()));
+		}
+	}
+	
+	if (!bHasDataFailedToReset)
+	{
+		ResettableDataArray.Empty();
+		RemoveActionBinding(ResetActionHandle);
+	}
+	
+	bIsResettingData = false;
 }
 
 void UPxiiOptionsMenuScreen::OnBackBoundActionTriggered()
@@ -135,8 +184,40 @@ void UPxiiOptionsMenuScreen::OnTabSelected(FName TabID)
 	if (ListView_OptionsList->GetNumItems() > 0)
 	{
 		ListView_OptionsList->NavigateToIndex(0);
-		ListView_OptionsList->ClearSelection();
 		ListView_OptionsList->SetSelectedIndex(0);
+	}
+	
+	// Check if there is data to be reset, if yes show reset button and vice versa
+	ResettableDataArray.Empty();
+	
+	for (UPxiiListDataObjectBase* FoundListSourceItem : FoundListSourceItems)
+	{
+		if (!FoundListSourceItem)
+		{
+			continue;
+		}
+		
+		if (!FoundListSourceItem->OnListDataModified.IsBoundToObject(this))
+		{
+			FoundListSourceItem->OnListDataModified.AddUObject(this, &ThisClass::OnListViewDataObjectModified);	
+		}
+		
+		if (FoundListSourceItem->CanResetBackToDefaultValue())
+		{
+			ResettableDataArray.AddUnique(FoundListSourceItem);
+		}
+	}
+	
+	if (ResettableDataArray.IsEmpty())
+	{
+		RemoveActionBinding(ResetActionHandle);
+	}
+	else
+	{
+		if (!GetActionBindings().Contains(ResetActionHandle))
+		{
+			AddActionBinding(ResetActionHandle);
+		}
 	}
 }
 
@@ -181,6 +262,35 @@ void UPxiiOptionsMenuScreen::OnListViewItemSelected(UObject* InSelectedItem)
 	
 	UPxiiListDataObjectBase* DO = Cast<UPxiiListDataObjectBase>(InSelectedItem);
 	OptionsDetailsView->UpdateDetailsInfo(DO, TryGetEntryWidgetClassName(InSelectedItem));
+}
+
+void UPxiiOptionsMenuScreen::OnListViewDataObjectModified(UPxiiListDataObjectBase* InModifiedDataObject,
+	EListDataModifyType ModifiedReason)
+{
+	if (!InModifiedDataObject || bIsResettingData)
+	{
+		return;
+	}
 	
-	UPxiiListEntryBase* SelectedWidget = ListView_OptionsList->GetEntryWidgetFromItem<UPxiiListEntryBase>(InSelectedItem);
+	if (InModifiedDataObject->CanResetBackToDefaultValue())
+	{
+		ResettableDataArray.AddUnique(InModifiedDataObject);
+		
+		if (!GetActionBindings().Contains(ResetActionHandle))
+		{
+			AddActionBinding(ResetActionHandle);
+		}
+	}
+	else
+	{
+		if (ResettableDataArray.Contains(InModifiedDataObject))
+		{
+			ResettableDataArray.Remove(InModifiedDataObject);
+		}
+	}
+	
+	if (ResettableDataArray.IsEmpty())
+	{
+		RemoveActionBinding(ResetActionHandle);
+	}
 }

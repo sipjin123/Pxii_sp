@@ -26,7 +26,7 @@ public:
 	//~ End UListDataObject_Base Interface
 	
 protected:
-	FORCEINLINE FString GetDefaultValueFromString() const { return DefaultStringValue.GetValue(); }
+	FORCEINLINE FString GetDefaultValueAsString() const { return DefaultStringValue.GetValue(); }
 	
 	TSharedPtr<FPxiiDataInteractionUtility> DataDynamicGetter;
 	TSharedPtr<FPxiiDataInteractionUtility> DataDynamicSetter;

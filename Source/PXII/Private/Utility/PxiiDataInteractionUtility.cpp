@@ -11,7 +11,7 @@ FPxiiDataInteractionUtility::FPxiiDataInteractionUtility(const FString& InFuncPa
 	}
 }
 
-FString FPxiiDataInteractionUtility::GetValueAsString(FName InSettingsID) const
+FString FPxiiDataInteractionUtility::GetSavedValueAsString(FName InSettingsID) const
 {
 	CachedGameSettings->Set(InSettingsID);
 	
@@ -22,7 +22,7 @@ FString FPxiiDataInteractionUtility::GetValueAsString(FName InSettingsID) const
 	return Value;
 }
 
-void FPxiiDataInteractionUtility::SetValueAsString(FName InSettingsID, const FString& InValue)
+void FPxiiDataInteractionUtility::SetValueToSaveFromString(FName InSettingsID, const FString& InValue)
 {
 	CachedGameSettings->Set(InSettingsID);
 	

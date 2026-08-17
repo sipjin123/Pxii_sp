@@ -14,8 +14,8 @@ class PXII_API FPxiiDataInteractionUtility
 public:
 	FPxiiDataInteractionUtility(const FString& InFuncPath);
 	
-	FString GetValueAsString(FName InSettingsID) const;
-	void SetValueAsString(FName InSettingsID, const FString& InValue);
+	FString GetSavedValueAsString(FName InSettingsID) const;
+	void SetValueToSaveFromString(FName InSettingsID, const FString& InValue);
 	
 private:
 	FCachedPropertyPath CachedFuncPath;

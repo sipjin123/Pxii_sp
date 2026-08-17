@@ -34,6 +34,11 @@ void APxiiCharacter::PossessedBy(AController* NewController)
 }
 
 
+void APxiiCharacter::ProcessBlasterFired_Implementation()
+{
+
+}
+
 USkeletalMeshComponent* APxiiCharacter::GetMesh()
 {
 	return MeshRef;

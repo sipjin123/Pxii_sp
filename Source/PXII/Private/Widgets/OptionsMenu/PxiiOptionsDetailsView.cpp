@@ -3,8 +3,10 @@
 
 #include "Widgets/OptionsMenu/PxiiOptionsDetailsView.h"
 
+#include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
+
 void UPxiiOptionsDetailsView::UpdateDetailsInfo(UPxiiListDataObjectBase* InDataObject,
-	const FString& InEntryWidgetClassName)
+                                                const FString& InEntryWidgetClassName)
 {
 	if (!InDataObject)
 	{
@@ -13,10 +15,31 @@ void UPxiiOptionsDetailsView::UpdateDetailsInfo(UPxiiListDataObjectBase* InDataO
 	
 	TextBlock_Title->SetText(InDataObject->GetDataDisplayName());
 	
-	if (!InDataObject->GetSoftDescriptionImage().IsNull())
+	// In case there is need to change image based on selection
+	UPxiiListDataObjectStringImage* StringImageDataObject = Cast<UPxiiListDataObjectStringImage>(InDataObject);
+	if (!StringImageDataObject)
 	{
-		Image_DescriptionImage->SetBrushFromLazyTexture(InDataObject->GetSoftDescriptionImage());
-		Image_DescriptionImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		if (!InDataObject->GetSoftDescriptionImage().IsNull())
+		{
+			Image_DescriptionImage->SetBrushFromLazyTexture(InDataObject->GetSoftDescriptionImage());
+			Image_DescriptionImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+		else
+		{
+			Image_DescriptionImage->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+	else
+	{
+		if (!StringImageDataObject->GetCurrentTexture().IsNull())
+		{
+			Image_DescriptionImage->SetBrushFromLazyTexture(StringImageDataObject->GetCurrentTexture());
+			Image_DescriptionImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+		else
+		{
+			Image_DescriptionImage->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 	
 	RichTextBlock_Description->SetText(InDataObject->GetDescriptionRichText());

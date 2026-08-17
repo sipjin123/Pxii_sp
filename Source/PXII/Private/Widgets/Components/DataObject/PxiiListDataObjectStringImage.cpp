@@ -1,17 +1,28 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
+
 #include "Utility/PXIILogUtility.h"
 
-void UPxiiListDataObjectString::AddDynamicOptions(const FString& InStringValue, const FText& InDisplayText)
+void UPxiiListDataObjectStringImage::AddDynamicOptions(const FString& InStringValue, const FText& InDisplayText, TSoftObjectPtr<UTexture2D> InTexture)
 {
+	if (InTexture.IsNull())
+	{
+		return;
+	}
 	AvailableStringValues.Add(InStringValue);
 	AvailableDisplayTexts.Add(InDisplayText);
+	AvailableTextures.Add(InTexture);
+	
+	if (CurrentTexture.IsNull())
+	{
+		CurrentTexture = InTexture;
+	}
 }
 
-void UPxiiListDataObjectString::NextOption()
+void UPxiiListDataObjectStringImage::NextOption()
 {
-	if (AvailableStringValues.IsEmpty() || AvailableDisplayTexts.IsEmpty())
+	if (AvailableStringValues.IsEmpty() || AvailableDisplayTexts.IsEmpty() || AvailableTextures.IsEmpty())
 	{
 		return;
 	}
@@ -28,6 +39,15 @@ void UPxiiListDataObjectString::NextOption()
 		CurrentStringValue = AvailableStringValues[0];
 	}
 	
+	if (AvailableTextures.IsValidIndex(NextStringIndex))
+	{
+		CurrentTexture = AvailableTextures[NextStringIndex];
+	}
+	else
+	{
+		CurrentTexture = AvailableTextures[0];
+	}
+	
 	TrySetDisplayText(CurrentStringValue);
 	
 	//Set value to settings
@@ -41,9 +61,9 @@ void UPxiiListDataObjectString::NextOption()
 	}
 }
 
-void UPxiiListDataObjectString::PreviousOption()
+void UPxiiListDataObjectStringImage::PreviousOption()
 {
-	if (AvailableStringValues.IsEmpty() || AvailableDisplayTexts.IsEmpty())
+	if (AvailableStringValues.IsEmpty() || AvailableDisplayTexts.IsEmpty() || AvailableTextures.IsEmpty())
 	{
 		return;
 	}
@@ -60,6 +80,15 @@ void UPxiiListDataObjectString::PreviousOption()
 		CurrentStringValue = AvailableStringValues.Last();
 	}
 	
+	if (AvailableTextures.IsValidIndex(PreviousStringIndex))
+	{
+		CurrentTexture = AvailableTextures[PreviousStringIndex];
+	}
+	else
+	{
+		CurrentTexture = AvailableTextures[0];
+	}
+	
 	TrySetDisplayText(CurrentStringValue);
 	
 	if (DataDynamicSetter)
@@ -72,7 +101,7 @@ void UPxiiListDataObjectString::PreviousOption()
 	}
 }
 
-void UPxiiListDataObjectString::OnValueChangeByRotator(const FText& InSelectedText)
+void UPxiiListDataObjectStringImage::OnValueChangeByRotator(const FText& InSelectedText)
 {
 	const int32 FoundIndex = AvailableDisplayTexts.IndexOfByPredicate(
 		[InSelectedText](const FText& AvailableText)->bool
@@ -96,7 +125,7 @@ void UPxiiListDataObjectString::OnValueChangeByRotator(const FText& InSelectedTe
 	}
 }
 
-void UPxiiListDataObjectString::OnDataObjectInitialized()
+void UPxiiListDataObjectStringImage::OnDataObjectInitialized()
 {
 	if (!AvailableStringValues.IsEmpty())
 	{
@@ -123,12 +152,12 @@ void UPxiiListDataObjectString::OnDataObjectInitialized()
 	}
 }
 
-bool UPxiiListDataObjectString::CanResetBackToDefaultValue() const
+bool UPxiiListDataObjectStringImage::CanResetBackToDefaultValue() const
 {
 	return HasDefaultValue() && CurrentStringValue != GetDefaultValueAsString();
 }
 
-bool UPxiiListDataObjectString::TryResetBackToDefaultValue()
+bool UPxiiListDataObjectStringImage::TryResetBackToDefaultValue()
 {
 	if (CanResetBackToDefaultValue())
 	{
@@ -150,7 +179,7 @@ bool UPxiiListDataObjectString::TryResetBackToDefaultValue()
 	return false;
 }
 
-bool UPxiiListDataObjectString::TrySetDisplayText(const FString& InStringValue)
+bool UPxiiListDataObjectStringImage::TrySetDisplayText(const FString& InStringValue)
 {
 	const int Index = AvailableStringValues.IndexOfByKey(InStringValue);
 	

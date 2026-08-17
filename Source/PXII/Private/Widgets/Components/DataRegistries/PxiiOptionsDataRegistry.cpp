@@ -3,8 +3,10 @@
 
 #include "Widgets/Components/DataRegistries/PxiiOptionsDataRegistry.h"
 #include "Utility/PXIILogUtility.h"
+#include "VerseVM/VBPVMRuntimeType.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
 
 #define MAKE_OPTIONS_DATA_CONTROL(FuncName) \
 	MakeShared<FPxiiDataInteractionUtility>(GET_FUNCTION_NAME_STRING_CHECKED(UPxiiGameUserSettings, FuncName))
@@ -112,12 +114,20 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					DO->SetDataID(UEnum::GetValueAsName(Data->DataID));
 					DO->SetDataDisplayName(Data->DataDisplayName);
 					
+					if (Data->bHasAnyImageToShow && Data->ImageToShow.IsValid())
+					{
+						DO->SetSoftDescriptionImage(Data->ImageToShow);
+					}
+					
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
 					
 					for (const FOptionsMap& Option : Data->OptionsSet)
 					{
 						DO->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName);
 					}
+					
+					// Set first option as default value
+					DO->SetDefaultValueFromString(Data->OptionsSet[0].Value.ToString());
 					
 					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
 					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));
@@ -141,6 +151,11 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					UPxiiListDataObjectScalar* DO = NewObject<UPxiiListDataObjectScalar>();
 					DO->SetDataID(UEnum::GetValueAsName(Data->DataID));
 					DO->SetDataDisplayName(Data->DataDisplayName);
+					
+					if (Data->bHasAnyImageToShow && Data->ImageToShow.IsValid())
+					{
+						DO->SetSoftDescriptionImage(Data->ImageToShow);
+					}
 						
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
 					DO->SetDisplayValueRange(TRange<float>(Data->DisplayValueRange.X, Data->DisplayValueRange.Y));
@@ -157,6 +172,53 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					{
 						DO->SetNumericFormattingOptions(UPxiiListDataObjectScalar::WithDecimal(Data->FractionalDigits));
 					}
+					
+					
+					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
+					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));
+					
+					DO->SetShouldApplyChangeImmediately(true);
+					
+					CollectionToAdd->AddChildListData(DO);
+				}
+			}
+		}
+		else if (OptionsEntry.Type == EOptionsDataType::StringImage)
+		{
+			if (OptionsEntry.Data.GetScriptStruct() == FStringImageData::StaticStruct())
+			{
+				if (const FStringImageData* Data = OptionsEntry.Data.GetPtr<FStringImageData>())
+				{
+					UPxiiListDataObjectStringImage* DO = NewObject<UPxiiListDataObjectStringImage>();
+					DO->SetDataID(UEnum::GetValueAsName(Data->DataID));
+					DO->SetDataDisplayName(Data->DataDisplayName);
+					
+					DO->SetDescriptionRichText(Data->DescriptionRichText);
+					
+					for (const FOptionsMap& Option : Data->OptionStrings)
+					{
+						const int32 FoundIndex = Data->OptionStrings.IndexOfByPredicate(
+							[Option](const FOptionsMap& CheckedOption)->bool
+							{
+								return CheckedOption.DisplayName.EqualTo(Option.DisplayName);
+							}
+						);
+						
+						TSoftObjectPtr<UTexture2D> FoundTexture;
+						if (Data->bHasAnyImageToShow && !Data->ImagesToShow.IsEmpty() && Data->ImagesToShow.IsValidIndex(FoundIndex))
+						{
+							FoundTexture = Data->ImagesToShow[FoundIndex];
+						}
+						else
+						{
+							FoundTexture = nullptr;
+						}
+						
+						DO->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName, FoundTexture);
+					}
+					
+					// Set first option as default value
+					DO->SetDefaultValueFromString(Data->OptionStrings[0].Value.ToString());
 					
 					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
 					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));

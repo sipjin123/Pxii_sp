@@ -46,6 +46,12 @@ protected:
 	bool bIsObstructed;
 
 public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ProcessBlasterFired();
+	
+	void ProcessBlasterFired_Implementation();
+	
 	UFUNCTION(BlueprintCallable)
 	USkeletalMeshComponent* GetMesh();
 	

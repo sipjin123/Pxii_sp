@@ -46,6 +46,14 @@ void UPxiiListEntryBase::NativeOnListItemObjectSet(UObject* ListItemObject)
 	OnOwningListDataObjectSet(CastedDataObject);
 }
 
+void UPxiiListEntryBase::NativeOnEntryReleased()
+{
+	// This is for bug that cause double entry to be highlighted at the same time
+	IUserObjectListEntry::NativeOnEntryReleased();
+	
+	NativeOnListEntryWidgetHovered(false);
+}
+
 void UPxiiListEntryBase::OnOwningListDataObjectSet(UPxiiListDataObjectBase* InOwningListDataObject)
 {
 	if (Cast<UPxiiListDataObjectCollection>(InOwningListDataObject))

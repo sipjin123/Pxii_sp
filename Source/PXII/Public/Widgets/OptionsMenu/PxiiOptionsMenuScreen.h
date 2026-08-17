@@ -26,6 +26,7 @@ protected:
 	//~ Begin UCommonActivatableWidget Interface
 	virtual void NativeOnActivated() override;
 	virtual void NativeOnDeactivated() override;
+	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 	//~ End UCommonActivatableWidget Interface
 
 private:
@@ -68,6 +69,8 @@ private:
 	
 	FUIActionBindingHandle ResetActionHandle;
 	FUIActionBindingHandle BackActionHandle;
+	
+	bool bIsResettingData = false;
 
 	UFUNCTION()
 	void OnTabSelected(FName TabID);
@@ -77,4 +80,10 @@ private:
 	
 	UFUNCTION()
 	void OnListViewItemSelected(UObject* InSelectedItem);
+	
+	void OnListViewDataObjectModified(UPxiiListDataObjectBase* InModifiedDataObject, EListDataModifyType ModifiedReason);
+	
+	// Resettable data
+	UPROPERTY(Transient)
+	TArray<UPxiiListDataObjectBase*> ResettableDataArray;
 };

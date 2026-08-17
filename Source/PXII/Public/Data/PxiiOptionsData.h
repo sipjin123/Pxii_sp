@@ -15,6 +15,8 @@ enum class EOptionsDataType : uint8
 	String,
 	Boolean,
 	Slider,
+	StringImage,
+	None,
 };
 
 USTRUCT(BlueprintType)
@@ -41,6 +43,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FText DataDisplayName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
+	FText DescriptionRichText;
 };
 
 USTRUCT(BlueprintType)
@@ -49,8 +54,11 @@ struct FStringData : public FDataBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | String", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
-	FText DescriptionRichText;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
+	bool bHasAnyImageToShow = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "bHasAnyImageToShow"))
+	TSoftObjectPtr<UTexture2D> ImageToShow;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | String", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	TArray<FOptionsMap> OptionsSet;
@@ -71,8 +79,11 @@ struct FSliderData : public FDataBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
-	FText DescriptionRichText;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
+	bool bHasAnyImageToShow = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (EditCondition = "bHasAnyImageToShow"))
+	TSoftObjectPtr<UTexture2D> ImageToShow;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Slider", meta = (ForceInlineRow, EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
 	FVector2D DisplayValueRange { 0, 1.f };
@@ -94,13 +105,29 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FStringImageData : public FDataBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Image", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None"))
+	bool bHasAnyImageToShow = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Image", meta = (EditCondition = "bHasAnyImageToShow", ToolTip = "Make sure index is same as option string to link"))
+	TArray<TSoftObjectPtr<UTexture2D>> ImagesToShow;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data | Image", meta = (EditCondition = "DataID != EPxiiGameUserSettingsID::None", ToolTip = "Make sure index is same as image to link"))
+	TArray<FOptionsMap> OptionStrings;
+};
+
+USTRUCT(BlueprintType)
 struct FOptionsDataEntry
 {
 	GENERATED_BODY()
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EOptionsDataType Type = EOptionsDataType::String;
+	EOptionsDataType Type = EOptionsDataType::None;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BaseStruct = "/Script/PXII.DataBase", ExcludeBaseStruct))
 	FInstancedStruct Data;
