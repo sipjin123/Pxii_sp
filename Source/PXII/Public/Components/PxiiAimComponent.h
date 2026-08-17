@@ -23,16 +23,16 @@ struct FHitInformation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FHitResult HitResult = FHitResult();
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FVector TraceStart = FVector::ZeroVector;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FVector TraceEnd = FVector::ZeroVector;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FVector TraceDirection = FVector::ZeroVector;
 	
 	FHitInformation() = default;

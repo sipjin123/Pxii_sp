@@ -40,4 +40,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="PXII|Math")
 	static bool GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation);
+
+	UFUNCTION(BlueprintPure, Category="Combat|Weapons")
+	static TArray<FVector> GenerateShotgunTrajectories(
+		FVector Origin,
+		FVector ForwardDirection,
+		float Distance,
+		int32 PelletCount,
+		float SpreadAngleDegrees
+	);
 };

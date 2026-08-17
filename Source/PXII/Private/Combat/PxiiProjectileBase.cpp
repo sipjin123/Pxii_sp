@@ -48,7 +48,7 @@ void APxiiProjectileBase::BeginPlay()
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Projectile Damage: {%s} -- {%s}"), *GetNameSafe(HitActor), *GetNameSafe(Hit.GetActor()));
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Projectile Damage: {%s} -- {%s} -- %f"), *GetNameSafe(HitActor), *GetNameSafe(Hit.GetActor()), BaseDMG);
 	
 	if(DamageGE && !InstigatorASC)
 	{
@@ -239,13 +239,13 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()));
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s %f"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()), BaseDMG);
 
 	auto NewHitActor = TargetActor;
 	if (NewHitActor && NewHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
 	{
 		IPxiiDamageableInterface::Execute_ApplyDamage(NewHitActor, GetOwner(), GetDamage(result), 0);
-		PXII_LOG(ELogCategory::Projectile, Log, TEXT("NEW TArget is a BODY PART"));
+		PXII_LOG(ELogCategory::Projectile, Log, TEXT("NEW TArget is a BODY PART: %f"), BaseDMG);
 		UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, result.ImpactPoint, 25.f, FLinearColor::Blue, 2.f);
 		return;
 	}
@@ -356,7 +356,8 @@ float APxiiProjectileBase::GetDamage(const FHitResult& result)
 		float dist = FVector::Dist(result.ImpactPoint, result.GetActor()->GetActorLocation());
 		fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
 	}
-
+	
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("DMG is : %f -> %f"), BaseDMG, (BaseDMG * fallOffModifier));
 	return BaseDMG * fallOffModifier;
 }
 
@@ -428,8 +429,7 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT: %s -- %s -- %s -- %s"), *GetName(), *OtherComp->GetName(), *GetNameSafe(Hit.GetActor()), *GetNameSafe(Hit.GetComponent()));
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Bullet HIT: %s -- %s -- %s -- %s -- %f"), *GetName(), *OtherComp->GetName(), *GetNameSafe(Hit.GetActor()), *GetNameSafe(Hit.GetComponent()), BaseDMG);
 	
 	if (OtherActor == this || OtherActor == InstigatorActor)
 	{

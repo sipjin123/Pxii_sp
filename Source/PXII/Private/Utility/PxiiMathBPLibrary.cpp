@@ -215,3 +215,38 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, 
 	OutLocation = ValidLocations[FMath::RandRange(0, ValidLocations.Num() - 1)];
 	return true;
 }
+
+TArray<FVector> UPxiiMathBPLibrary::GenerateShotgunTrajectories(
+FVector Origin,
+FVector ForwardDirection,
+float Distance,
+int32 PelletCount,
+float SpreadAngleDegrees
+)
+{
+	TArray<FVector> Trajectories;
+
+	if (PelletCount <= 0 || Distance <= 0.f)
+	{
+		return Trajectories;
+	}
+
+	ForwardDirection.Normalize();
+
+	Trajectories.Reserve(PelletCount);
+
+	const float SpreadRadians = FMath::DegreesToRadians(SpreadAngleDegrees);
+
+	for (int32 i = 0; i < PelletCount; ++i)
+	{
+		const FVector PelletDirection =
+			FMath::VRandCone(ForwardDirection, SpreadRadians);
+
+		const FVector EndPoint =
+			Origin + (PelletDirection * Distance);
+
+		Trajectories.Add(EndPoint);
+	}
+
+	return Trajectories;
+}

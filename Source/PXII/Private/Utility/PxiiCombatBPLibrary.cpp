@@ -176,7 +176,6 @@ void UPxiiCombatBPLibrary::ProcessTraceHit(APxiiCharacter* character, FHitResult
 
     if(!processDamage)
     {
-        UE_LOG(LogTemp, Warning, TEXT("---------------- Skip Process"));
         return;
     }
     
