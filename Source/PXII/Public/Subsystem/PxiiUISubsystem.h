@@ -18,6 +18,37 @@ enum class EAsyncPushWidgetState : uint8
 	AfterPush
 };
 
+UENUM(BlueprintType)
+enum class EConfirmationScreenType : uint8
+{
+	OnlyConfirm,
+	YesOrNo,
+	AcceptOrCancel,
+	Unknown UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EConfirmationScreenButtonAction : uint8
+{
+	Confirmed,
+	Cancelled,
+	Closed,
+	Unknown UMETA(Hidden)
+};
+
+USTRUCT(BlueprintType)
+struct FConfirmationScreenButtonInfo
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EConfirmationScreenButtonAction ButtonAction { EConfirmationScreenButtonAction::Unknown };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText ButtonText;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnButtonDescriptionTextUpdated, UPxiiButtonBase*, BroadcastingButton, FText, DescriptionText);
 
 /**
@@ -45,8 +76,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UISubsystem")
 	void RegisterBaseStack(UPxiiWidgetStackBase* InBaseStack);
 
-	//Need to specify the Soft Widget class in project settings
+	//Need to specify the Soft Widget class in data asset
 	void PushSoftWidgetToStackAsync(const FGameplayTag& InStackTag, TSoftClassPtr<UPxiiActivatableWidget> InSoftWidgetClass, TFunction<void(EAsyncPushWidgetState, UPxiiActivatableWidget*)> InAsyncPushStateCallback);
+	
+	void PushConfirmationScreenToModalStackAsync(const FText& InScreenTitle, const FText& InScreenContent, 
+		TArray<FConfirmationScreenButtonInfo> ButtonsToCreate, TFunction<void(EConfirmationScreenButtonAction)> ButtonClickedCallback);
 	
 	UFUNCTION(BlueprintPure, Category = "UISubsystem")
 	TSoftClassPtr<UPxiiActivatableWidget> GetWidgetSoftClassByTag(UPARAM(meta = (Categories = "Pxii.UI.Widget")) const FGameplayTag InWidgetTag);

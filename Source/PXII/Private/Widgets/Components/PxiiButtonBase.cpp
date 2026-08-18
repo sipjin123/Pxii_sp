@@ -40,6 +40,16 @@ void UPxiiButtonBase::SetShowToolTip(bool InShowToolTip)
 	bShowToolTip = InShowToolTip;
 }
 
+FText UPxiiButtonBase::GetButtonText() const
+{
+	if (TextBlock_ButtonText)
+	{
+		return TextBlock_ButtonText->GetText();
+	}
+	
+	return FText();
+}
+
 void UPxiiButtonBase::NativeOnCurrentTextStyleChanged()
 {
 	Super::NativeOnCurrentTextStyleChanged();

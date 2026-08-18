@@ -27,6 +27,7 @@ public class PXII : ModuleRules
 			"Mover",
 			"PropertyPath",
 			"LoadingScreenModule",
+			"HairStrandsCore",
 			
 			// UI
 			"UMG",
@@ -35,7 +36,7 @@ public class PXII : ModuleRules
 			
 			// Common UI
 			"CommonUI",
-			"CommonInput",
+			"CommonInput", 
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

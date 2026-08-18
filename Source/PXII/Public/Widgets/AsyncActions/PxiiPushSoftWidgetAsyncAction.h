@@ -22,7 +22,8 @@ public:
 	virtual void Activate() override;
 	//~ End UBlueprintAsyncActionBase Interface
 
-	UFUNCTION(BlueprintCallable, Category = "UI | Async Action", meta = (WorldContext = "WorldContextObject", HidePin = "WorldContextObject", BlueprintInternalUseOnly = "true", DisplayName = "Push Soft Widget To Stack"))
+	UFUNCTION(BlueprintCallable, Category = "UI | Async Action", meta = (WorldContext = "WorldContextObject", 
+		HidePin = "WorldContextObject", BlueprintInternalUseOnly = "true", DisplayName = "Push Soft Widget To Stack"))
 	static UPxiiPushSoftWidgetAsyncAction* PushSoftWidget(const UObject* WorldContextObject,
 														  APxiiPlayerController* OwningPlayerController, 
 														  TSoftClassPtr<UPxiiActivatableWidget> InSoftWidgetClass,

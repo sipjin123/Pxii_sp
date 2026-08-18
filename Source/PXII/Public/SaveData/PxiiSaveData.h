@@ -3,6 +3,23 @@
 #include "PxiiSaveData.generated.h"
 
 USTRUCT(BlueprintType)
+struct FCustomizationSaveData
+{
+	GENERATED_BODY()
+	
+public:
+	
+	UPROPERTY()
+	FString HeadSlotItemKey;
+
+	UPROPERTY()
+	FString UpperSlotItemKey;
+	
+	UPROPERTY()
+	FString LowerSlotItemKey;
+};
+
+USTRUCT(BlueprintType)
 struct FPlayerData
 {
 	GENERATED_BODY()
@@ -45,4 +62,7 @@ public:
 
 	UPROPERTY()
 	FCheckpointData Checkpoint;
+
+	UPROPERTY()
+	FCustomizationSaveData Customization;
 };

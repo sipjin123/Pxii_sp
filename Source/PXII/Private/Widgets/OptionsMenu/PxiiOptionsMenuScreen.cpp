@@ -5,6 +5,7 @@
 
 #include "Editor/WidgetCompilerLog.h"
 #include "Input/CommonUIInputTypes.h"
+#include "Subsystem/PxiiUISubsystem.h"
 #include "Utility/PXIILogUtility.h"
 
 void UPxiiOptionsMenuScreen::NativeOnInitialized()
@@ -36,6 +37,7 @@ void UPxiiOptionsMenuScreen::NativeOnInitialized()
 	
 	// Bind delegate
 	TabListWidget_OptionsTabs->OnTabSelected.AddUniqueDynamic(this, &ThisClass::OnTabSelected);
+	OnStartReset.AddDynamic(this, &ThisClass::ResetData);
 	
 	ListView_OptionsList->OnItemIsHoveredChanged().AddUObject(this, &ThisClass::OnListViewItemHovered);
 	ListView_OptionsList->OnItemSelectionChanged().AddUObject(this, &ThisClass::OnListViewItemSelected);
@@ -114,34 +116,15 @@ void UPxiiOptionsMenuScreen::OnResetBoundActionTriggered()
 		// this is for double checking
 	}
 	
-	//TODO: Confirmation screen
-	bIsResettingData = true;
-	bool bHasDataFailedToReset = false;
-	for (UPxiiListDataObjectBase* DataToReset : ResettableDataArray)
+	// Push confirmation screen
+	UCommonButtonBase* SelectedTabButton = TabListWidget_OptionsTabs->GetTabButtonBaseByID(TabListWidget_OptionsTabs->GetActiveTab());
+	UPxiiButtonBase* CastedButton = Cast<UPxiiButtonBase>(SelectedTabButton);
+	if (!CastedButton)
 	{
-		if (!DataToReset)
-		{
-			continue;
-		}
-		
-		if (DataToReset->TryResetBackToDefaultValue())
-		{
-			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Reset %s"), *DataToReset->GetDataDisplayName().ToString()));
-		}
-		else
-		{
-			bHasDataFailedToReset = true;
-			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Failed to reset %s"), *DataToReset->GetDataDisplayName().ToString()));
-		}
+		PXII_LOG(ELogCategory::UI, Error, TEXT("[%s]: Failed to cast to pxii button base"), *ThisClass::StaticClass()->GetName());
+		return;
 	}
-	
-	if (!bHasDataFailedToReset)
-	{
-		ResettableDataArray.Empty();
-		RemoveActionBinding(ResetActionHandle);
-	}
-	
-	bIsResettingData = false;
+	OnResetTriggered.Broadcast(CastedButton->GetButtonText());
 }
 
 void UPxiiOptionsMenuScreen::OnBackBoundActionTriggered()
@@ -293,4 +276,40 @@ void UPxiiOptionsMenuScreen::OnListViewDataObjectModified(UPxiiListDataObjectBas
 	{
 		RemoveActionBinding(ResetActionHandle);
 	}
+}
+
+void UPxiiOptionsMenuScreen::ResetData(EConfirmationScreenButtonAction ButtonAction)
+{
+	if (ButtonAction != EConfirmationScreenButtonAction::Confirmed)
+	{
+		return;
+	}
+	
+	bIsResettingData = true;
+	bool bHasDataFailedToReset = false;
+	for (UPxiiListDataObjectBase* DataToReset : ResettableDataArray)
+	{
+		if (!DataToReset)
+		{
+			continue;
+		}
+		
+		if (DataToReset->TryResetBackToDefaultValue())
+		{
+			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Reset %s"), *DataToReset->GetDataDisplayName().ToString()));
+		}
+		else
+		{
+			bHasDataFailedToReset = true;
+			PxiiLog::Print(ThisClass::StaticClass()->GetName(), FString::Printf(TEXT("Failed to reset %s"), *DataToReset->GetDataDisplayName().ToString()));
+		}
+	}
+	
+	if (!bHasDataFailedToReset)
+	{
+		ResettableDataArray.Empty();
+		RemoveActionBinding(ResetActionHandle);
+	}
+	
+	bIsResettingData = false;
 }

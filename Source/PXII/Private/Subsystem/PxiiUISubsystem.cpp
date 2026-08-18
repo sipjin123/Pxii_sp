@@ -6,7 +6,9 @@
 #include "Widgets/CommonActivatableWidgetContainer.h"
 #include "Utility/PXIILogUtility.h"
 #include "CommonUI/PxiiActivatableWidget.h"
+#include "Data/PxiiTags.h"
 #include "Settings/UIDeveloperSettings.h"
+#include "Widgets/ConfirmationScreen/PxiiConfirmationPopupScreen.h"
 
 UPxiiUISubsystem* UPxiiUISubsystem::Get(const UObject* WorldContextObject)
 {
@@ -96,6 +98,39 @@ void UPxiiUISubsystem::PushSoftWidgetToStackAsync(const FGameplayTag & InStackTa
 				InAsyncPushStateCallback(EAsyncPushWidgetState::AfterPush, CreatedWidget);
 			}
 		)
+	);
+}
+
+void UPxiiUISubsystem::PushConfirmationScreenToModalStackAsync(const FText& InScreenTitle, const FText& InScreenContent,
+	TArray<FConfirmationScreenButtonInfo> ButtonsToCreate,
+	TFunction<void(EConfirmationScreenButtonAction)> ButtonClickedCallback)
+{
+	UPxiiConfirmationScreenInfo* CreatedInfo = nullptr;
+	CreatedInfo = UPxiiConfirmationScreenInfo::CreateScreen(InScreenTitle, InScreenContent, ButtonsToCreate);
+	
+	if (!CreatedInfo)
+	{
+		PXII_LOG(ELogCategory::UI, Warning, TEXT("[%s]: Confirmation screen is not created"), *ThisClass::StaticClass()->GetName());
+		return;
+	}
+	
+	PushSoftWidgetToStackAsync(
+		UI::Pxii_UI_WidgetStack_Modal, 
+		GetWidgetSoftClassByTag(UI::Pxii_UI_Widget_ConfirmationScreen),
+		[CreatedInfo, ButtonClickedCallback](EAsyncPushWidgetState InPushState, UPxiiActivatableWidget* InPushedWidget)
+		{
+			if (InPushState == EAsyncPushWidgetState::OnCreatedBeforePush)
+			{
+				UPxiiConfirmationPopupScreen* CreatedPopupScreen = Cast<UPxiiConfirmationPopupScreen>(InPushedWidget);
+				if(!CreatedPopupScreen)
+				{
+					PXII_LOG(ELogCategory::UI, Warning, TEXT("[%s]: Cast to confirmation screen is invalid"), *ThisClass::StaticClass()->GetName());
+					return;
+				}
+				
+				CreatedPopupScreen->InitConfirmationScreen(CreatedInfo, ButtonClickedCallback);
+			}
+		}
 	);
 }
 

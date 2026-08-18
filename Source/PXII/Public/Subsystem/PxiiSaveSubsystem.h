@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Components/PxiiCustomizationComponent.h"
 #include "SaveData/PxiiSaveData.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "PxiiSaveSubsystem.generated.h"
@@ -21,6 +22,13 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Save")
 	UPxiiSaveData* GetCurrentSave() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Save")
+	bool SaveCustomization(UPxiiCustomizationComponent* comp);
+
+	UFUNCTION(BlueprintCallable, Category = "Save")
+	bool LoadCustomization(UPxiiCustomizationComponent* comp);
+
 private:
 	
 	UPROPERTY()

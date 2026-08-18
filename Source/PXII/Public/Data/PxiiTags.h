@@ -39,6 +39,7 @@ namespace UI
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_TitleScreen_Start);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_TitleScreen_Main);
 	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_OptionsMenu);
+	PXII_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pxii_UI_Widget_ConfirmationScreen);
 }
 
 namespace GameLevels

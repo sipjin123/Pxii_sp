@@ -65,6 +65,40 @@ UPxiiSaveData* UPxiiSaveSubsystem::GetCurrentSave() const
 	return CurrentSaveData;
 }
 
+bool UPxiiSaveSubsystem::SaveCustomization(UPxiiCustomizationComponent* comp)
+{
+	if (!CreateSaveIfNeeded())
+	{
+		return false;
+	}
+
+	if(!comp)
+	{
+		return false;
+	}
+
+	comp->FillCustomizationSaveData(CurrentSaveData->Customization);
+	SaveGame();
+	
+	return true;
+}
+
+bool UPxiiSaveSubsystem::LoadCustomization(UPxiiCustomizationComponent* comp)
+{
+	if (!CreateSaveIfNeeded())
+	{
+		return false;
+	}
+
+	if(!comp)
+	{
+		return false;
+	}
+	
+	comp->LoadData(CurrentSaveData->Customization);
+	return true;
+}
+
 bool UPxiiSaveSubsystem::CreateSaveIfNeeded()
 {
 	if (CurrentSaveData)

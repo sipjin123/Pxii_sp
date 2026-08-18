@@ -5,10 +5,14 @@
 #include "CoreMinimal.h"
 #include "PxiiOptionsDetailsView.h"
 #include "CommonUI/PxiiActivatableWidget.h"
+#include "Subsystem/PxiiUISubsystem.h"
 #include "Widgets/Components/PxiiListViewBase.h"
 #include "Widgets/Components/PxiiTabListWidgetBase.h"
 #include "Widgets/Components/DataRegistries/PxiiOptionsDataRegistry.h"
 #include "PxiiOptionsMenuScreen.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResetTriggered, FText, SelectedTabID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartReset, EConfirmationScreenButtonAction, ButtonAction);
 
 /**
  * 
@@ -17,6 +21,13 @@ UCLASS()
 class PXII_API UPxiiOptionsMenuScreen : public UPxiiActivatableWidget
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnResetTriggered OnResetTriggered;
+	
+	UPROPERTY(BlueprintCallable)
+	FOnStartReset OnStartReset;
 	
 protected:
 	// ~ Begin UUserWidget Interface
@@ -81,7 +92,11 @@ private:
 	UFUNCTION()
 	void OnListViewItemSelected(UObject* InSelectedItem);
 	
+	UFUNCTION()
 	void OnListViewDataObjectModified(UPxiiListDataObjectBase* InModifiedDataObject, EListDataModifyType ModifiedReason);
+	
+	UFUNCTION()
+	void ResetData(EConfirmationScreenButtonAction ButtonAction);
 	
 	// Resettable data
 	UPROPERTY(Transient)

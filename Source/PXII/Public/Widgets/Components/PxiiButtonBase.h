@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void SetShowToolTip(bool InShowToolTip);
 	
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	FText GetButtonText() const;
+	
 private:
 	//~ Begin UCommonButtonBase Interface
 	virtual void NativeOnCurrentTextStyleChanged() override;
