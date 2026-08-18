@@ -48,7 +48,7 @@ void APxiiProjectileBase::BeginPlay()
 
 void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Projectile Damage: {%s} -- {%s} -- %f"), *GetNameSafe(HitActor), *GetNameSafe(Hit.GetActor()), BaseDMG);
+	//PXII_LOG(ELogCategory::Projectile, Log, TEXT("Applying Projectile Damage: {%s} -- {%s} -- %f"), *GetNameSafe(HitActor), *GetNameSafe(Hit.GetActor()), BaseDMG);
 	
 	if(DamageGE && !InstigatorASC)
 	{
@@ -239,7 +239,7 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s %f"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()), BaseDMG);
+	//PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s %f"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()), BaseDMG);
 
 	auto NewHitActor = TargetActor;
 	if (NewHitActor && NewHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
@@ -268,7 +268,7 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 				}
 			}
 			float finalDMG = GetDamage(result);
-			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
+			//PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
 			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, finalDMG,  EDamageSource::Range);
 		} else
 		{
@@ -357,7 +357,6 @@ float APxiiProjectileBase::GetDamage(const FHitResult& result)
 		fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
 	}
 	
-	PXII_LOG(ELogCategory::Projectile, Log, TEXT("DMG is : %f -> %f"), BaseDMG, (BaseDMG * fallOffModifier));
 	return BaseDMG * fallOffModifier;
 }
 
