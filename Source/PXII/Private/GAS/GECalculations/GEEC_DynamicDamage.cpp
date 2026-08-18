@@ -108,10 +108,10 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		IPxiiCombatInterface::Execute_ProcessDamageData(SourceActor, SourceActor, IncomingDamage, DamageSource);
 		
 		if (bIsTargetParry)
-		IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::Parry, 0);
+		IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::Parry, 0, SourceActor);
 
 		if (bIsTargetDodge)
-			IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::PerfectDodge, 0);
+			IPxiiCombatInterface::Execute_TriggerSpecialAction(TargetActor, ESpecialAction::PerfectDodge, 0, SourceActor);
 		if (BlockDamageProcessing)
 		{
 			return;

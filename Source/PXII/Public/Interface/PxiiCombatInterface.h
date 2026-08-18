@@ -77,7 +77,7 @@ public:
 	void DisableAttackState();
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
-	void TriggerSpecialAction(ESpecialAction SpecialAction, int32 Magnitude);
+	void TriggerSpecialAction(ESpecialAction SpecialAction, int32 Magnitude, AActor* Instigator);
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void NotifyHitTarget(AActor* Target, FDamageNotifPayload Payload);
