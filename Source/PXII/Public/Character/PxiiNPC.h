@@ -67,6 +67,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool IsAttacking;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsDodgeWindowActive;
+	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	const UPxiiAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
