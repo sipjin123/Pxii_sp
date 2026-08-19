@@ -81,6 +81,7 @@ enum class EHitEffectType : uint8 {
 	Timestop = 9	UMETA(DisplayName = "Timestop"),
 	FlyAway = 10	UMETA(DisplayName = "FlyAway"),
 	StandingUp = 11	UMETA(DisplayName = "StandingUp"),
+	Ministun = 12	UMETA(DisplayName = "Ministun"),
 };
 
 UENUM(BlueprintType)

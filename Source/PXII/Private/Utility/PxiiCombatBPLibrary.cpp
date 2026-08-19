@@ -71,30 +71,47 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
                 InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
             }
 
-            if(true)//if (HitEffectType == EHitEffectType::Knockback)
+            if(HitEffectType != EHitEffectType::Default)
             {
                 UE_LOG(LogTemp, Warning, TEXT("Should Apply Infliction: %s"), *StaticEnum<EHitEffectType>()->GetNameStringByValue(static_cast<int64>(HitEffectType)));
-                const FGameplayTag KnocbackTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Knockback"));
                 FHitResult HitResult;
                 HitResult.ImpactPoint = result.ImpactPoint;
                 HitResult.Location = result.Location;
-
                 FGameplayEventData Payload;
-                Payload.EventTag = KnocbackTag;
 
                 FGameplayAbilityTargetDataHandle TargetDataHandle;
-
                 TargetDataHandle.Add(
                     new FGameplayAbilityTargetData_SingleTargetHit(HitResult)
                 );
 
                 Payload.TargetData = TargetDataHandle;
                 Payload.Instigator = SourceActor;
-                UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-                    TargetActor,
-                    KnocbackTag,
-                    Payload
-                );
+                
+                FGameplayTag DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Flinch"));
+                switch (HitEffectType)
+                {
+                case EHitEffectType::Knockback:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Knockback"));
+                    break;
+                case EHitEffectType::Knockdown:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Knockdown"));
+                    break;
+                case EHitEffectType::FlyAway:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.FlyAway"));
+                    break;
+                case EHitEffectType::Stagger:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Stagger"));
+                    break;
+                case EHitEffectType::Ministun:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Ministun"));
+                    break;
+                case EHitEffectType::Flinch:
+                    DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Flinch"));
+                    break;
+                }
+                Payload.EventTag = DynamicTag;
+
+                UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, DynamicTag, Payload);
             }
         }
     }
