@@ -93,7 +93,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	AActor* LastKnownTarget;
-
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EFactionType FactionType;
+	
 	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
 	

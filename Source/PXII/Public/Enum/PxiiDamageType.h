@@ -7,6 +7,15 @@
 #include "PxiiDamageType.generated.h"
 
 UENUM(BlueprintType)
+enum class EFactionType:uint8
+{
+	Neutral=0 UMETA(DisplayName="None"),
+	Player=1 UMETA(DisplayName="Player"),
+	Enemy=2 UMETA(DisplayName="Enemy"),
+	Ally=3 UMETA(DisplayName="Ally"),
+};
+
+UENUM(BlueprintType)
 enum class EDamageType:uint8
 {
 	None=0 UMETA(DisplayName="None"),

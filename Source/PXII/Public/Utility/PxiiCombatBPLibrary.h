@@ -24,6 +24,10 @@ class PXII_API UPxiiCombatBPLibrary : public UBlueprintFunctionLibrary
 	
 public:
 
+	// Retrieves all actors within a radius
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = WorldContextObject), meta = (ToolTip = "Fetches all actors within an area with filtering"))
+	static TArray<AActor*> GetActorsWithinRadius(FVector Origin, float Radius, UObject * WorldContextObject, EFactionType FactionType, bool ShowDebug);
+
 	UFUNCTION(BlueprintCallable)
 	static void StartProjectileTrace(APxiiCharacter* character, FHitInformation& TraceInformation, bool processDamage = false, FName MuzzleSocketName = "Muzzle", bool drawDebugTrace = true);
 
@@ -32,6 +36,9 @@ public:
 	
 	static bool DoCameraTrace(APxiiCharacter* character, float TraceDistance, FHitResult& HitResult, FVector& TraceEnd, bool DrawTrace);
 
+	UFUNCTION(BlueprintPure, Category="PXII|World")
+	static bool IsGameWorld(UObject* WorldContextObject);
+	
 	static bool DoSocketTrace(APxiiCharacter* character, FName socketName, FVector aimPoint, FHitInformation& HitResult, bool DrawTrace);
 
 	static bool GetCameraViewPoint(APxiiCharacter* character, FVector& OutLoc, FVector& OutDir);
@@ -63,5 +70,5 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable)
-	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude);
+	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
 };

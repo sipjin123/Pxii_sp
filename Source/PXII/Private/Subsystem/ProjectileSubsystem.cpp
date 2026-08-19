@@ -69,10 +69,13 @@ void UProjectileSubsystem::InitializePool(TSoftClassPtr<APxiiProjectileBase> Pro
 				if (!ProjectilePool.IsMaxAlready())
 				{
 					APxiiProjectileBase* SpawnedProjectile = GetWorld()->SpawnActor<APxiiProjectileBase>(LoadedProjectileClass, Location, Rotation, SpawnParams);
-					SpawnedProjectile->SetProjectileTag(ClassTag);
-					SpawnedProjectile->SetIsInUse(false);
-					SpawnedProjectile->OnReturnToPool.AddUObject(this, &UProjectileSubsystem::ReturnProjectileToPool);
-					ProjectilePool.AvailableProjectiles.AddUnique(SpawnedProjectile);
+					if (SpawnedProjectile)
+					{
+						SpawnedProjectile->SetProjectileTag(ClassTag);
+						SpawnedProjectile->SetIsInUse(false);
+						SpawnedProjectile->OnReturnToPool.AddUObject(this, &UProjectileSubsystem::ReturnProjectileToPool);
+						ProjectilePool.AvailableProjectiles.AddUnique(SpawnedProjectile);
+					}
 				}
 				else 
 				{

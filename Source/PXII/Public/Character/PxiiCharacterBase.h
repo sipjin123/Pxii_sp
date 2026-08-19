@@ -75,6 +75,9 @@ public:
 	virtual bool CanGetAggro_Implementation();
 	virtual int32 GetAvailableAggroSlots();
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EFactionType FactionType;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	int MaxAggroSlots = 2;
 	

@@ -2,6 +2,8 @@
 
 
 #include "Utility/PxiiCombatBPLibrary.h"
+
+#include "Character/PxiiNPC.h"
 #include "Settings/CombatDeveloperSettings.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
 #include "Utility/PXIILogUtility.h"
@@ -9,6 +11,7 @@
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Data/PxiiTags.h"
 #include "Enum/PxiiDamageType.h"
+#include "Enum/PxiiEnemyType.h"
 #include "Interface/PxiiDamageableInterface.h"
 #include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
@@ -32,7 +35,7 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     return false;
 }
 
-void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude)
+void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType)
 {
     UAbilitySystemComponent* InstigatorASC = nullptr;
     if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(SourceActor))
@@ -67,12 +70,114 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
 
                 InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
             }
+
+            if(true)//if (HitEffectType == EHitEffectType::Knockback)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Should Apply Infliction: %s"), *StaticEnum<EHitEffectType>()->GetNameStringByValue(static_cast<int64>(HitEffectType)));
+                const FGameplayTag KnocbackTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Knockback"));
+                FHitResult HitResult;
+                HitResult.ImpactPoint = result.ImpactPoint;
+                HitResult.Location = result.Location;
+
+                FGameplayEventData Payload;
+                Payload.EventTag = KnocbackTag;
+
+                FGameplayAbilityTargetDataHandle TargetDataHandle;
+
+                TargetDataHandle.Add(
+                    new FGameplayAbilityTargetData_SingleTargetHit(HitResult)
+                );
+
+                Payload.TargetData = TargetDataHandle;
+                Payload.Instigator = SourceActor;
+                UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+                    TargetActor,
+                    KnocbackTag,
+                    Payload
+                );
+            }
         }
     }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("---------------- FAILED TO Register Hit"));
     }
+}
+
+TArray<AActor*> UPxiiCombatBPLibrary::GetActorsWithinRadius(FVector Origin, float Radius, UObject* WorldContextObject,
+    EFactionType FactionType, bool ShowDebug)
+{
+    const UWorld * world = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert);
+    TArray<AActor*> OutActors;
+    const FCollisionShape DetectionSphere = FCollisionShape::MakeSphere(Radius);
+
+    // Define object types to detect (only detect Pawns, like enemies)
+    FCollisionObjectQueryParams ObjectQueryParams;
+    ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+    // Store detected actors
+    TArray<FOverlapResult> OverlapResults;
+
+    // Perform Overlap
+    const bool bHasOverlap = world->OverlapMultiByObjectType(
+        OverlapResults, 
+        Origin, 
+        FQuat::Identity, 
+        ObjectQueryParams, 
+        DetectionSphere
+    );
+
+    // Draw debug sphere (DEBUG)
+    if(ShowDebug)
+    {
+        DrawDebugSphere(world, Origin, Radius, 16, FColor::Green, false, 2.0f);
+    }
+	
+    // Use a set to track unique actors
+    TSet<AActor*> UnitsHit;
+	
+    // Process detected actors
+    if (bHasOverlap)
+    {
+        for (const FOverlapResult& Result : OverlapResults)
+        {
+            AActor* DetectedActor = Result.GetActor();
+            if (DetectedActor)
+            {
+                if (DetectedActor->Implements<UPxiiDamageableInterface>())
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Part Enemy detected: %s"), *DetectedActor->GetName());
+                }
+                if (DetectedActor->Implements<UPxiiCombatInterface>())
+                {
+                    bool isAlive = true; //IPxiiCombatInterface::Execute_IsAlive(DetectedActor)
+                    if (isAlive)
+                    {
+                        // Filter actors here
+                        bool IsValidActorHit =
+                                FactionType == EFactionType::Player && DetectedActor->IsA(APxiiCharacter::StaticClass()) || 
+                                FactionType == EFactionType::Enemy && DetectedActor->IsA(APxiiNPC::StaticClass()) ||
+                                FactionType == EFactionType::Neutral && DetectedActor->IsA(ACharacter::StaticClass());
+			
+                        //bool IsValidActorHit = true;
+
+                        // Check validity and prevent duplicates
+                        if (IsValidActorHit && !UnitsHit.Contains(DetectedActor))
+                        {
+                            if(ShowDebug)
+                            {
+                                // Log Collision (DEBUG)
+                                UE_LOG(LogTemp, Warning, TEXT("Enemy detected: %s"), *DetectedActor->GetName());
+                            }
+                            UnitsHit.Add(DetectedActor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return UnitsHit.Array();
 }
 
 void UPxiiCombatBPLibrary::StartProjectileTrace(APxiiCharacter* Character, FHitInformation& TraceInformation, bool processDamage, FName MuzzleSocketName, bool drawDebugTrace)
@@ -284,6 +389,13 @@ bool UPxiiCombatBPLibrary::DoCameraTrace(APxiiCharacter* character, float TraceD
     }
 
     return world->LineTraceSingleByChannel(HitResult,CameraLocation, TraceEnd,ECC_Visibility, CameraParams);
+}
+
+bool UPxiiCombatBPLibrary::IsGameWorld(UObject* WorldContextObject)
+{
+    if (!WorldContextObject) return false;
+    const UWorld* World = WorldContextObject->GetWorld();
+    return World && World->IsGameWorld();
 }
 
 bool UPxiiCombatBPLibrary::DoSocketTrace(APxiiCharacter* character, FName socketName, FVector aimPoint, FHitInformation& HitResult, bool DrawTrace)

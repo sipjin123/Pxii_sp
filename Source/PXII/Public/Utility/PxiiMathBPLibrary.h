@@ -19,6 +19,9 @@ public:
 	static FVector GetLocationInFrontOfActor(const AActor* Actor, float Distance);
 	
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static FVector GetLocationRightOfActor(const AActor* Actor, float Distance);
+
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static FVector GetLocationInFrontOfActorCam(const AActor* Actor, const FRotator& CameraRotation, float Distance);
 	
 	UFUNCTION(BlueprintPure, Category="PXII|Math")

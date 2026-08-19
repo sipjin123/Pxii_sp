@@ -14,6 +14,12 @@ FVector UPxiiMathBPLibrary::GetLocationInFrontOfActor(const AActor* Actor, float
 	return Actor->GetActorLocation() + Actor->GetActorForwardVector() * Distance;
 }
 
+FVector UPxiiMathBPLibrary::GetLocationRightOfActor(const AActor* Actor, float Distance)
+{
+	if (!Actor) return FVector::ZeroVector;
+	return Actor->GetActorLocation() + Actor->GetActorRightVector() * Distance;
+}
+
 FVector UPxiiMathBPLibrary::GetLocationInFrontOfActorCam(const AActor* Actor, const FRotator& CameraRotation, float Distance)
 {
 	if (!Actor)
