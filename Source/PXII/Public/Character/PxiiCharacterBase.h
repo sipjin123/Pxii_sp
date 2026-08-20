@@ -90,6 +90,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnAggroUpdated OnAggroUpdated;
 
+	UPROPERTY(BlueprintReadWrite)
+	AActor* SpecialActionTarget;
+	
 	UPROPERTY(EditAnywhere)
 	bool LogAggro = true;
 };
