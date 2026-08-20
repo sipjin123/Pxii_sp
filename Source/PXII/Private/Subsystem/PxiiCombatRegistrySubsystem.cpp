@@ -10,6 +10,7 @@
 #include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
 #include "Enum/PxiiDamageType.h"
+#include "Utility/PxiiCombatBPLibrary.h"
 #include "Utility/PXIILogUtility.h"
 
 class UGameplayEffect;
@@ -176,6 +177,7 @@ void UPxiiCombatRegistrySubsystem::ProcessDamageRegistry(const FQueuedDamage& Da
 				DamageEntry.HitData.DamageSource
 			);
 
+			//UE_LOG(LogTemp, Warning, TEXT("[CRS] ---------------------------- HIT FLAG Remain {%d}"), DamageEntry.HitData.Flags);
 			if (TraceOrigin)
 			{
 				DrawDebugSphere(World, DamageEntry.HitData.HitCoord, 25.f, // Radius
@@ -231,25 +233,11 @@ void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActo
 		if (bLogFlow)
 			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d -------------------------------------- Damage Applied, Remain {%d} INDEX: {%d} --  {%d}"), CurrentTickIndex, DamageQueue.Num(), DamageSource, HitEffectType);
 		SourceASC->ApplyGameplayEffectSpecToTarget(*ParrySpecHandle.Data.Get(), TargetASC);
-
-		/*
-		if (Target->GetClass()->ImplementsInterface(UICombatant::StaticClass()))
-		{
-			// TODO: Logic for determining intensity here
-			int32 IntensityValue = 1;
-			switch (HitEffectType)
-			{
-				case EHitEffectType::Flinch:
-					IICombatant::Execute_ApplyFlinch(Target);
-					break;
-				case EHitEffectType::Knockback:
-					IICombatant::Execute_ApplyKnockback(Target, IntensityValue);
-					break;
-				case EHitEffectType::Knockdown:
-					IICombatant::Execute_ApplyKnockdown(Target, IntensityValue);
-					break;
-			}
-		}*/
+		
+		FHitResult HitResult;
+		HitResult.ImpactPoint = HitCoords;
+		HitResult.Location = HitCoords;
+		UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(Source, Target, HitResult, 0.f, HitEffectType);
 	}
 }
 

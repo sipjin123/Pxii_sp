@@ -3,6 +3,17 @@
 #include "Engine/DataAsset.h"
 #include "PxiiCustomizationMap.generated.h"
 
+UENUM(BlueprintType)
+enum class ESlotType : uint8
+{
+	Invalid,
+	Head,
+	Upper,
+	Lower,
+	Tattoo,
+	Blaster
+};
+
 UCLASS(BlueprintType)
 class PXII_API UPxiiCustomizationMap : public UPrimaryDataAsset
 {
@@ -18,4 +29,10 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UPxiiCustomizationSlot> LowerBodySlot;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPxiiCustomizationSlot> TattooSlot;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPxiiCustomizationSlot> BlasterSlot;
 };

@@ -78,6 +78,8 @@ public:
 	virtual void EnableAttackState_Implementation() override;
 	virtual void DisableAttackState_Implementation() override;
 
+	virtual EFactionType GetFaction_Implementation() override;
+	
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FHitEffectType OnHitEffectType;
 	

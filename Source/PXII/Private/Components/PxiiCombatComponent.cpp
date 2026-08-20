@@ -62,50 +62,6 @@ void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector 
 	{
 		UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(this, ImpactLocation, 50.f, FLinearColor::Blue, TraceDuration);
 	}
-	/*
-	FTransform MuzzleTransform = SMWeapon->GetSocketTransform(MuzzleSocketName);
-	FTransform SocketTransform = MuzzleTransform;
-	FVector ToTarget = TargetLoc - SocketTransform.GetLocation();
-	FRotator TargetRotation = ToTarget.Rotation();
-
-	FActorSpawnParameters SpawnParams;
-	if (ShowDebugLine)
-	{
-		DrawDebugLine(GetWorld(), SocketTransform.GetLocation(), TargetLoc, FColor::Red, false, ShowDebugLineDuration, 0, .9f);
-	}
-
-	// Dev override switches here for Debugging
-	const  bool SpawnDecal = true;
-	const bool ReleaseVfx = true;
-	
-	if (ReleaseVfx)
-	{
-		if (ProjectileClass)
-			APXIIProjectile* SpawnedProjectile = GetWorld()->SpawnActor<APXIIProjectile>(ProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-		if (MuzzleVFX)
-			GetWorld()->SpawnActor<AActor>(MuzzleVFX, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-
-		// TODO(BURLIN): Check if this is still needed, PXIIProjectile.cpp already has VFX on collide
-		if (HitVFX)
-			GetWorld()->SpawnActor<AActor>(HitVFX, TargetLoc, TargetRotation, SpawnParams);
-
-		if (SpawnDecal){
-			// TODO(BURLIN): Check if randomization is necessary
-			int32 RandomNumber = FMath::RandRange(5, 10); 
-			FVector DecalSize = FVector(RandomNumber, RandomNumber, RandomNumber);
-			float LifeSpan = 7.0f;
-
-			// Spawn the Decal
-			UGameplayStatics::SpawnDecalAtLocation(
-					  GetWorld(),
-					  BulletHoleDecal,
-					  DecalSize,
-					  TargetLoc,
-					  ImpactNormal.Rotation(),
-					  LifeSpan
-				  );
-		}
-	}*/
 }
 
 
@@ -149,7 +105,6 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 	// Result
 	TArray<FHitResult> OutHits;
 
-	bool UseSphere = false;
 	if (UseSphere)
 	{
 		UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
@@ -222,8 +177,7 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 	USkeletalMeshComponent* Mesh = CharacterRef->FindComponentByClass<USkeletalMeshComponent>();
 	if (Mesh)
 	{
-		FVector HandLocation = Mesh->GetSocketLocation(TEXT("palm_r_Socket"));
-		bool UseSphere = false;
+		FVector HandLocation = Mesh->GetSocketLocation(SocketTarget);
 		if (UseSphere)
 		{
 			UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner(),
@@ -266,23 +220,6 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 
 void UPxiiCombatComponent::FinalizeHitTraceLogic()
 {
-	//if (LogSlashLogic)
-	//	UE_LOG(LogTemp, Warning, TEXT("%s Slash Trace: Finalize Index:%d"), *UPXIINetworkBPLibrary::GetNetworkType(this), TraceIndex);
-	/*
-	APawn* Pawn = Cast<APawn>(GetOwner());
-	if (!Pawn)
-	{
-		return;
-	}
-
-	const bool bIsLocalPlayer = Pawn->IsLocallyControlled();
-	const bool bIsServer = Pawn->HasAuthority();
-
-	if (!bIsLocalPlayer && !bIsServer)
-	{
-		return;
-	}*/
-	
 	for (FHitResult OutHitParam : SlashDataArray)
 	{
 		const FVector ImpactPoint = OutHitParam.ImpactPoint;

@@ -65,7 +65,7 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 
 	if (IsAttacking)
 	{
-		FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("palm_r_Socket"));
+		FVector SocketLocation = GetMesh()->GetSocketLocation(CombatComponent->SocketTarget);
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this, SocketLocation]()
 		{
 			//Multicast_SpawnSimulatedHit(SocketLocation);

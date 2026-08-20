@@ -71,4 +71,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
+	
+	UFUNCTION(BlueprintCallable)
+	static void RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
 };

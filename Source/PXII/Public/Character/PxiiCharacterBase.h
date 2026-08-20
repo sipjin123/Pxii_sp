@@ -56,7 +56,7 @@ public:
 	virtual UPxiiCombatComponent* GetCombatComponent_Implementation() const override;
 	virtual const UPxiiAttributeSet* GetAttributeSet_Implementation() const override;
 	virtual UPxiiAimAssistComponent* GetAimAssistComponent_Implementation() const override;
-	
+	virtual EFactionType GetFaction_Implementation() override;
 	virtual void EnableAttackState_Implementation() override;
 	virtual void DisableAttackState_Implementation() override;
 	

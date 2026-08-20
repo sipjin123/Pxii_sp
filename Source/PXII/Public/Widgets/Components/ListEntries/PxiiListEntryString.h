@@ -16,7 +16,7 @@ UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
 class PXII_API UPxiiListEntryString : public UPxiiListEntryBase
 {
 	GENERATED_BODY()
-
+	
 protected:
 	// ~ Begin UUserWidget Interface
 	virtual void NativeOnInitialized() override;

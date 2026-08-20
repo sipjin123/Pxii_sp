@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameUserSettings.h"
+#include  "GenericPlatform/GenericApplication.h"
 #include "PxiiGameUserSettings.generated.h"
 
 UENUM(BlueprintType)
@@ -49,20 +50,61 @@ class PXII_API UPxiiGameUserSettings : public UGameUserSettings
 	GENERATED_BODY()
 	
 public:
+	UPxiiGameUserSettings();
+	
 	static UPxiiGameUserSettings* Get();
 	void Set(FName InCurrentSettingsID);
 	
-#pragma region Collection Tab
 	UFUNCTION()
 	FString GetCurrentGameSettings() const;
 	
 	UFUNCTION()
 	void SetCurrentGameSettings(FString InSettingsValue);
-#pragma endregion 
+	
+	static TArray<FMonitorInfo> GetAllDisplayMonitorInfo();
+	void SetActiveMonitorID(const FString& InDisplayID);
+	
+	static TArray<FIntPoint> GetSupportedFullscreenResolutions();
 	
 private:
+	UPROPERTY()
+	const UEnum* WindowModePtr;
+	
+#pragma region Gameplay Tab
 	UPROPERTY(Config)
 	FString CurrentGameDifficulty;
+#pragma endregion
+	
+#pragma region Controls Tab
+	UPROPERTY(Config)
+	FString CurrentKeyboardAndMouseMap;
+	
+	UPROPERTY(Config)
+	FString CurrentGamepadMap;
+#pragma endregion 
+	
+#pragma region Graphics
+	UPROPERTY(Config)
+	FString CurrentDisplayID;
+	
+	UPROPERTY(Config)
+	TEnumAsByte<EWindowMode::Type> CurrentDisplayMode;
+	
+	UPROPERTY(Config)
+	FIntPoint CurrentDisplayResolution;
+#pragma endregion 
+	
+#pragma region Audio Tab
+	UPROPERTY(Config)
+	float OverallVolume;
+	
+	UPROPERTY(Config)
+	float MusicVolume;
+#pragma endregion 
+	
+#pragma region Language
+	
+#pragma endregion
 	
 	UPROPERTY()
 	EPxiiGameUserSettingsID CurrentSettingsID { EPxiiGameUserSettingsID::None };

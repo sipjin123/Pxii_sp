@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "PxiiDataRegistryBase.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
+#include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
 #include "PxiiOptionsDataRegistry.generated.h"
 
+ENUM_RANGE_BY_COUNT(EWindowMode::Type, EWindowMode::NumWindowModes)
 /**
  * 
  */
@@ -27,6 +31,9 @@ public:
 private:
 	void ConstructTabs();
 	void ConstructDataObjects(UPxiiListDataObjectCollection* CollectionToAdd, const TArray<FOptionsDataEntry>& DataEntries);
+	void SetStringOptionsCycle(const FStringData* Data, UPxiiListDataObjectString* DataObjectToSet);
+	void SetStringImageOptionsCycle(const FStringImageData* Data, UPxiiListDataObjectStringImage* DataObjectToSet);
+	
 	void FindChildListDataRecursively(UPxiiListDataObjectBase* InParentData, TArray<UPxiiListDataObjectBase*>& OutFoundChildListData) const;
 
 	UPROPERTY(Transient)

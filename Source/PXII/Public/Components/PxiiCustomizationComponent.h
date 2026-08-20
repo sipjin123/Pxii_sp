@@ -11,24 +11,34 @@ class PXII_API UPxiiCustomizationComponent : public UActorComponent
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetHeadSlot(UPxiiCustomizationBaseData* headData);
+	void SetHeadSlot(UPxiiCustomizationBaseData* headData, bool saveChange = false);
 	
-	virtual void SetHeadSlot_Implementation(UPxiiCustomizationBaseData* headData);
+	virtual void SetHeadSlot_Implementation(UPxiiCustomizationBaseData* headData, bool saveChange = false);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetLowerSlot(UPxiiCustomizationBaseData* lowerData);
+	void SetLowerSlot(UPxiiCustomizationBaseData* lowerData, bool saveChange = false);
 
-	virtual void SetLowerSlot_Implementation(UPxiiCustomizationBaseData* lowerData);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetUpperSlot(UPxiiCustomizationBaseData* upperData);
-
-	virtual void SetUpperSlot_Implementation(UPxiiCustomizationBaseData* upperData);
+	virtual void SetLowerSlot_Implementation(UPxiiCustomizationBaseData* lowerData, bool saveChange = false);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnSlotUpdated();
+	void SetUpperSlot(UPxiiCustomizationBaseData* upperData, bool saveChange = false);
 
-	virtual void OnSlotUpdated_Implementation();
+	virtual void SetUpperSlot_Implementation(UPxiiCustomizationBaseData* upperData, bool saveChange = false);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetTattooSlot(UPxiiCustomizationBaseData* tattooData, bool saveChange = false);
+
+	virtual void SetTattooSlot_Implementation(UPxiiCustomizationBaseData* tattooData, bool saveChange = false);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetBlasterSlot(UPxiiCustomizationBaseData* blasterData, bool saveChange = false);
+
+	virtual void SetBlasterSlot_Implementation(UPxiiCustomizationBaseData* blasterData, bool saveChange = false);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnSlotUpdated(bool saveChange = false);
+
+	virtual void OnSlotUpdated_Implementation(bool saveChange = false);
 
 	UFUNCTION(BlueprintPure)
 	UPxiiCustomizationBaseData* GetCurrentHead();
@@ -38,6 +48,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UPxiiCustomizationBaseData* GetCurrentLower();
+
+	UFUNCTION(BlueprintPure)
+	UPxiiCustomizationBaseData* GetCurrentBlaster();
+
+	UFUNCTION(BlueprintPure)
+	UPxiiCustomizationBaseData* GetCurrentTattoo();
 
 	UFUNCTION(BlueprintCallable)
 	void FillCustomizationSaveData(FCustomizationSaveData& comp);
@@ -58,5 +74,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UPxiiCustomizationBaseData> CurrentLower;
+
+	UPROPERTY()
+	TObjectPtr<UPxiiCustomizationBaseData> CurrentTattoo;
+
+	UPROPERTY()
+	TObjectPtr<UPxiiCustomizationBaseData> CurrentBlaster;
 	
 };

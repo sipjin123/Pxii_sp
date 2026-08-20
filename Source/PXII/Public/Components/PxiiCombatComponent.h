@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndHitTrace();
 
+	UPROPERTY(EditAnywhere)
+	bool UseSphere = false;
+	
 	UFUNCTION(BlueprintCallable)
 	void ProcessDepthSlash(FVector EndLoc);
 
@@ -122,4 +125,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float LengthExtension = 0.f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName SocketTarget;
 };

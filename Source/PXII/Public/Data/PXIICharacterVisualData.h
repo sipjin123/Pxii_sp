@@ -12,4 +12,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 VisualOverrideId;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool DisableVisualOverride = false;
 };

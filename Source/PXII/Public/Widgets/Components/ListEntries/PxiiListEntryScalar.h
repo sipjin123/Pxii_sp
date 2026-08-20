@@ -28,6 +28,9 @@ protected:
 	//~ End UPxiiListEntryBase Interface
 	
 private:
+	UFUNCTION()
+	void OnSliderValueChange(float Value);
+	
 #pragma region BoundWidgets
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	UCommonNumericTextBlock* NumericTextBlock_Value;

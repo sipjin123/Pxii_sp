@@ -28,6 +28,7 @@ public class PXII : ModuleRules
 			"PropertyPath",
 			"LoadingScreenModule",
 			"HairStrandsCore",
+			"ApplicationCore",
 			
 			// UI
 			"UMG",

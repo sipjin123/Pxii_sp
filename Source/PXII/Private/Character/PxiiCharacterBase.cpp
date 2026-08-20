@@ -106,6 +106,11 @@ UPxiiAimAssistComponent* APxiiCharacterBase::GetAimAssistComponent_Implementatio
 	return FindComponentByClass<UPxiiAimAssistComponent>();
 }
 
+EFactionType APxiiCharacterBase::GetFaction_Implementation()
+{
+	return FactionType;
+}
+
 void APxiiCharacterBase::EnableAttackState_Implementation()
 {
 	IsAttacking = true;

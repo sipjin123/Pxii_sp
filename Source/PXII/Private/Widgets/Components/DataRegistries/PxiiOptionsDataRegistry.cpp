@@ -121,13 +121,7 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
 					
-					for (const FOptionsMap& Option : Data->OptionsSet)
-					{
-						DO->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName);
-					}
-					
-					// Set first option as default value
-					DO->SetDefaultValueFromString(Data->OptionsSet[0].Value.ToString());
+					SetStringOptionsCycle(Data, DO);
 					
 					DO->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameSettings));
 					DO->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameSettings));
@@ -195,7 +189,7 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 					
 					DO->SetDescriptionRichText(Data->DescriptionRichText);
 					
-					for (const FOptionsMap& Option : Data->OptionStrings)
+					/*for (const FOptionsMap& Option : Data->OptionStrings)
 					{
 						const int32 FoundIndex = Data->OptionStrings.IndexOfByPredicate(
 							[Option](const FOptionsMap& CheckedOption)->bool
@@ -215,7 +209,9 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 						}
 						
 						DO->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName, FoundTexture);
-					}
+					}*/
+					
+					SetStringImageOptionsCycle(Data, DO);
 					
 					// Set first option as default value
 					DO->SetDefaultValueFromString(Data->OptionStrings[0].Value.ToString());
@@ -232,8 +228,97 @@ void UPxiiOptionsDataRegistry::ConstructDataObjects(UPxiiListDataObjectCollectio
 	}
 }
 
+void UPxiiOptionsDataRegistry::SetStringOptionsCycle(const FStringData* Data, UPxiiListDataObjectString* DataObjectToSet)
+{
+	if (!Data->OptionsSet.IsEmpty())
+	{
+		for (const FOptionsMap& Option : Data->OptionsSet)
+		{
+			DataObjectToSet->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName);
+		}
+					
+		// Set default value or get first option as default value
+		DataObjectToSet->SetDefaultValueFromString(Data->OptionsSet[0].Value.ToString());
+	}
+	else
+	{
+		if (Data->DataID == EPxiiGameUserSettingsID::Display)
+		{
+			// if the entry is about display, we set display manually
+			TArray<FMonitorInfo> MonitorInfos = UPxiiGameUserSettings::GetAllDisplayMonitorInfo();
+						
+			for (const FMonitorInfo& MonitorInfo : MonitorInfos)
+			{
+				DataObjectToSet->AddDynamicOptions(MonitorInfo.ID, FText::FromString(MonitorInfo.FriendlyName));
+			}
+					
+			// Set first option as default value
+			DataObjectToSet->SetDefaultValueFromString(MonitorInfos[0].ID);
+		}
+		
+		if (Data->DataID == EPxiiGameUserSettingsID::DisplayMode)
+		{
+			TArray<EWindowMode::Type> WindowModes;
+			const UEnum* WindowModePtr = StaticEnum<EWindowMode::Type>();
+			
+			for (EWindowMode::Type WindowMode : TEnumRange<EWindowMode::Type>())
+			{
+				WindowModes.AddUnique(WindowMode);
+			}
+			
+			for (const EWindowMode::Type& WindowMode : WindowModes)
+			{
+				FString Mode = WindowModePtr->GetNameStringByValue(WindowMode);
+				DataObjectToSet->AddDynamicOptions(Mode, FText::FromString(Mode));
+				PXII_LOG(ELogCategory::UI, Warning, TEXT("[% s]: %s"), *ThisClass::StaticClass()->GetName(), *Mode);
+			}
+			
+			DataObjectToSet->SetDefaultValueFromString(WindowModePtr->GetNameStringByValue(UPxiiGameUserSettings::GetDefaultWindowMode()));
+		}
+		
+		if (Data->DataID == EPxiiGameUserSettingsID::DisplayResolution)
+		{
+			// if the entry is about reso, we set reso manually
+			TArray<FIntPoint> Resolutions = UPxiiGameUserSettings::GetSupportedFullscreenResolutions();
+			
+			for (const FIntPoint& Resolution : Resolutions)
+			{
+				DataObjectToSet->AddDynamicOptions(Resolution.ToString(), FText::FromString(FString::Format(TEXT("{0} x {1}"), {Resolution.X, Resolution.Y})));
+            }
+			
+            FIntPoint NativeResolution = UPxiiGameUserSettings::Get()->GetDesktopResolution();
+			DataObjectToSet->SetDefaultValueFromString(NativeResolution.ToString());
+		}
+	}
+}
+
+void UPxiiOptionsDataRegistry::SetStringImageOptionsCycle(const FStringImageData* Data, UPxiiListDataObjectStringImage* DataObjectToSet)
+{
+	for (const FOptionsMap& Option : Data->OptionStrings)
+	{
+		const int32 FoundIndex = Data->OptionStrings.IndexOfByPredicate(
+			[Option](const FOptionsMap& CheckedOption)->bool
+			{
+				return CheckedOption.DisplayName.EqualTo(Option.DisplayName);
+			}
+		);
+						
+		TSoftObjectPtr<UTexture2D> FoundTexture;
+		if (Data->bHasAnyImageToShow && !Data->ImagesToShow.IsEmpty() && Data->ImagesToShow.IsValidIndex(FoundIndex))
+		{
+			FoundTexture = Data->ImagesToShow[FoundIndex];
+		}
+		else
+		{
+			FoundTexture = nullptr;
+		}
+						
+		DataObjectToSet->AddDynamicOptions(Option.Value.ToString(), Option.DisplayName, FoundTexture);
+	}
+}
+
 void UPxiiOptionsDataRegistry::FindChildListDataRecursively(UPxiiListDataObjectBase* InParentData,
-	TArray<UPxiiListDataObjectBase*>& OutFoundChildListData) const
+                                                            TArray<UPxiiListDataObjectBase*>& OutFoundChildListData) const
 {
 	if (!InParentData || !InParentData->HasAnyChildListData())
 	{

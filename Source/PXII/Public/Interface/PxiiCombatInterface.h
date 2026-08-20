@@ -101,4 +101,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	APxiiWeaponRange* GetWeaponBaseRange();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	EFactionType GetFaction();
 };

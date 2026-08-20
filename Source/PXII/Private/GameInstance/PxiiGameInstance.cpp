@@ -84,10 +84,13 @@ void UPxiiGameInstance::Init()
 
 	if(CharacterVisualData)
 	{
-		IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("DDCvar.VisualOverride"));
-		if(CVar)
+		if(!CharacterVisualData->DisableVisualOverride)
 		{
-			CVar->Set(CharacterVisualData->VisualOverrideId, ECVF_SetByCode);
+			IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("DDCvar.VisualOverride"));
+			if(CVar)
+			{
+				CVar->Set(CharacterVisualData->VisualOverrideId, ECVF_SetByCode);
+			}			
 		}
 	}
 

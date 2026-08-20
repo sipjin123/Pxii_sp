@@ -17,6 +17,12 @@ public:
 	
 	UPROPERTY()
 	FString LowerSlotItemKey;
+
+	UPROPERTY()
+	FString TattooSlotKey;
+
+	UPROPERTY()
+	FString BlasterSlotKey;
 };
 
 USTRUCT(BlueprintType)

@@ -16,4 +16,7 @@ class PXII_API UPxiiRotatorBase : public UCommonRotator
 	
 public:
 	void SetSelectedOptionByText(const FText& InText);
+	
+	UFUNCTION(BlueprintPure, Category = "Rotator")
+	FORCEINLINE TArray<FText> GetAllOptions() { return TextLabels; }
 };
