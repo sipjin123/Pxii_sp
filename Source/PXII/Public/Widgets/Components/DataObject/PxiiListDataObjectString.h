@@ -23,11 +23,14 @@ public:
 	FORCEINLINE const TArray<FText>& GetAvailableDisplayTexts() const { return AvailableDisplayTexts; }
 	FORCEINLINE FText GetCurrentDisplayText() const { return CurrentDisplayText; }
 	
+	//~ Begin UPxiiListDataObjectBase Interface
+	virtual bool CanResetBackToDefaultValue() const override;
+	virtual bool TryResetBackToDefaultValue() override;
+	//~ End UPxiiListDataObjectBase Interface
+	
 protected:
 	//~ Begin UPxiiListDataObjectBase Interface
 	virtual void OnDataObjectInitialized() override;
-	virtual bool CanResetBackToDefaultValue() const override;
-	virtual bool TryResetBackToDefaultValue() override;
 	//~ End UPxiiListDataObjectBase Interface
 	
 	bool TrySetDisplayText(const FString& InStringValue);

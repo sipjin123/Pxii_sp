@@ -5,6 +5,7 @@
 
 #include "CommonInputSubsystem.h"
 #include "Utility/PXIILogUtility.h"
+#include "Widgets/Components/PxiiListViewBase.h"
 
 void UPxiiListEntryString::NativeOnInitialized()
 {
@@ -35,6 +36,20 @@ void UPxiiListEntryString::OnOwningListDataObjectSet(UPxiiListDataObjectBase* In
 	
 	Rotator_Options->PopulateTextLabels(CachedOwningListDataObjectString->GetAvailableDisplayTexts());
 	Rotator_Options->SetSelectedOptionByText(CachedOwningListDataObjectString->GetCurrentDisplayText());
+	
+	{// for disabling reso change when fullscreen
+		if (CachedOwningListDataObjectString->GetDataDisplayName().EqualTo(FText::FromString("Display Resolution")))
+		{
+			UPxiiListViewBase* OwningListView = Cast<UPxiiListViewBase>(GetOwningListView());
+		
+			if (!OwningListView)
+			{
+				return;
+			}
+		
+			OwningListView->SetCachedDisplayResolutionListEntry(this);
+		}
+	}
 }
 
 void UPxiiListEntryString::OnOwningListDataObjectModified(UPxiiListDataObjectBase* InModifiedListDataObject,
@@ -43,6 +58,36 @@ void UPxiiListEntryString::OnOwningListDataObjectModified(UPxiiListDataObjectBas
 	if (CachedOwningListDataObjectString)
 	{
 		Rotator_Options->SetSelectedOptionByText(CachedOwningListDataObjectString->GetCurrentDisplayText());
+	}
+	
+	{// for disabling reso change when fullscreen
+		if (CachedOwningListDataObjectString->GetDataDisplayName().EqualTo(FText::FromString("Display Mode")))
+		{
+			UPxiiListViewBase* OwningListView = Cast<UPxiiListViewBase>(GetOwningListView());
+		
+			if (!OwningListView)
+			{
+				return;
+			}
+		
+			if (OwningListView->GetCachedDisplayResolutionListEntry())
+			{
+				if (CachedOwningListDataObjectString->GetCurrentDisplayText().EqualTo(FText::FromString("Fullscreen")) ||
+				   CachedOwningListDataObjectString->GetCurrentDisplayText().EqualTo(FText::FromString("WindowedFullscreen")))
+				{
+					OwningListView->GetCachedDisplayResolutionListEntry()->OnFullscreen.Broadcast(false);
+					OwningListView->GetCachedDisplayResolutionListEntry()->GetCachedOwningListDataObjectString()->TryResetBackToDefaultValue();
+				}
+				else
+				{
+					OwningListView->GetCachedDisplayResolutionListEntry()->OnFullscreen.Broadcast(true);
+				}
+			}
+			else
+			{
+				PXII_LOG(ELogCategory::UI, Warning, TEXT("[% s]: Invalid cached entry"), *ThisClass::StaticClass()->GetName());
+			}
+		}
 	}
 }
 

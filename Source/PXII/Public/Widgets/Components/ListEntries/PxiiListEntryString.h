@@ -9,6 +9,8 @@
 #include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
 #include "PxiiListEntryString.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFullscreen, bool, bIsInteractable);
+
 /**
  *
  */
@@ -16,6 +18,12 @@ UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
 class PXII_API UPxiiListEntryString : public UPxiiListEntryBase
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnFullscreen OnFullscreen;
+	
+	FORCEINLINE UPxiiListDataObjectString* GetCachedOwningListDataObjectString() const { return CachedOwningListDataObjectString; }
 	
 protected:
 	// ~ Begin UUserWidget Interface

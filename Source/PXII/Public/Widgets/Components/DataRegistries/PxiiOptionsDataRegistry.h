@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "PxiiDataRegistryBase.h"
-#include "Widgets/Components/DataObject/PxiiListDataObjectScalar.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectString.h"
 #include "Widgets/Components/DataObject/PxiiListDataObjectStringImage.h"
+#include "Widgets/Components/ListEntries/PxiiListEntryScalar.h"
 #include "PxiiOptionsDataRegistry.generated.h"
 
 ENUM_RANGE_BY_COUNT(EWindowMode::Type, EWindowMode::NumWindowModes)
