@@ -8,10 +8,7 @@
 
 APxiiWeaponRange::APxiiWeaponRange()
 {
-	MuzzleFlashComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("MuzzleFlash"));
 
-	MuzzleFlashComponent->SetupAttachment(SKWeapon);
-	MuzzleFlashComponent->SetAutoActivate(false);
 }
 
 void APxiiWeaponRange::BeginPlay()
@@ -28,17 +25,37 @@ void APxiiWeaponRange::BeginPlay()
 		return;
 	}
 
-	MuzzleFlashComponent->AttachToComponent(SKWeapon, FAttachmentTransformRules::SnapToTargetIncludingScale, MuzzleSocketName);
 	MuzzleLocation = SKWeapon->GetSocketLocation(MuzzleSocketName);
 	
-	if(MuzzleFlashEffect)
+	if(!MuzzleFlashEffect.IsEmpty())
 	{
-		MuzzleFlashComponent->SetAsset(MuzzleFlashEffect);	
-		HasMuzzleFlash = true;
+		MuzzleFlashComponents.Empty();
+		int32 index = 0;
+		for(UNiagaraSystem* system : MuzzleFlashEffect)
+		{
+			if(!system)
+			{
+				continue;
+			}
+
+			FString vfxName = "MuzzleFlash-" + FString::FromInt(index);
+			UNiagaraComponent* MuzzleFlashComponent = NewObject<UNiagaraComponent>(this, FName(*vfxName));
+			MuzzleFlashComponent->AttachToComponent(SKWeapon, FAttachmentTransformRules::SnapToTargetIncludingScale, MuzzleSocketName);
+
+			MuzzleFlashComponent->SetupAttachment(SKWeapon, MuzzleSocketName);
+			MuzzleFlashComponent->RegisterComponent();
+
+			MuzzleFlashComponent->SetAutoActivate(false);
+			MuzzleFlashComponent->SetAsset(system);
+			HasMuzzleFlash = true;
+
+			index++;
+			MuzzleFlashComponents.Add(MuzzleFlashComponent);
+		}
 	}
 	else
 	{
-		HasMuzzleFlash = MuzzleFlashComponent->GetAsset() != nullptr;
+		HasMuzzleFlash = false;
 	}
 }
 
@@ -49,7 +66,10 @@ void APxiiWeaponRange::PlayMuzzleFlash_Implementation()
 		return;
 	}
 
-	MuzzleFlashComponent->Activate(true);
+	for(UNiagaraComponent* comp : MuzzleFlashComponents)
+	{
+		comp->Activate(true);
+	}
 }
 
 void APxiiWeaponRange::PlayWeaponSfx_Implementation()
@@ -97,4 +117,9 @@ UPxiiRecoilPattern* APxiiWeaponRange::GetAdsRecoil()
 UPxiiRecoilPattern* APxiiWeaponRange::GetHipRecoil()
 {
 	return HipRecoil;
+}
+
+TArray<UNiagaraSystem*> APxiiWeaponRange::GetSystem()
+{
+	return MuzzleFlashEffect;
 }

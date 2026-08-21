@@ -134,6 +134,7 @@ void UPxiiGameInstance::OnPreLoadMap(const FString& MapName)
 
 void UPxiiGameInstance::OnDestinationWorldLoaded(UWorld* LoadedWorld)
 {
+	// any how will not be called now.....
 	if (bShouldShowLoadingScreen)
 	{
 		// Called stop movie on progress bar full instead here
@@ -177,4 +178,5 @@ void UPxiiGameInstance::OnLevelLoaded()
 	PxiiLog::Print(TEXT("Loading Screen"), FString::Printf(TEXT("On level loaded")));
 
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, CurrentLevel, false, FString());
+	MapLoadHandle.Reset();
 }

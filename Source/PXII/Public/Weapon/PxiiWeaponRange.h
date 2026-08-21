@@ -35,6 +35,8 @@ public:
 	UPxiiRecoilPattern* GetAdsRecoil();
 	
 	UPxiiRecoilPattern* GetHipRecoil();
+
+	TArray<UNiagaraSystem*> GetSystem();
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
@@ -47,10 +49,10 @@ private:
 	TObjectPtr<UPxiiWeaponSfxData> WeaponSfx;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX")
-	UNiagaraComponent* MuzzleFlashComponent;
+	TArray<UNiagaraComponent*> MuzzleFlashComponents;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNiagaraSystem> MuzzleFlashEffect;
+	TArray<TObjectPtr<UNiagaraSystem>> MuzzleFlashEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX", meta = (AllowPrivateAccess = "true"))
 	FName MuzzleSocketName = "Muzzle";
