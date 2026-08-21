@@ -45,11 +45,11 @@ public:
 	static bool GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation);
 
 	UFUNCTION(BlueprintPure, Category="Combat|Weapons")
-	static TArray<FVector> GenerateShotgunTrajectories(
-		FVector Origin,
-		FVector ForwardDirection,
-		float Distance,
-		int32 PelletCount,
-		float SpreadAngleDegrees
-	);
+	static TArray<FVector> GenerateShotgunTrajectories(FVector Origin, FVector ForwardDirection, float Distance, int32 PelletCount, float SpreadAngleDegrees);
+
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static TArray<FVector> GenerateRandomPointsInSphere(FVector Origin, FVector ForwardDirection, float Radius, float Flatness, int32 NumPoints, float MinSpacing);
+	
+	UFUNCTION(BlueprintPure, Category="PXII|Math")
+	static TArray<FVector> GenerateRandomPointsInRing(FVector Origin, FVector ForwardDirection, float InnerRadius, float OuterRadius, int32 NumPoints, float MinSpacing);
 };

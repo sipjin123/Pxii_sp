@@ -256,3 +256,119 @@ float SpreadAngleDegrees
 
 	return Trajectories;
 }
+
+TArray<FVector> UPxiiMathBPLibrary::GenerateRandomPointsInSphere(FVector Origin, FVector ForwardDirection, float Radius, float Flatness,int32 NumPoints, float MinSpacing)
+{
+	TArray<FVector> Points;
+	if (NumPoints <= 0 || Radius <= 0.f) return Points;
+
+	ForwardDirection = ForwardDirection.GetSafeNormal();
+
+	if (ForwardDirection.IsNearlyZero())
+	{
+		ForwardDirection = FVector::ForwardVector;
+	}
+
+	Flatness = FMath::Clamp(Flatness, 0.f, 1.f);
+	MinSpacing = FMath::Max(0.f, MinSpacing);
+
+	Points.Reserve(NumPoints);
+
+	const int32 MaxAttempts = NumPoints * 1000;
+	int32 Attempts = 0;
+
+	while (Points.Num() < NumPoints && Attempts < MaxAttempts)
+	{
+		++Attempts;
+
+		// Generate random point inside a unit sphere.
+		FVector LocalPoint = FMath::VRand();
+
+		// Uniform distribution through the volume.
+		LocalPoint *= FMath::Pow(FMath::FRand(), 1.f / 3.f);
+
+		// Convert to radius.
+		LocalPoint *= Radius;
+
+		/*
+		 * Flatten along the ForwardDirection.
+		 *
+		 * Separate the point into:
+		 *   Forward component
+		 *   Perpendicular component
+		 */
+		const float ForwardDistance = FVector::DotProduct(LocalPoint, ForwardDirection);
+		const FVector ForwardComponent = ForwardDirection * ForwardDistance;
+		const FVector PerpendicularComponent = LocalPoint - ForwardComponent;
+
+		// Reduce depth while preserving width/height.
+		LocalPoint = PerpendicularComponent + ForwardComponent * Flatness;
+
+		const FVector Candidate = Origin + LocalPoint;
+
+		bool bValid = true;
+
+		for (const FVector& ExistingPoint : Points)
+		{
+			if (FVector::DistSquared(Candidate, ExistingPoint) <
+				FMath::Square(MinSpacing))
+			{
+				bValid = false;
+				break;
+			}
+		}
+
+		if (bValid)
+		{
+			Points.Add(Candidate);
+		}
+	}
+
+	return Points;
+}
+
+TArray<FVector> UPxiiMathBPLibrary::GenerateRandomPointsInRing(FVector Origin, FVector ForwardDirection, float InnerRadius, float OuterRadius, int32 NumPoints, float MinSpacing)
+{
+	TArray<FVector> Points;
+
+	if (NumPoints <= 0 || OuterRadius <= 0.f)
+	{
+		return Points;
+	}
+
+	ForwardDirection.Z = 0.f;
+	ForwardDirection.Normalize();
+
+	if (ForwardDirection.IsNearlyZero())
+	{
+		ForwardDirection = FVector::ForwardVector;
+	}
+
+	const FVector Right = FVector::CrossProduct(FVector::UpVector, ForwardDirection).GetSafeNormal();
+
+	const float InnerSq = FMath::Square(FMath::Max(0.f, InnerRadius));
+	const float OuterSq = FMath::Square(FMath::Max(InnerRadius, OuterRadius));
+
+	Points.Reserve(NumPoints);
+
+	for (int32 i = 0; i < NumPoints; ++i)
+	{
+		const bool bRightHemisphere = (i % 2) == 0;
+
+		// Right: -90° to 90°
+		// Left :  90° to 270°
+		const float Angle = bRightHemisphere
+			? FMath::FRandRange(-HALF_PI, HALF_PI)
+			: FMath::FRandRange(HALF_PI, PI + HALF_PI);
+
+		const float Radius = FMath::Sqrt(FMath::FRandRange(InnerSq, OuterSq));
+
+		const FVector Offset =
+			(ForwardDirection * FMath::Cos(Angle) +
+			 Right * FMath::Sin(Angle)) * Radius;
+
+		Points.Add(Origin + Offset);
+	}
+
+	return Points;
+}
