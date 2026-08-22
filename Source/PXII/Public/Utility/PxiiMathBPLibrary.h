@@ -52,4 +52,9 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="PXII|Math")
 	static TArray<FVector> GenerateRandomPointsInRing(FVector Origin, FVector ForwardDirection, float InnerRadius, float OuterRadius, int32 NumPoints, float MinSpacing);
+
+	UFUNCTION(BlueprintCallable, Category="Utilities|Curves", meta=(WorldContext="WorldContextObject"))
+	static void GenerateSimpleArc(const bool bDrawDebug, const bool bUseRandom,
+		const UObject* WorldContextObject, const FVector& Start, const FVector& End,
+		float Height, int32 NumPoints, TArray<FVector>& OutPoints, FVector ArcDirection);
 };

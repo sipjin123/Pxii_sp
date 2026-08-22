@@ -372,3 +372,61 @@ TArray<FVector> UPxiiMathBPLibrary::GenerateRandomPointsInRing(FVector Origin, F
 
 	return Points;
 }
+
+void UPxiiMathBPLibrary::GenerateSimpleArc(const bool bDrawDebug, const bool bUseRandom,
+	const UObject* WorldContextObject, const FVector& Start, const FVector& End, float Height, int32 NumPoints,
+	TArray<FVector>& OutPoints, FVector ArcDirection)
+{
+	OutPoints.Reset();
+
+	const FColor DebugColor = FColor::Green;   // line/point color
+	const float LifeTime    = .5f;             // seconds visible
+	const float Thickness   = 2.f;             // line thickness
+
+	if (NumPoints < 2) return;
+
+	// Normalize arc direction (default to up if invalid)
+	if (ArcDirection.IsNearlyZero())
+	{
+		ArcDirection = FVector::UpVector;
+	}
+	
+	if (bUseRandom)
+	{
+		do
+		{
+			ArcDirection = FMath::VRand();   // random unit vector
+		}
+		while (ArcDirection.Z < 0.f);        // reject downward directions
+	}
+	else
+	{
+		ArcDirection = ArcDirection.GetSafeNormal();
+	}
+
+	// Control point halfway between Start/End, shifted along ArcDirection
+	FVector Mid = (Start + End) * 0.5f + ArcDirection * Height;
+
+	FVector Prev = Start;
+
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+
+	for (int32 i = 0; i < NumPoints; i++)
+	{
+		float t = (float)i / (float)(NumPoints - 1);
+		FVector Point =
+			(1 - t) * (1 - t) * Start +
+			2 * (1 - t) * t * Mid +
+			t * t * End;
+
+		OutPoints.Add(Point);
+
+		if (bDrawDebug && i > 0 && World)
+		{
+			DrawDebugLine(World, Prev, Point, DebugColor, false, LifeTime, 0, Thickness);
+			DrawDebugPoint(World, Point, 6.f, DebugColor, false, LifeTime);
+		}
+
+		Prev = Point;
+	}
+}
