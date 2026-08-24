@@ -95,4 +95,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	bool LogAggro = true;
+	
+	UFUNCTION(BlueprintCallable,Category="PXII|Movement")
+	void SetMoverMovementMode(FName MovementModeName);
 };

@@ -155,3 +155,13 @@ int32 APxiiCharacterBase::GetAvailableAggroSlots()
 	return MaxAggroSlots - CurrentAggroCount;
 }
 
+void APxiiCharacterBase::SetMoverMovementMode(FName MovementModeName)
+{
+	if (!MoverComponent)
+	{
+		return;
+	}
+
+	//MoverComponent->QueueNextMovementMode(MovementModeName);
+}
+
