@@ -76,5 +76,6 @@ public:
 	static void RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
 
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat")
-	static TArray<AActor*> MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel,bool bDrawDebug=false);
+	static TArray<AActor*> MultiSphereTraceTargetChain(UObject* WorldContextObject, FVector Origin, FVector Direction, float Distance,
+		float SphereRadius, int32 MaxTraces, TSubclassOf<APawn> TargetPawnClass, ETraceTypeQuery TraceChannel, bool bDrawDebug=false, bool bErrorLog=false);
 };

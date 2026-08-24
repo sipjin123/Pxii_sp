@@ -500,87 +500,95 @@ bool UPxiiCombatBPLibrary::GetCameraViewPoint(APxiiCharacter* character, FVector
     return true;
 }
 
-TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel,bool bDrawDebug)
+TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel, bool bDrawDebug, bool bErrorLog)
 {
     TArray<AActor*> FoundActors;
-    if (!WorldContextObject || Distance<=0.f || SphereRadius<=0.f || MaxTraces<=0)
+    if (!WorldContextObject||Distance<=0.f||SphereRadius<=0.f||MaxTraces<=0)
     {
+        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Invalid parameters"));
         return FoundActors;
     }
     Direction=Direction.GetSafeNormal();
-    if (Direction.IsNearlyZero()) return FoundActors;
+    if (Direction.IsNearlyZero())
+    {
+        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Direction is zero"));
+        return FoundActors;
+    }
     UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
-    if (!World)  return FoundActors;
-    
+    if (!World)
+    {
+        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: World is null"));
+        return FoundActors;
+    }
     FVector CurrentStart=Origin;
     float RemainingDistance=Distance;
     TSet<AActor*> UniqueActors;
-    
-    // Each loop represents one sphere trace, limited by MaxTraces.
+    UE_LOG(LogTemp,Warning,TEXT("TargetChain START Origin=%s Direction=%s Distance=%.2f Radius=%.2f MaxTraces=%d"),*Origin.ToString(),*Direction.ToString(),Distance,SphereRadius,MaxTraces);
     for (int32 TraceIndex=0;TraceIndex<MaxTraces&&RemainingDistance>0.f;++TraceIndex)
     {
-        // Calculate the end point using the remaining distance.
         const FVector CurrentEnd=CurrentStart+Direction*RemainingDistance;
+        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Start=%s End=%s Remaining=%.2f"),TraceIndex,*CurrentStart.ToString(),*CurrentEnd.ToString(),RemainingDistance);
         TArray<FHitResult> Hits;
         TArray<AActor*> ActorsToIgnore;
         ActorsToIgnore.Add(WorldContextObject->GetTypedOuter<AActor>());
-        
+        for (AActor* Actor:UniqueActors)
+        {
+            ActorsToIgnore.Add(Actor);
+        }
         UKismetSystemLibrary::SphereTraceMulti(World,CurrentStart,CurrentEnd,SphereRadius,TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hits,true);
-        // Nothing was hit, so stop generating traces.
+        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] HitCount=%d"),TraceIndex,Hits.Num());
         if (Hits.Num()==0)
         {
+            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No collision"),TraceIndex);
             break;
         }
-        
-        bool bFoundTarget=false;
-        // Track the closest valid target hit by this trace.
-        float ClosestDistance=RemainingDistance;
-        FVector NextTracePoint=CurrentEnd;
-        // Check all actors hit by the sphere trace.
+        Hits.Sort([](const FHitResult& A,const FHitResult& B)
+        {
+            return A.Distance<B.Distance;
+        });
+        AActor* HitActor=nullptr;
+        float HitDistance=RemainingDistance;
         for (const FHitResult& Hit:Hits)
         {
-            AActor* HitActor=Hit.GetActor();
-            // Ignore invalid actors.
-            if (!IsValid(HitActor))
+            AActor* Actor=Hit.GetActor();
+            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Hit Actor=%s Component=%s Distance=%.2f"),TraceIndex,*GetNameSafe(Actor),*GetNameSafe(Hit.GetComponent()),Hit.Distance);
+            if (!IsValid(Actor))
             {
+                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Invalid actor"),TraceIndex);
                 continue;
             }
-            // Ignore actors that aren't the requested target class.
-            if (TargetPawnClass&&!HitActor->IsA(TargetPawnClass))
+            if (UniqueActors.Contains(Actor))
             {
+                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Already hit %s"),TraceIndex,*GetNameSafe(Actor));
                 continue;
             }
-            // Only add each actor once.
-            if (!UniqueActors.Contains(HitActor))
+            if (TargetPawnClass&&!Actor->IsA(TargetPawnClass))
             {
-                UniqueActors.Add(HitActor);
-                FoundActors.Add(HitActor);
+                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: %s is not TargetPawnClass"),TraceIndex,*GetNameSafe(Actor));
+                continue;
             }
-            // Find the closest valid hit point.
-            const float HitDistance=FVector::Dist(CurrentStart,Hit.ImpactPoint);
-            if (HitDistance<ClosestDistance)
-            {
-                ClosestDistance=HitDistance;
-                NextTracePoint=Hit.ImpactPoint;
-                bFoundTarget=true;
-            }
-        }
-        // No valid target was found, so stop the chain.
-        if (!bFoundTarget)
-        {
+            HitActor=Actor;
+            HitDistance=Hit.Distance;
+            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] TARGET FOUND: %s Distance=%.2f"),TraceIndex,*GetNameSafe(HitActor),HitDistance);
             break;
         }
-        // Move the next trace slightly past the hit point.
-        const float AdvanceAmount=SphereRadius*0.5f;
-        const float TravelDistance=ClosestDistance+AdvanceAmount;
-        RemainingDistance-=TravelDistance;
-        // Stop when the total trace distance has been consumed.
+        if (!HitActor)
+        {
+            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No valid target found"),TraceIndex);
+            break;
+        }
+        UniqueActors.Add(HitActor);
+        FoundActors.Add(HitActor);
+        RemainingDistance-=HitDistance;
+        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Added %s RemainingDistance=%.2f"),TraceIndex,*GetNameSafe(HitActor),RemainingDistance);
         if (RemainingDistance<=0.f)
         {
+            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: Distance exhausted"),TraceIndex);
             break;
         }
-        // Start the next trace beyond the previous hit.
-        CurrentStart=NextTracePoint+Direction*AdvanceAmount;
+        CurrentStart=CurrentStart+Direction*HitDistance;
+        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] NextStart=%s"),TraceIndex,*CurrentStart.ToString());
     }
+    UE_LOG(LogTemp,Warning,TEXT("TargetChain COMPLETE: FoundActors=%d"),FoundActors.Num());
     return FoundActors;
 }
