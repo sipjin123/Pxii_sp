@@ -7,6 +7,7 @@
 #include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "Interface/PxiiCombatInterface.h"
+#include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
 DEFINE_LOG_CATEGORY(LogGEECDamage);
@@ -142,6 +143,23 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 					const FVector HitLocation = Context.GetOrigin();
 					//UE_LOG(LogGEECDamage, Warning, TEXT("Dmg Number is: %s"), *TargetActor->GetName());
 					Spawner->OnSpawnDamageText.Broadcast(HitLocation, IncomingDamage, bIsCritical);
+				}
+			}
+			if (UPxiiCombatRegistrySubsystem* CombatSubsystem = World->GetSubsystem<UPxiiCombatRegistrySubsystem>())
+			{
+				TSubclassOf<UGameplayEffect> GEECStagger = CombatSubsystem->GetGEECStagger();
+				if (GEECStagger && TargetASC)
+				{
+					FGameplayEffectContextHandle EffectContext = TargetASC->MakeEffectContext();
+					EffectContext.AddSourceObject(this);
+					FGameplayEffectSpecHandle SpecHandle = TargetASC->MakeOutgoingSpec(GEECStagger, 1.f, EffectContext);
+
+					if (SpecHandle.IsValid())
+					{
+						// Override the Gameplay Effect duration.
+						SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Combat.Damage.Stagger")), 10.f);
+						TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+					}
 				}
 			}
 		}

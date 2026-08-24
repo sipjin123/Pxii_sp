@@ -101,7 +101,11 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UGameplayAbility> GA_Stagger;
-	TSubclassOf<UGameplayAbility> GetGAStagger() const { return GA_Stagger; } 
+	TSubclassOf<UGameplayAbility> GetGAStagger() const { return GA_Stagger; }
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGameplayEffect> GEEC_Stagger;
+	TSubclassOf<UGameplayEffect> GetGEECStagger() const { return GEEC_Stagger; } 
 	
 private:
 

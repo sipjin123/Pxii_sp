@@ -11,6 +11,7 @@
 #include "GameplayEffectExtension.h"
 #include "PxiiCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAnimEventBroadcast, int32, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitTarget, FVector, Location);
 DECLARE_LOG_CATEGORY_EXTERN(LogTempCharacter, Log, All);
 
@@ -80,6 +81,9 @@ public:
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHitTarget TraceTarget;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FAnimEventBroadcast AnimEventBroadcast;
 public:
 
 	virtual void ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource) override;

@@ -48,6 +48,14 @@ void UGEEC_DynamicStagger::Execute_Implementation(const FGameplayEffectCustomExe
 	EvalParams.TargetTags = TargetTags;
 
 	float CurrentHealth = 0.0f;
+
+	static const FGameplayTag VulnerableTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.Status.Vulnerable"));
+	const bool bIsTargetVulnerable = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(VulnerableTag);
+	static const FGameplayTag StaggerTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.Status.Stagger"));
+	const bool bIsTargetStagger = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(StaggerTag);
+	
+	if (bIsTargetVulnerable || bIsTargetStagger) return;
+	
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetStaggerStatCapture().StaggerMeterDef, EvalParams, CurrentHealth);
 
 	const float TargetStaggerMeter = GESpec.GetSetByCallerMagnitude(
