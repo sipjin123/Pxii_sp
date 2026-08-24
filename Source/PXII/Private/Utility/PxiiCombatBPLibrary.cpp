@@ -499,3 +499,88 @@ bool UPxiiCombatBPLibrary::GetCameraViewPoint(APxiiCharacter* character, FVector
 
     return true;
 }
+
+TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel,bool bDrawDebug)
+{
+    TArray<AActor*> FoundActors;
+    if (!WorldContextObject || Distance<=0.f || SphereRadius<=0.f || MaxTraces<=0)
+    {
+        return FoundActors;
+    }
+    Direction=Direction.GetSafeNormal();
+    if (Direction.IsNearlyZero()) return FoundActors;
+    UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
+    if (!World)  return FoundActors;
+    
+    FVector CurrentStart=Origin;
+    float RemainingDistance=Distance;
+    TSet<AActor*> UniqueActors;
+    
+    // Each loop represents one sphere trace, limited by MaxTraces.
+    for (int32 TraceIndex=0;TraceIndex<MaxTraces&&RemainingDistance>0.f;++TraceIndex)
+    {
+        // Calculate the end point using the remaining distance.
+        const FVector CurrentEnd=CurrentStart+Direction*RemainingDistance;
+        TArray<FHitResult> Hits;
+        TArray<AActor*> ActorsToIgnore;
+        ActorsToIgnore.Add(WorldContextObject->GetTypedOuter<AActor>());
+        
+        UKismetSystemLibrary::SphereTraceMulti(World,CurrentStart,CurrentEnd,SphereRadius,TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hits,true);
+        // Nothing was hit, so stop generating traces.
+        if (Hits.Num()==0)
+        {
+            break;
+        }
+        
+        bool bFoundTarget=false;
+        // Track the closest valid target hit by this trace.
+        float ClosestDistance=RemainingDistance;
+        FVector NextTracePoint=CurrentEnd;
+        // Check all actors hit by the sphere trace.
+        for (const FHitResult& Hit:Hits)
+        {
+            AActor* HitActor=Hit.GetActor();
+            // Ignore invalid actors.
+            if (!IsValid(HitActor))
+            {
+                continue;
+            }
+            // Ignore actors that aren't the requested target class.
+            if (TargetPawnClass&&!HitActor->IsA(TargetPawnClass))
+            {
+                continue;
+            }
+            // Only add each actor once.
+            if (!UniqueActors.Contains(HitActor))
+            {
+                UniqueActors.Add(HitActor);
+                FoundActors.Add(HitActor);
+            }
+            // Find the closest valid hit point.
+            const float HitDistance=FVector::Dist(CurrentStart,Hit.ImpactPoint);
+            if (HitDistance<ClosestDistance)
+            {
+                ClosestDistance=HitDistance;
+                NextTracePoint=Hit.ImpactPoint;
+                bFoundTarget=true;
+            }
+        }
+        // No valid target was found, so stop the chain.
+        if (!bFoundTarget)
+        {
+            break;
+        }
+        // Move the next trace slightly past the hit point.
+        const float AdvanceAmount=SphereRadius*0.5f;
+        const float TravelDistance=ClosestDistance+AdvanceAmount;
+        RemainingDistance-=TravelDistance;
+        // Stop when the total trace distance has been consumed.
+        if (RemainingDistance<=0.f)
+        {
+            break;
+        }
+        // Start the next trace beyond the previous hit.
+        CurrentStart=NextTracePoint+Direction*AdvanceAmount;
+    }
+    return FoundActors;
+}
