@@ -499,35 +499,32 @@ bool UPxiiCombatBPLibrary::GetCameraViewPoint(APxiiCharacter* character, FVector
 
     return true;
 }
-
-TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel, bool bDrawDebug, bool bErrorLog)
+TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel,bool bDrawDebug,bool bErrorLog)
 {
     TArray<AActor*> FoundActors;
     if (!WorldContextObject||Distance<=0.f||SphereRadius<=0.f||MaxTraces<=0)
     {
-        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Invalid parameters"));
+        if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Invalid parameters"));
         return FoundActors;
     }
     Direction=Direction.GetSafeNormal();
     if (Direction.IsNearlyZero())
     {
-        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Direction is zero"));
+        if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: Direction is zero"));
         return FoundActors;
     }
     UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
     if (!World)
     {
-        UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: World is null"));
+        if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("TargetChain FAILED: World is null"));
         return FoundActors;
     }
     FVector CurrentStart=Origin;
     float RemainingDistance=Distance;
     TSet<AActor*> UniqueActors;
-    UE_LOG(LogTemp,Warning,TEXT("TargetChain START Origin=%s Direction=%s Distance=%.2f Radius=%.2f MaxTraces=%d"),*Origin.ToString(),*Direction.ToString(),Distance,SphereRadius,MaxTraces);
     for (int32 TraceIndex=0;TraceIndex<MaxTraces&&RemainingDistance>0.f;++TraceIndex)
     {
         const FVector CurrentEnd=CurrentStart+Direction*RemainingDistance;
-        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Start=%s End=%s Remaining=%.2f"),TraceIndex,*CurrentStart.ToString(),*CurrentEnd.ToString(),RemainingDistance);
         TArray<FHitResult> Hits;
         TArray<AActor*> ActorsToIgnore;
         ActorsToIgnore.Add(WorldContextObject->GetTypedOuter<AActor>());
@@ -536,10 +533,9 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
             ActorsToIgnore.Add(Actor);
         }
         UKismetSystemLibrary::SphereTraceMulti(World,CurrentStart,CurrentEnd,SphereRadius,TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hits,true);
-        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] HitCount=%d"),TraceIndex,Hits.Num());
         if (Hits.Num()==0)
         {
-            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No collision"),TraceIndex);
+            if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No collision"),TraceIndex);
             break;
         }
         Hits.Sort([](const FHitResult& A,const FHitResult& B)
@@ -551,44 +547,39 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
         for (const FHitResult& Hit:Hits)
         {
             AActor* Actor=Hit.GetActor();
-            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Hit Actor=%s Component=%s Distance=%.2f"),TraceIndex,*GetNameSafe(Actor),*GetNameSafe(Hit.GetComponent()),Hit.Distance);
             if (!IsValid(Actor))
             {
-                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Invalid actor"),TraceIndex);
+                if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Invalid actor"),TraceIndex);
                 continue;
             }
             if (UniqueActors.Contains(Actor))
             {
-                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Already hit %s"),TraceIndex,*GetNameSafe(Actor));
+                if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Already hit %s"),TraceIndex,*GetNameSafe(Actor));
                 continue;
             }
             if (TargetPawnClass&&!Actor->IsA(TargetPawnClass))
             {
-                UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: %s is not TargetPawnClass"),TraceIndex,*GetNameSafe(Actor));
+                if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: %s is not TargetPawnClass"),TraceIndex,*GetNameSafe(Actor));
                 continue;
             }
             HitActor=Actor;
             HitDistance=Hit.Distance;
-            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] TARGET FOUND: %s Distance=%.2f"),TraceIndex,*GetNameSafe(HitActor),HitDistance);
             break;
         }
         if (!HitActor)
         {
-            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No valid target found"),TraceIndex);
+            if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: No valid target found"),TraceIndex);
             break;
         }
         UniqueActors.Add(HitActor);
         FoundActors.Add(HitActor);
         RemainingDistance-=HitDistance;
-        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Added %s RemainingDistance=%.2f"),TraceIndex,*GetNameSafe(HitActor),RemainingDistance);
         if (RemainingDistance<=0.f)
         {
-            UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: Distance exhausted"),TraceIndex);
+            if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] STOP: Distance exhausted"),TraceIndex);
             break;
         }
         CurrentStart=CurrentStart+Direction*HitDistance;
-        UE_LOG(LogTemp,Warning,TEXT("Trace[%d] NextStart=%s"),TraceIndex,*CurrentStart.ToString());
     }
-    UE_LOG(LogTemp,Warning,TEXT("TargetChain COMPLETE: FoundActors=%d"),FoundActors.Num());
     return FoundActors;
 }
