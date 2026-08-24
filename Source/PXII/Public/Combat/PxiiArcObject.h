@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/PxiiCharacter.h"
 #include "GameFramework/Actor.h"
 #include "PxiiArcObject.generated.h"
 
@@ -25,6 +26,7 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FHitTarget HitTarget;
+	
 protected:
 	virtual void BeginPlay() override;
 

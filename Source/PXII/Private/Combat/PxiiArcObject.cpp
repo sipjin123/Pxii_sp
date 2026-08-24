@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Character/PxiiCharacter.h"
 #include "Combat/PxiiArcObject.h"
+#include "Character/PxiiCharacter.h"
 
 // Sets default values
 APxiiArcObject::APxiiArcObject()
