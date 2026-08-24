@@ -41,4 +41,6 @@ private:
 	
 	UPROPERTY(Transient)
 	UPxiiListDataObjectScalar* CachedOwningListDataObjectScalar;
+	
+	bool bIsInitializing = false;
 };

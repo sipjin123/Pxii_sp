@@ -30,9 +30,9 @@ public:
 
 private:
 	void ConstructTabs();
-	void ConstructDataObjects(UPxiiListDataObjectCollection* CollectionToAdd, const TArray<FOptionsDataEntry>& DataEntries);
-	void SetStringOptionsCycle(const FStringData* Data, UPxiiListDataObjectString* DataObjectToSet);
-	void SetStringImageOptionsCycle(const FStringImageData* Data, UPxiiListDataObjectStringImage* DataObjectToSet);
+	void ConstructDataObjects(UPxiiListDataObjectCollection* CollectionToAdd, TArray<FOptionsDataEntry> DataEntries);
+	//void SetStringOptionsCycle(const FStringData* Data, UPxiiListDataObjectString* DataObjectToSet);
+	//void SetStringImageOptionsCycle(const FStringImageData* Data, UPxiiListDataObjectStringImage* DataObjectToSet);
 	
 	void FindChildListDataRecursively(UPxiiListDataObjectBase* InParentData, TArray<UPxiiListDataObjectBase*>& OutFoundChildListData) const;
 

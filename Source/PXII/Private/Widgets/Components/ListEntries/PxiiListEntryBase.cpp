@@ -51,6 +51,11 @@ void UPxiiListEntryBase::NativeOnEntryReleased()
 	// This is for bug that cause double entry to be highlighted at the same time
 	IUserObjectListEntry::NativeOnEntryReleased();
 	
+	if (UPxiiListDataObjectBase* Data = Cast<UPxiiListDataObjectBase>(GetListItem()))
+	{
+		Data->OnListDataModified.RemoveAll(this);
+	}
+	
 	NativeOnListEntryWidgetHovered(false);
 }
 

@@ -25,17 +25,22 @@ void UPxiiListEntryScalar::OnOwningListDataObjectSet(UPxiiListDataObjectBase* In
 	if (!IsValid(CachedOwningListDataObjectScalar))
 	{
 		PXII_LOG(ELogCategory::UI, Warning, TEXT("[% s]: Failed to cast to list data object scalar"), *ThisClass::StaticClass()->GetName());
+		return;
 	}
+	
+	//bIsInitializing = true;
 
 	NumericTextBlock_Value->SetNumericType(CachedOwningListDataObjectScalar->GetDisplayNumericType());
 	NumericTextBlock_Value->FormattingSpecification = CachedOwningListDataObjectScalar->GetNumericFormattingOptions();
-	//NumericTextBlock_Value->SetCurrentValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
+	NumericTextBlock_Value->SetCurrentValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
 	
 	AnalogSlider_Slider->SetMinValue(CachedOwningListDataObjectScalar->GetDisplayValueRange().GetLowerBoundValue());
 	AnalogSlider_Slider->SetMaxValue(CachedOwningListDataObjectScalar->GetDisplayValueRange().GetUpperBoundValue());
 	AnalogSlider_Slider->SetStepSize(CachedOwningListDataObjectScalar->GetSliderStepSize());
 	
-	//AnalogSlider_Slider->SetValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
+	AnalogSlider_Slider->SetValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
+	
+	//bIsInitializing = false;
 	OnOwningListDataObjectModified(CachedOwningListDataObjectScalar, EListDataModifyType::DirectlyModified);
 }
 
@@ -44,14 +49,18 @@ void UPxiiListEntryScalar::OnOwningListDataObjectModified(UPxiiListDataObjectBas
 {
 	if (CachedOwningListDataObjectScalar)
 	{
+		//bIsInitializing = true;
+		
 		NumericTextBlock_Value->SetCurrentValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
 		AnalogSlider_Slider->SetValue(CachedOwningListDataObjectScalar->GetCurrentValue(CachedOwningListDataObjectScalar->GetDataID()));
+		
+		//bIsInitializing = false;
 	}
 }
 
 void UPxiiListEntryScalar::OnSliderValueChange(float Value)
 {
-	if (CachedOwningListDataObjectScalar)
+	if ( CachedOwningListDataObjectScalar)
 	{
 		CachedOwningListDataObjectScalar->SetCurrentValue(CachedOwningListDataObjectScalar->GetDataID(), Value);
 	}
