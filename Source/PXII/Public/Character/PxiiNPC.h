@@ -89,7 +89,10 @@ public:
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHitTarget TraceTarget;
-
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FAttackState OnAbilityEnded;
+	
 	UPROPERTY(BlueprintReadWrite)
 	AActor* LastKnownAttacker;
 
