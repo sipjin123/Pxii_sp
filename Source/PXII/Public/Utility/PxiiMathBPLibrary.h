@@ -57,4 +57,10 @@ public:
 	static void GenerateSimpleArc(const bool bDrawDebug, const bool bUseRandom,
 		const UObject* WorldContextObject, const FVector& Start, const FVector& End,
 		float Height, int32 NumPoints, TArray<FVector>& OutPoints, FVector ArcDirection);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Math")
+	static TArray<FVector> GenerateParabolicPath(FVector Origin, FVector TargetLocation, int32 NodeCount, float ParabolicHeight);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Projectile")
+	static bool CalculateProjectileVelocity(FVector Start,FVector Target,float ApexHeight,float Gravity,FVector& OutVelocity);
 };

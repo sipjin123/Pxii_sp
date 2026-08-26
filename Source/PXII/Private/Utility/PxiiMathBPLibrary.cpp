@@ -430,3 +430,60 @@ void UPxiiMathBPLibrary::GenerateSimpleArc(const bool bDrawDebug, const bool bUs
 		Prev = Point;
 	}
 }
+
+TArray<FVector> UPxiiMathBPLibrary::GenerateParabolicPath(FVector Origin, FVector TargetLocation, int32 NodeCount,
+	float ParabolicHeight)
+{
+	TArray<FVector> Path;
+	if (NodeCount<2)
+	{
+		return Path;
+	}
+	Path.Reserve(NodeCount);
+	for (int32 Index=0;Index<NodeCount;++Index)
+	{
+		const float Alpha=(float)Index/(float)(NodeCount-1);
+		const FVector LinearPosition=FMath::Lerp(Origin,TargetLocation,Alpha);
+		const float HeightOffset=4.f*ParabolicHeight*Alpha*(1.f-Alpha);
+		Path.Add(LinearPosition+FVector::UpVector*HeightOffset);
+	}
+	return Path;
+}
+
+bool UPxiiMathBPLibrary::CalculateProjectileVelocity(FVector Start, FVector Target, float ApexHeight, float Gravity,
+	FVector& OutVelocity)
+{
+	OutVelocity=FVector::ZeroVector;
+	if (Gravity<=0.f)
+	{
+		return false;
+	}
+
+	const FVector Delta=Target-Start;
+	const float HeightDelta=Delta.Z;
+	const float HorizontalDistance=FVector2D(Delta.X,Delta.Y).Size();
+	const float Apex=FMath::Max(Start.Z,Target.Z)+ApexHeight;
+	const float UpwardHeight=Apex-Start.Z;
+
+	if (UpwardHeight<=0.f)
+	{
+		return false;
+	}
+
+	const float TimeToApex=FMath::Sqrt((2.f*UpwardHeight)/Gravity);
+	const float DownwardHeight=Apex-Target.Z;
+	const float TimeFromApex=FMath::Sqrt((2.f*DownwardHeight)/Gravity);
+	const float TotalTime=TimeToApex+TimeFromApex;
+
+	if (TotalTime<=KINDA_SMALL_NUMBER)
+	{
+		return false;
+	}
+
+	const FVector HorizontalDirection=FVector(Delta.X,Delta.Y,0.f).GetSafeNormal();
+	const FVector HorizontalVelocity=HorizontalDirection*(HorizontalDistance/TotalTime);
+	const float VerticalVelocity=Gravity*TimeToApex;
+
+	OutVelocity=HorizontalVelocity+FVector::UpVector*VerticalVelocity;
+	return true;
+}
