@@ -10,11 +10,12 @@ APxiiArcObject::APxiiArcObject()
 
 }
 
-void APxiiArcObject::InitializeArc(const TArray<FVector>& InArcPoints, float InTravelTime)
+void APxiiArcObject::InitializeArc(const TArray<FVector>& InArcPoints, float InTravelTime, bool bDormantState)
 {
 	ArcPoints = InArcPoints;
 	TravelTime = InTravelTime;
-
+	bIsDormant = bDormantState;
+	
 	if (ArcPoints.Num() >= 2)
 	{
 		CurrentIndex = 0;
@@ -34,6 +35,7 @@ void APxiiArcObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsDormant) return;
 	if (ArcPoints.Num() < 2) return;
 
 	ElapsedTime += DeltaTime;
@@ -53,5 +55,5 @@ void APxiiArcObject::Tick(float DeltaTime)
 	float SegmentAlpha = SegmentFloat - SegmentIndex;
 
 	FVector NewLocation = FMath::Lerp(ArcPoints[SegmentIndex], ArcPoints[SegmentIndex + 1], SegmentAlpha);
-	SetActorLocation(NewLocation);
+	SetActorLocation(NewLocation, bUseSweep);
 }

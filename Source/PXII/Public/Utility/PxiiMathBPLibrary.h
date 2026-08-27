@@ -63,4 +63,10 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Projectile")
 	static bool CalculateProjectileVelocity(FVector Start,FVector Target,float ApexHeight,float Gravity,FVector& OutVelocity);
+	
+	UFUNCTION(BlueprintPure,Category="PXII|Combat")
+	static bool IsActorBehindContext(AActor* SourceActor,AActor* ContextActor);
+	
+	UFUNCTION(BlueprintPure,Category="PXII|Combat")
+	static bool IsActorInFrontOfContext(AActor* SourceActor,AActor* ContextActor);
 };

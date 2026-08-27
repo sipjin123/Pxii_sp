@@ -10,6 +10,7 @@
 #include "Targeting/Targetable.h"
 #include "PxiiNPC.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAnimEventBroadcastEnemy, int32, Payload, float, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttackState, bool, IsEnabled, int32, Payload);
 UCLASS()
@@ -85,6 +86,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FAttackState OnAttackState;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FAnimEventBroadcastEnemy AnimEventBroadcastEnemy;
 	
 	/** Signals that a projectile hits a target **/
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")

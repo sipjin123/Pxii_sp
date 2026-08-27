@@ -487,3 +487,33 @@ bool UPxiiMathBPLibrary::CalculateProjectileVelocity(FVector Start, FVector Targ
 	OutVelocity=HorizontalVelocity+FVector::UpVector*VerticalVelocity;
 	return true;
 }
+
+bool UPxiiMathBPLibrary::IsActorBehindContext(AActor* SourceActor, AActor* ContextActor)
+{
+	if (!IsValid(SourceActor)||!IsValid(ContextActor))
+	{
+		return false;
+	}
+	const FVector ContextToSource=(SourceActor->GetActorLocation()-ContextActor->GetActorLocation()).GetSafeNormal2D();
+	const FVector ContextForward=ContextActor->GetActorForwardVector().GetSafeNormal2D();
+	if (ContextToSource.IsNearlyZero()||ContextForward.IsNearlyZero())
+	{
+		return false;
+	}
+	return FVector::DotProduct(ContextForward,ContextToSource)<-0.5f;
+}
+
+bool UPxiiMathBPLibrary::IsActorInFrontOfContext(AActor* SourceActor, AActor* ContextActor)
+{
+	if (!IsValid(SourceActor)||!IsValid(ContextActor))
+	{
+		return false;
+	}
+	const FVector ContextToSource=(SourceActor->GetActorLocation()-ContextActor->GetActorLocation()).GetSafeNormal2D();
+	const FVector ContextForward=ContextActor->GetActorForwardVector().GetSafeNormal2D();
+	if (ContextToSource.IsNearlyZero()||ContextForward.IsNearlyZero())
+	{
+		return false;
+	}
+	return FVector::DotProduct(ContextForward,ContextToSource)>0.5f;
+}

@@ -499,7 +499,7 @@ bool UPxiiCombatBPLibrary::GetCameraViewPoint(APxiiCharacter* character, FVector
 
     return true;
 }
-TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject,FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<APawn> TargetPawnClass,ETraceTypeQuery TraceChannel,bool bDrawDebug,bool bErrorLog)
+TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* WorldContextObject, AActor* Owner, FVector Origin,FVector Direction,float Distance,float SphereRadius,int32 MaxTraces,TSubclassOf<AActor> TargetActorClass,ETraceTypeQuery TraceChannel,bool bDrawDebug,bool bErrorLog)
 {
     TArray<AActor*> FoundActors;
     if (!WorldContextObject||Distance<=0.f||SphereRadius<=0.f||MaxTraces<=0)
@@ -528,6 +528,7 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
         TArray<FHitResult> Hits;
         TArray<AActor*> ActorsToIgnore;
         ActorsToIgnore.Add(WorldContextObject->GetTypedOuter<AActor>());
+        ActorsToIgnore.Add(Owner);
         for (AActor* Actor:UniqueActors)
         {
             ActorsToIgnore.Add(Actor);
@@ -557,7 +558,7 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
                 if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: Already hit %s"),TraceIndex,*GetNameSafe(Actor));
                 continue;
             }
-            if (TargetPawnClass&&!Actor->IsA(TargetPawnClass))
+            if (TargetActorClass&&!Actor->IsA(TargetActorClass))
             {
                 if (bErrorLog) UE_LOG(LogTemp,Warning,TEXT("Trace[%d] Ignored: %s is not TargetPawnClass"),TraceIndex,*GetNameSafe(Actor));
                 continue;

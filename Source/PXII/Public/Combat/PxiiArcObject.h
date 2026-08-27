@@ -19,14 +19,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void InitializeArc(const TArray<FVector>& InArcPoints, float InTravelTime);
+	void InitializeArc(const TArray<FVector>& InArcPoints, float InTravelTime, bool bDormantState);
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FVector> ArcPoints;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FHitTarget HitTarget;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bUseSweep;
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bIsDormant;
 protected:
 	virtual void BeginPlay() override;
 
