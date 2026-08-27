@@ -584,3 +584,33 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
     }
     return FoundActors;
 }
+
+APawn* UPxiiCombatBPLibrary::GetPawnInFrontByBoxTrace(UObject* WorldContextObject, AActor* SourceActor,
+    FVector BoxExtent, FVector Offset, float Distance, ETraceTypeQuery TraceChannel, bool bDrawDebug)
+{
+    if (!SourceActor||Distance<=0.f)
+    {
+        return nullptr;
+    }
+    UWorld* World=WorldContextObject->GetWorld();
+    if (!World)
+    {
+        return nullptr;
+    }
+    const FVector Start=SourceActor->GetActorLocation() + Offset;
+    const FVector Direction=SourceActor->GetActorForwardVector().GetSafeNormal();
+    if (Direction.IsNearlyZero())
+    {
+        return nullptr;
+    }
+    const FVector End=Start+Direction*Distance;
+    FHitResult Hit;
+    TArray<AActor*> ActorsToIgnore;
+    ActorsToIgnore.Add(SourceActor);
+    const bool bHit=UKismetSystemLibrary::BoxTraceSingle(World,Start,End,BoxExtent,SourceActor->GetActorRotation(),TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hit,true);
+    if (!bHit)
+    {
+        return nullptr;
+    }
+    return Cast<APawn>(Hit.GetActor());
+}

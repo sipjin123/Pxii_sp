@@ -27,7 +27,7 @@ public:
 	virtual TArray<FVector> GetWeakpointLocations_Implementation() const override;
 	virtual bool IsLockable_Implementation() const override;
 	virtual float GetThreatPriority_Implementation() const override;
-
+	virtual AActor* GetCombatTarget_Implementation() const override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

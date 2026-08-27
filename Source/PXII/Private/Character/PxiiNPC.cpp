@@ -65,6 +65,11 @@ float APxiiNPC::GetThreatPriority_Implementation() const
 	return ThreatPriority;
 }
 
+AActor* APxiiNPC::GetCombatTarget_Implementation() const
+{
+	return LastKnownTarget;
+}
+
 // Called when the game starts or when spawned
 void APxiiNPC::BeginPlay()
 {
