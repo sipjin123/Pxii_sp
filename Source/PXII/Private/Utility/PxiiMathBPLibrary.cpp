@@ -555,64 +555,26 @@ FVector UPxiiMathBPLibrary::GetPointFromTargetTowardSource(FVector Source, FVect
 TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor,AActor* TargetActor,int32 NodeCount,float Radius,FVector& OutInitialTargetLocation)
 {
 	TArray<FVector> Nodes;
-	OutInitialTargetLocation=FVector::ZeroVector;
-	if (!SourceActor||!TargetActor||NodeCount<=0||Radius<=0.f)
+	if (!TargetActor||!SourceActor||NodeCount<=0||Radius<=0.f)
 	{
 		return Nodes;
 	}
-	const FVector Origin=SourceActor->GetActorLocation();
-	OutInitialTargetLocation=TargetActor->GetActorLocation();
-	const FVector Forward=SourceActor->GetActorForwardVector().GetSafeNormal2D();
-	if (Forward.IsNearlyZero())
+	const FVector TargetLocation=TargetActor->GetActorLocation();
+	const FVector CasterLocation=SourceActor->GetActorLocation();
+	FVector TargetToCaster=CasterLocation-TargetLocation;
+	TargetToCaster.Z=0.f;
+	TargetToCaster=TargetToCaster.GetSafeNormal();
+	if (TargetToCaster.IsNearlyZero())
 	{
 		return Nodes;
 	}
 	Nodes.Reserve(NodeCount);
-	const float AngleStep=360.f/NodeCount;
-	const float StartAngle=0.f;
+	const float AngleStep=360.f/static_cast<float>(NodeCount);
 	for (int32 i=0;i<NodeCount;++i)
 	{
-		const float Angle=StartAngle+(AngleStep*i);
-		const FVector Direction=Forward.RotateAngleAxis(Angle,FVector::UpVector);
-		Nodes.Add(Origin+Direction*Radius);
+		const float Angle=AngleStep*static_cast<float>(i);
+		const FVector Direction=TargetToCaster.RotateAngleAxis(Angle,FVector::UpVector);
+		Nodes.Add(Direction*Radius);
 	}
 	return Nodes;
-}
-
-FVector UPxiiMathBPLibrary::GetNextStrafeTarget(UObject* WorldContextObject,AActor* TargetActor,const FVector& InitialTargetLocation,const FVector& CurrentLocation,const TArray<FVector>& StrafeNodes,int32 CurrentNodeIndex,EPxiiDirection StrafeDirection,float NavProjectionRadius,int32& OutNodeIndex)
-{
-	OutNodeIndex=INDEX_NONE;
-	if (!WorldContextObject||!TargetActor||StrafeNodes.Num()==0)
-	{
-		return FVector::ZeroVector;
-	}
-	UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
-	if (!World)
-	{
-		return FVector::ZeroVector;
-	}
-	UNavigationSystemV1* NavSystem=FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
-	if (!NavSystem)
-	{
-		return FVector::ZeroVector;
-	}
-	if (!StrafeNodes.IsValidIndex(CurrentNodeIndex))
-	{
-		CurrentNodeIndex=0;
-	}
-	const FVector TargetDelta=TargetActor->GetActorLocation()-InitialTargetLocation;
-	const int32 Step=StrafeDirection==EPxiiDirection::Right?1:-1;
-	for (int32 Offset=1;Offset<StrafeNodes.Num();++Offset)
-	{
-		const int32 NodeIndex=(CurrentNodeIndex+(Step*Offset)+StrafeNodes.Num())%StrafeNodes.Num();
-		const FVector UpdatedNode=StrafeNodes[NodeIndex]+TargetDelta;
-		FNavLocation NavLocation;
-		if (!NavSystem->ProjectPointToNavigation(UpdatedNode,NavLocation,FVector(NavProjectionRadius)))
-		{
-			continue;
-		}
-		OutNodeIndex=NodeIndex;
-		return NavLocation.Location;
-	}
-	return FVector::ZeroVector;
 }
