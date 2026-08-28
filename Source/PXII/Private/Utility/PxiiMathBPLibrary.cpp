@@ -552,14 +552,16 @@ FVector UPxiiMathBPLibrary::GetPointFromTargetTowardSource(FVector Source, FVect
 	return Target+Direction*DistanceFromTarget;
 }
 
-TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor, int32 NodeCount, float Radius)
+TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor,AActor* TargetActor,int32 NodeCount,float Radius,FVector& OutInitialTargetLocation)
 {
 	TArray<FVector> Nodes;
-	if (!SourceActor||NodeCount<=0||Radius<=0.f)
+	OutInitialTargetLocation=FVector::ZeroVector;
+	if (!SourceActor||!TargetActor||NodeCount<=0||Radius<=0.f)
 	{
 		return Nodes;
 	}
 	const FVector Origin=SourceActor->GetActorLocation();
+	OutInitialTargetLocation=TargetActor->GetActorLocation();
 	const FVector Forward=SourceActor->GetActorForwardVector().GetSafeNormal2D();
 	if (Forward.IsNearlyZero())
 	{
@@ -577,39 +579,40 @@ TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor, int
 	return Nodes;
 }
 
-FVector UPxiiMathBPLibrary::GetNextStrafeTarget(UObject* WorldContextObject,const FVector& CurrentLocation,const TArray<FVector>& StrafeNodes,int32 CurrentNodeIndex,EPxiiDirection StrafeDirection,float NavProjectionRadius,int32& OutNodeIndex)
+FVector UPxiiMathBPLibrary::GetNextStrafeTarget(UObject* WorldContextObject,AActor* TargetActor,const FVector& InitialTargetLocation,const FVector& CurrentLocation,const TArray<FVector>& StrafeNodes,int32 CurrentNodeIndex,EPxiiDirection StrafeDirection,float NavProjectionRadius,int32& OutNodeIndex)
 {
 	OutNodeIndex=INDEX_NONE;
-	if (!WorldContextObject||StrafeNodes.Num()==0)
+	if (!WorldContextObject||!TargetActor||StrafeNodes.Num()==0)
 	{
-		return CurrentLocation;
+		return FVector::ZeroVector;
 	}
 	UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
 	if (!World)
 	{
-		return CurrentLocation;
+		return FVector::ZeroVector;
 	}
 	UNavigationSystemV1* NavSystem=FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
 	if (!NavSystem)
 	{
-		return CurrentLocation;
+		return FVector::ZeroVector;
 	}
 	if (!StrafeNodes.IsValidIndex(CurrentNodeIndex))
 	{
 		CurrentNodeIndex=0;
 	}
+	const FVector TargetDelta=TargetActor->GetActorLocation()-InitialTargetLocation;
 	const int32 Step=StrafeDirection==EPxiiDirection::Right?1:-1;
 	for (int32 Offset=1;Offset<StrafeNodes.Num();++Offset)
 	{
 		const int32 NodeIndex=(CurrentNodeIndex+(Step*Offset)+StrafeNodes.Num())%StrafeNodes.Num();
-		const FVector Node=StrafeNodes[NodeIndex];
+		const FVector UpdatedNode=StrafeNodes[NodeIndex]+TargetDelta;
 		FNavLocation NavLocation;
-		if (!NavSystem->ProjectPointToNavigation(Node,NavLocation,FVector(NavProjectionRadius)))
+		if (!NavSystem->ProjectPointToNavigation(UpdatedNode,NavLocation,FVector(NavProjectionRadius)))
 		{
 			continue;
 		}
 		OutNodeIndex=NodeIndex;
 		return NavLocation.Location;
 	}
-	return CurrentLocation;
+	return FVector::ZeroVector;
 }
