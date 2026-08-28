@@ -545,3 +545,9 @@ bool UPxiiMathBPLibrary::IsActorInFrontOfContext(AActor* SourceActor, AActor* Co
 	}
 	return FVector::DotProduct(ContextForward,ContextToSource)>0.5f;
 }
+
+FVector UPxiiMathBPLibrary::GetPointFromTargetTowardSource(FVector Source, FVector Target, float DistanceFromTarget)
+{
+	const FVector Direction=(Source-Target).GetSafeNormal();
+	return Target+Direction*DistanceFromTarget;
+}

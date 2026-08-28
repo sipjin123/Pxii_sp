@@ -39,3 +39,18 @@ enum class ENPCState:uint8
 	SearchingTarget=8 UMETA(DisplayName="SearchingTarget"),
 	Assessment=9 UMETA(DisplayName="Assessment"),
 };
+
+UENUM(BlueprintType)
+enum class EEnemy:uint8
+{
+	None=0 UMETA(DisplayName="None"),
+	Brawler=1 UMETA(DisplayName="Brawler"),
+	Slinger=2 UMETA(DisplayName="Slinger"),
+	Mage=3 UMETA(DisplayName="Mage"),
+	
+	Shielder=4 UMETA(DisplayName="Shielder"),
+	Warrior=5 UMETA(DisplayName="Warrior"),
+	
+	Alpha=6 UMETA(DisplayName="Alpha"),
+	Asyrah=7 UMETA(DisplayName="Asyrah"),
+};

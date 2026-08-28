@@ -70,4 +70,7 @@ public:
 	
 	UFUNCTION(BlueprintPure,Category="PXII|Combat")
 	static bool IsActorInFrontOfContext(AActor* SourceActor,AActor* ContextActor);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Math")
+	static FVector GetPointFromTargetTowardSource(FVector Source,FVector Target,float DistanceFromTarget);
 };
