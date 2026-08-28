@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enum/PxiiDamageType.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "PxiiMathBPLibrary.generated.h"
 
@@ -42,7 +43,7 @@ public:
 		TSubclassOf<UNavigationQueryFilter> FilterClass, FVector& OutLocation, int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug = false, float Duration = 2.f);
 	
 	UFUNCTION(BlueprintCallable, Category="PXII|Math")
-	static bool GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation);
+	static bool GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection = EPxiiDirection::Back);
 
 	UFUNCTION(BlueprintPure, Category="Combat|Weapons")
 	static TArray<FVector> GenerateShotgunTrajectories(FVector Origin, FVector ForwardDirection, float Distance, int32 PelletCount, float SpreadAngleDegrees);

@@ -94,3 +94,16 @@ enum class ESpecialAction:uint8
 	PerfectDodge=2 UMETA(DisplayName="PerfectDodge"),
 	Magic=3 UMETA(DisplayName="Magic"),
 };
+
+
+UENUM(BlueprintType)
+enum class EPxiiDirection:uint8
+{
+	None=0 UMETA(DisplayName="None"),
+
+	// Physical
+	Right=1 UMETA(DisplayName="Right"),
+	Left=2 UMETA(DisplayName="Left"),
+	Back=3 UMETA(DisplayName="Back"),
+	Front=4 UMETA(DisplayName="Front"),
+};

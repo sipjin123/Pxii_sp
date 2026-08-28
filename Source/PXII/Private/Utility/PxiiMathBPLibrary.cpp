@@ -134,7 +134,7 @@ bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObje
 	return false;
 }
 
-bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation)
+bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection)
 {
 	OutLocation = FVector::ZeroVector;
 
@@ -150,8 +150,24 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, 
 	}
 
 	const FVector Origin = Actor->GetActorLocation() + Offset;
-	const FVector Backward = -Actor->GetActorForwardVector();
-	const FRotator BackwardRotation = Backward.Rotation();
+	FVector DirectionVector = -Actor->GetActorForwardVector();
+	switch (PxiiDirection)
+	{
+	case EPxiiDirection::Right:
+		DirectionVector=Actor->GetActorRightVector();
+		break;
+	case EPxiiDirection::Left:
+		DirectionVector=-Actor->GetActorRightVector();
+		break;
+	case EPxiiDirection::Front:
+		DirectionVector=Actor->GetActorForwardVector();
+		break;
+	case EPxiiDirection::Back:
+		DirectionVector=-Actor->GetActorForwardVector();
+		break;
+	}
+	
+	const FRotator BackwardRotation = DirectionVector.Rotation();
 
 	TArray<FVector> ValidLocations;
 	ValidLocations.Reserve(TraceCount);
@@ -165,12 +181,30 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, 
 		const float Alpha = TraceCount == 1 ? 0.5f : static_cast<float>(i) / (TraceCount - 1);
 		const float Angle = FMath::Lerp(-HalfConeAngle, HalfConeAngle, Alpha);
 
-		const FVector Direction = BackwardRotation.RotateVector(FVector::ForwardVector).RotateAngleAxis(Angle, FVector::UpVector);
+		FVector NewRotVector = FVector::ForwardVector;
+		switch (PxiiDirection)
+		{
+		case EPxiiDirection::Right:
+			NewRotVector = FVector::RightVector;
+		break;
+		case EPxiiDirection::Left:
+			NewRotVector = -FVector::LeftVector;
+		break;
+		case EPxiiDirection::Front:
+			NewRotVector = -FVector::ForwardVector;
+		break;
+		case EPxiiDirection::Back:
+			NewRotVector = FVector::ForwardVector;
+		break;
+		}
+		
+		//const FVector Direction = BackwardRotation.RotateVector(NewRotVector).RotateAngleAxis(Angle, FVector::UpVector);
+		const FVector Direction = DirectionVector.RotateAngleAxis(Angle,FVector::UpVector);
 		const FVector CandidateLocation = Origin + Direction * DistanceBehind;
 
 		FHitResult HitResult;
 
-		const bool bHit = World->SweepSingleByChannel(HitResult, CandidateLocation, CandidateLocation, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), QueryParams);
+		const bool bHit = World->SweepSingleByChannel(HitResult, Origin, CandidateLocation, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), QueryParams);
 
 		DrawDebugSphere(World, CandidateLocation, SphereRadius, 12, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 2.0f);
 		DrawDebugLine(World, Origin, CandidateLocation, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 1.0f);
@@ -222,13 +256,7 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationBehindActor(const AActor* Actor, 
 	return true;
 }
 
-TArray<FVector> UPxiiMathBPLibrary::GenerateShotgunTrajectories(
-FVector Origin,
-FVector ForwardDirection,
-float Distance,
-int32 PelletCount,
-float SpreadAngleDegrees
-)
+TArray<FVector> UPxiiMathBPLibrary::GenerateShotgunTrajectories(FVector Origin, FVector ForwardDirection, float Distance, int32 PelletCount, float SpreadAngleDegrees)
 {
 	TArray<FVector> Trajectories;
 
