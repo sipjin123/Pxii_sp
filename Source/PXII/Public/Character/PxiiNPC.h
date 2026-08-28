@@ -45,6 +45,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ThreatPriority = 0.5f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsWaitingForCombatProximity = false;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
