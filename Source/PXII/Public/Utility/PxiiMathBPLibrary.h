@@ -73,4 +73,9 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Math")
 	static FVector GetPointFromTargetTowardSource(FVector Source,FVector Target,float DistanceFromTarget);
+	UFUNCTION(BlueprintPure,Category="PXII|AI")
+	static TArray<FVector> GenerateStrafeNodes(AActor* SourceActor,int32 NodeCount,float Radius);
+	
+	UFUNCTION(BlueprintPure,Category="PXII|AI")
+	static FVector GetNextStrafeTarget(UObject* WorldContextObject,const FVector& CurrentLocation,const TArray<FVector>& StrafeNodes,int32 CurrentNodeIndex,EPxiiDirection StrafeDirection,float NavProjectionRadius,int32& OutNodeIndex);
 };

@@ -551,3 +551,65 @@ FVector UPxiiMathBPLibrary::GetPointFromTargetTowardSource(FVector Source, FVect
 	const FVector Direction=(Source-Target).GetSafeNormal();
 	return Target+Direction*DistanceFromTarget;
 }
+
+TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor, int32 NodeCount, float Radius)
+{
+	TArray<FVector> Nodes;
+	if (!SourceActor||NodeCount<=0||Radius<=0.f)
+	{
+		return Nodes;
+	}
+	const FVector Origin=SourceActor->GetActorLocation();
+	const FVector Forward=SourceActor->GetActorForwardVector().GetSafeNormal2D();
+	if (Forward.IsNearlyZero())
+	{
+		return Nodes;
+	}
+	Nodes.Reserve(NodeCount);
+	const float AngleStep=360.f/NodeCount;
+	const float StartAngle=0.f;
+	for (int32 i=0;i<NodeCount;++i)
+	{
+		const float Angle=StartAngle+(AngleStep*i);
+		const FVector Direction=Forward.RotateAngleAxis(Angle,FVector::UpVector);
+		Nodes.Add(Origin+Direction*Radius);
+	}
+	return Nodes;
+}
+
+FVector UPxiiMathBPLibrary::GetNextStrafeTarget(UObject* WorldContextObject,const FVector& CurrentLocation,const TArray<FVector>& StrafeNodes,int32 CurrentNodeIndex,EPxiiDirection StrafeDirection,float NavProjectionRadius,int32& OutNodeIndex)
+{
+	OutNodeIndex=INDEX_NONE;
+	if (!WorldContextObject||StrafeNodes.Num()==0)
+	{
+		return CurrentLocation;
+	}
+	UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
+	if (!World)
+	{
+		return CurrentLocation;
+	}
+	UNavigationSystemV1* NavSystem=FNavigationSystem::GetCurrent<UNavigationSystemV1>(World);
+	if (!NavSystem)
+	{
+		return CurrentLocation;
+	}
+	if (!StrafeNodes.IsValidIndex(CurrentNodeIndex))
+	{
+		CurrentNodeIndex=0;
+	}
+	const int32 Step=StrafeDirection==EPxiiDirection::Right?1:-1;
+	for (int32 Offset=1;Offset<StrafeNodes.Num();++Offset)
+	{
+		const int32 NodeIndex=(CurrentNodeIndex+(Step*Offset)+StrafeNodes.Num())%StrafeNodes.Num();
+		const FVector Node=StrafeNodes[NodeIndex];
+		FNavLocation NavLocation;
+		if (!NavSystem->ProjectPointToNavigation(Node,NavLocation,FVector(NavProjectionRadius)))
+		{
+			continue;
+		}
+		OutNodeIndex=NodeIndex;
+		return NavLocation.Location;
+	}
+	return CurrentLocation;
+}
