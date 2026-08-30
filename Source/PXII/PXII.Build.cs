@@ -29,6 +29,7 @@ public class PXII : ModuleRules
 			"LoadingScreenModule",
 			"HairStrandsCore",
 			"ApplicationCore",
+			"MotionWarping",
 			
 			// UI
 			"UMG",

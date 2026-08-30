@@ -16,6 +16,7 @@ DECLARE_LOG_CATEGORY_EXTERN(PXIIUILogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIIAimLogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIITraceLogs, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(PXIIProjectileLogs, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(PXIILedgeTraversalLogs, Log, All);
 
 UENUM()
 enum class EPXIILogVerbosity : uint8
@@ -46,7 +47,8 @@ enum class ELogCategory : uint8
 	UI,
 	Aim,
 	Trace,
-	Projectile
+	Projectile,
+	LedgeTraversal
 };
 
 class PXII_API PXIILogUtility
@@ -64,23 +66,24 @@ public:
 	{
 		switch (category)
 		{
-		case ELogCategory::General:     return PXIILog;
-		case ELogCategory::Socket:      return PXIISocketLogs;
-		case ELogCategory::Lobby:		return PXIILobbyLogs;
-		case ELogCategory::Inventory:	return PXIIInventoryLogs;
-		case ELogCategory::AI:			return PXIIAILogs;
-		case ELogCategory::Combat:		return PXIICombatLogs;
-		case ELogCategory::Ability:		return PXIIAbilityLogs;
-		case ELogCategory::Equipment:	return PXIIEquipmentLogs;
-		case ELogCategory::SkillTree:	return PXIISkilltreeLogs;
-		case ELogCategory::Objective:	return PXIIObjectiveLogs;
-
-		case ELogCategory::Controls:	return PXIIControlsLogs;
-		case ELogCategory::UI:			return PXIIUILogs;
-		case ELogCategory::Trace:		return PXIITraceLogs;
-		case ELogCategory::Projectile:	return PXIIProjectileLogs;
-		case ELogCategory::Aim:			return PXIIAimLogs;
-		default:                         return PXIILog;
+		case ELogCategory::General:			return PXIILog;
+		case ELogCategory::Socket:			return PXIISocketLogs;
+		case ELogCategory::Lobby:			return PXIILobbyLogs;
+		case ELogCategory::Inventory:		return PXIIInventoryLogs;
+		case ELogCategory::AI:				return PXIIAILogs;
+		case ELogCategory::Combat:			return PXIICombatLogs;
+		case ELogCategory::Ability:			return PXIIAbilityLogs;
+		case ELogCategory::Equipment:		return PXIIEquipmentLogs;
+		case ELogCategory::SkillTree:		return PXIISkilltreeLogs;
+		case ELogCategory::Objective:		return PXIIObjectiveLogs;
+	
+		case ELogCategory::Controls:		return PXIIControlsLogs;
+		case ELogCategory::UI:				return PXIIUILogs;
+		case ELogCategory::Trace:			return PXIITraceLogs;
+		case ELogCategory::Projectile:		return PXIIProjectileLogs;
+		case ELogCategory::Aim:				return PXIIAimLogs;
+		case ELogCategory::LedgeTraversal:	return PXIILedgeTraversalLogs;
+		default:							return PXIILog;
 		}
 	}
 };
@@ -135,6 +138,9 @@ do { \
 			break; \
 			case ELogCategory::Projectile: \
 				UE_LOG(PXIIProjectileLogs, Verbosity, Format, ##__VA_ARGS__); \
+			break; \
+			case ELogCategory::LedgeTraversal: \
+			UE_LOG(PXIILedgeTraversalLogs, Verbosity, Format, ##__VA_ARGS__); \
 			break; \
 			default: \
 				UE_LOG(LogTemp, Verbosity, Format, ##__VA_ARGS__); \

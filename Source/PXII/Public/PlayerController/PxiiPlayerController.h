@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "CommonButtonBase.h"
 #include "Components/PxiiAimAssistComponent.h"
+#include "Components/PxiiLedgeTraversal.h"
 
 #include "GameFramework/PlayerController.h"
 #include "Input/PxiiPlayerInputConfig.h"
@@ -27,6 +28,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputAction> LookInput;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
+	TObjectPtr<UInputAction> JumpInput;
+
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -50,6 +54,9 @@ public:
 	bool IsMovementBlocked;
 	UPROPERTY(BlueprintReadWrite)
 	bool IsAimBlocked;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector2D LedgeInput;
 	
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D CachedMovementInput;
@@ -69,12 +76,32 @@ protected:
 	// Aim Yaw Scale
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float  AimYawScale = 0.25f;
+	
+	// Invert mouse look
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	bool bInvertMouseX = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	bool bInvertMouseY = false;
+	
+	// Clamp pitch angle
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	float PitchMin = -20.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	float PitchMax = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	bool EnabledLedgeTraversal = false;
 
 	UPROPERTY()
 	float CachedSlowdownFactor;
 
 	UFUNCTION()
 	void OnInputMethodChanged(ECommonInputType inputType);
+
+	UFUNCTION()
+	bool OnGrabLedgeInput();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SwitchMappingControls(int32 mapIndex = 1);
@@ -86,7 +113,12 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	FString GetActiveMapDisplayName();
+
+	UFUNCTION()
+	void OnJumpStarted();
 	
+	UFUNCTION()
+	void OnJumpTriggered();
 private:
 
 	UPROPERTY()
@@ -95,6 +127,8 @@ private:
 	TObjectPtr<UPxiiAimAssistComponent> AimAssistComp;
 	UPROPERTY()
 	TObjectPtr<UPxiiAimComponent> AimComp;
+	UPROPERTY()
+	TObjectPtr<UPxiiLedgeTraversal> LedgeComp;
 	UPROPERTY()
 	TObjectPtr<UCommonInputSubsystem> CommonInput;
 	UPROPERTY()

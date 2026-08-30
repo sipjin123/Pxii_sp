@@ -18,6 +18,13 @@ void APxiiPlayerController::BeginPlay()
 
 	CommonInput = UCommonInputSubsystem::Get(GetLocalPlayer());
 	CommonInput->OnInputMethodChangedNative.AddUObject(this, &APxiiPlayerController::OnInputMethodChanged);
+	
+	// Clamp Mouse Look Angle
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->ViewPitchMin = PitchMin;
+		PlayerCameraManager->ViewPitchMax = PitchMax;
+	}
 }
 
 void APxiiPlayerController::SetupInputComponent()
@@ -41,6 +48,10 @@ void APxiiPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Completed, this, &APxiiPlayerController::Move);
 		// Looking
 		EnhancedInputComponent->BindAction(LookInput, ETriggerEvent::Completed, this, &APxiiPlayerController::Look);
+
+		EnhancedInputComponent->BindAction(JumpInput, ETriggerEvent::Started, this, &APxiiPlayerController::OnJumpStarted);
+		EnhancedInputComponent->BindAction(JumpInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::OnJumpTriggered);
+
 		
 		EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APxiiPlayerController::AbilityInputTagPressed, &APxiiPlayerController::AbilityInputTagReleased);
 	}
@@ -58,32 +69,43 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 	ASC = Cast<UPxiiAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(InPawn));
 	AimAssistComp = InPawn->GetComponentByClass<UPxiiAimAssistComponent>();
 	AimComp = InPawn->GetComponentByClass<UPxiiAimComponent>();
-
+	LedgeComp = InPawn->GetComponentByClass<UPxiiLedgeTraversal>();
 	ActiveMapContext = DefaultMappingContext.GetName();
 	OnControlMappingUpdate();
 }
 
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	
 	if (IsMovementBlocked)
 	{
 		CachedMovementInput = FVector2D::ZeroVector;
 		return;
 	}
 	APawn* TargetPawn = GetPawn().Get();
-
+	
 	if (!TargetPawn)
 	{
 		return;
 	}
-
-	CachedMovementInput = InputActionValue.Get<FVector2D>();
+	
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 	
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	
 
+	if(LedgeComp->GetState() == ELedgeHangState::Hanging || LedgeComp->GetState() == ELedgeHangState::Shimmying)
+	{
+		LedgeInput = InputActionValue.Get<FVector2D>();
+		FVector2D Input = FVector2D(InputActionValue.Get<FVector2D>().X, 0.0f);
+		CachedMovementInput = FVector2D::ZeroVector;
+		LedgeComp->SetShimmyInput(-Input.X);
+		return;
+	}
+
+	CachedMovementInput = InputActionValue.Get<FVector2D>();
 	if(ASC && ASC->IsInputBlocked())
 	{
 		CachedMovementInput = FVector2D::ZeroVector;
@@ -101,9 +123,9 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 		{
 			//ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		}
-
+	
 		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Move] Pawn: %s Input control: %s"), *TargetPawn->GetClass()->GetName(), *CachedMovementInput.ToString());
-
+	
 		TargetPawn->AddMovementInput(ForwardDirection, CachedMovementInput.Y);
 		TargetPawn->AddMovementInput(RightDirection, CachedMovementInput.X);
 		//MoveCharacter(LastMovementInput, ForwardDirection, RightDirection);
@@ -116,13 +138,22 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
 {
-	if (IsAimBlocked) return;
+	if (IsAimBlocked)
+	{
+		return;	
+	}
+	
 	APawn* TargetPawn = GetPawn().Get();
 	if (!TargetPawn)
 	{
 		PXII_LOG(ELogCategory::Controls, Error, TEXT("DZ_LOG:: [Look] Pawn is Null"));
 		return;
 	}
+	//
+	// if(LedgeComp->GetState() == ELedgeHangState::Hanging || LedgeComp->GetState() == ELedgeHangState::Shimmying)
+	// {
+	// 	return;
+	// }
 	
 	CachedLookInput = InputActionValue.Get<FVector2D>();
 	FVector2D screenPos = GetViewportCenter();
@@ -131,9 +162,24 @@ void APxiiPlayerController::Look(const FInputActionValue& InputActionValue)
 	FVector2D modLookDelta = CachedLookInput * CachedSlowdownFactor;
 	
 	PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: [Look] Input control: %s"), *CachedLookInput.ToString());
-
-	TargetPawn->AddControllerYawInput(-modLookDelta.X * AimYawScale);
-	TargetPawn->AddControllerPitchInput(modLookDelta.Y * AimPitchScale);
+	
+	if (!bInvertMouseX)
+	{
+		TargetPawn->AddControllerYawInput(-modLookDelta.X * AimYawScale);
+	}
+	else
+	{
+		TargetPawn->AddControllerYawInput(modLookDelta.X * AimYawScale);
+	}
+	
+	if (!bInvertMouseY)
+	{
+		TargetPawn->AddControllerPitchInput(modLookDelta.Y * AimPitchScale);
+	}
+	else
+	{
+		TargetPawn->AddControllerPitchInput(-modLookDelta.Y * AimPitchScale);
+	}
 }
 
 FVector2D APxiiPlayerController::GetCachedLookInput() const
@@ -223,6 +269,20 @@ void APxiiPlayerController::OnInputMethodChanged(ECommonInputType inputType)
 	}
 }
 
+bool APxiiPlayerController::OnGrabLedgeInput()
+{
+	if (LedgeComp->GetState() == ELedgeHangState::None)
+	{
+		return LedgeComp->TryGrabLedge();
+	}
+	else if(LedgeComp->GetState() == ELedgeHangState::Hanging || LedgeComp->GetState() == ELedgeHangState::Shimmying)
+	{
+		return LedgeComp->TryLedgeJump(LedgeInput);
+	}
+	
+	return false;
+}
+
 void APxiiPlayerController::SwitchMappingControls_Implementation(int32 mapIndex)
 {
 	if(CurrentInputType != ECommonInputType::MouseAndKeyboard)
@@ -252,6 +312,34 @@ void APxiiPlayerController::OnControlMappingUpdate_Implementation()
 FString APxiiPlayerController::GetActiveMapDisplayName()
 {
 	return ActiveMapContext;
+}
+
+void APxiiPlayerController::OnJumpStarted()
+{
+	if(EnabledLedgeTraversal)
+	{
+		bool isGrabbingLedge = OnGrabLedgeInput();
+
+		if(isGrabbingLedge)
+		{
+			return;
+		}		
+	}
+	
+	APxiiCharacter* character = Cast<APxiiCharacter>(GetPawn());
+	if(character)
+	{
+		character->OnJumpStarted();
+	}
+}
+
+void APxiiPlayerController::OnJumpTriggered()
+{
+	APxiiCharacter* character = Cast<APxiiCharacter>(GetPawn());
+	if(character)
+	{
+		character->OnJumpTriggered();
+	}
 }
 
 UPlayerInputSubsystem* APxiiPlayerController::GetPlayerInputSubsystem() const

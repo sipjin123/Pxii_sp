@@ -50,6 +50,14 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ProcessBlasterFired();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnJumpStarted();
+	void OnJumpStarted_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnJumpTriggered();
+	void OnJumpTriggered_Implementation();
 	
 	void ProcessBlasterFired_Implementation();
 	
@@ -84,7 +92,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FAnimEventBroadcast AnimEventBroadcast;
-public:
 
 	virtual void ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource) override;
 };

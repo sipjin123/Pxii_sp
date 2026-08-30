@@ -34,6 +34,16 @@ void APxiiCharacter::PossessedBy(AController* NewController)
 }
 
 
+void APxiiCharacter::OnJumpStarted_Implementation()
+{
+	
+}
+
+void APxiiCharacter::OnJumpTriggered_Implementation()
+{
+	
+}
+
 void APxiiCharacter::ProcessBlasterFired_Implementation()
 {
 

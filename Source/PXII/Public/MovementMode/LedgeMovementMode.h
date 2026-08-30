@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "MovementMode.h"
-#include "DefaultMovementSet/Modes/SmoothWalkingMode.h"
+#include "DefaultMovementSet/Modes/FlyingMode.h"
 #include "LedgeMovementMode.generated.h"
 
 UCLASS(Blueprintable)
-class PXII_API ULedgeMovementMode : public UBaseMovementMode
+class PXII_API ULedgeMovementMode : public UFlyingMode
 {
 	GENERATED_BODY()
 	

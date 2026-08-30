@@ -15,6 +15,8 @@ DEFINE_LOG_CATEGORY(PXIITraceLogs);
 DEFINE_LOG_CATEGORY(PXIIAimLogs);
 DEFINE_LOG_CATEGORY(PXIIUILogs);
 DEFINE_LOG_CATEGORY(PXIIControlsLogs);
+DEFINE_LOG_CATEGORY(PXIILedgeTraversalLogs);
+
 
 void PXIILogUtility::Enable(ELogCategory Category)
 {
@@ -42,5 +44,6 @@ TSet<ELogCategory> PXIILogUtility::EnabledCategories =
 	ELogCategory::Ability,
 	ELogCategory::Equipment,
 	ELogCategory::SkillTree,
+	ELogCategory::LedgeTraversal,
 	//ELogCategory::Objective,
 };
