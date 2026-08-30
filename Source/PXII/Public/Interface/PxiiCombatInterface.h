@@ -68,6 +68,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	float OnGetCurrentDamage();
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	float OnGetCurrentMaxHealth();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	float OnGetCurrentHealth();
+	
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void ProcessDamageData(AActor* SourceActor, float Damage, float DamageSource);
 

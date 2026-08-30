@@ -98,4 +98,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable,Category="PXII|Movement")
 	void SetMoverMovementMode(FName MovementModeName);
+
+	virtual float OnGetCurrentHealth_Implementation() override;
+	virtual float OnGetCurrentMaxHealth_Implementation() override;
 };

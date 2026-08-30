@@ -134,7 +134,7 @@ bool UPxiiMathBPLibrary::GetRandomNavigablePointInRing(UObject* WorldContextObje
 	return false;
 }
 
-bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection)
+bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection, float DebugDuration)
 {
 	OutLocation = FVector::ZeroVector;
 
@@ -206,8 +206,8 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Acto
 
 		const bool bHit = World->SweepSingleByChannel(HitResult, Origin, CandidateLocation, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), QueryParams);
 
-		DrawDebugSphere(World, CandidateLocation, SphereRadius, 12, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 2.0f);
-		DrawDebugLine(World, Origin, CandidateLocation, bHit ? FColor::Red : FColor::Green, false, 5.0f, 0, 1.0f);
+		DrawDebugSphere(World, CandidateLocation, SphereRadius, 12, bHit ? FColor::Red : FColor::Green, false, DebugDuration, 0, 2.0f);
+		DrawDebugLine(World, Origin, CandidateLocation, bHit ? FColor::Red : FColor::Green, false, DebugDuration, 0, 1.0f);
 
 		if (bHit)
 		{
@@ -223,7 +223,7 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Acto
 
 		const bool bGroundHit = World->LineTraceSingleByChannel(GroundHit, GroundTraceStart, GroundTraceEnd, ECC_Visibility, QueryParams);
 
-		DrawDebugLine(World, GroundTraceStart, GroundTraceEnd, bGroundHit ? FColor::Blue : FColor::Yellow, false, 5.0f, 0, 1.0f);
+		DrawDebugLine(World, GroundTraceStart, GroundTraceEnd, bGroundHit ? FColor::Blue : FColor::Yellow, false, DebugDuration, 0, 1.0f);
 
 		if (!bGroundHit)
 		{
@@ -238,11 +238,11 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Acto
 
 		if (!NavSystem || !NavSystem->ProjectPointToNavigation(GroundLocation, NavLocation))
 		{
-			DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Orange, false, 5.0f, 0, 2.0f);
+			DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Orange, false, DebugDuration, 0, 2.0f);
 			continue;
 		}
 
-		DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Green, false, 5.0f, 0, 2.0f);
+		DrawDebugSphere(World, GroundLocation, SphereRadius, 12, FColor::Green, false, DebugDuration, 0, 2.0f);
 
 		ValidLocations.Add(GroundLocation);
 	}

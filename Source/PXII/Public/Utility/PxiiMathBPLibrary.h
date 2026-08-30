@@ -43,7 +43,7 @@ public:
 		TSubclassOf<UNavigationQueryFilter> FilterClass, FVector& OutLocation, int32& Attempts, int32 MaxAttempts, bool bRequireReachable, bool bDrawDebug = false, float Duration = 2.f);
 	
 	UFUNCTION(BlueprintCallable, Category="PXII|Math")
-	static bool GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection = EPxiiDirection::Back);
+	static bool GetRandomValidLocationActorDirection(const AActor* Actor, FVector Offset, int32 TraceCount, float DistanceBehind, float SphereRadius, float ConeAngle, FVector& OutLocation, EPxiiDirection PxiiDirection = EPxiiDirection::Back, float DebugDuration = .5f);
 
 	UFUNCTION(BlueprintPure, Category="Combat|Weapons")
 	static TArray<FVector> GenerateShotgunTrajectories(FVector Origin, FVector ForwardDirection, float Distance, int32 PelletCount, float SpreadAngleDegrees);

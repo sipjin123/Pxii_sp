@@ -168,3 +168,14 @@ void APxiiNPC::RegisterLastKnownAttacker_Implementation(AActor* Target, float Da
 	IPxiiCombatInterface::RegisterLastKnownAttacker_Implementation(Target, Damage);
 	LastKnownAttacker = Target;
 }
+
+float APxiiNPC::OnGetCurrentHealth_Implementation()
+{
+	return AttributeSet->Health.GetCurrentValue();
+}
+
+float APxiiNPC::OnGetCurrentMaxHealth_Implementation()
+{
+	
+	return AttributeSet->MaxHealth.GetCurrentValue();
+}

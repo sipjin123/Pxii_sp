@@ -165,3 +165,13 @@ void APxiiCharacterBase::SetMoverMovementMode(FName MovementModeName)
 	//MoverComponent->QueueNextMovementMode(MovementModeName);
 }
 
+float APxiiCharacterBase::OnGetCurrentHealth_Implementation()
+{
+	return AttributeSet->Health.GetCurrentValue();
+}
+
+float APxiiCharacterBase::OnGetCurrentMaxHealth_Implementation()
+{
+	return AttributeSet->MaxHealth.GetCurrentValue();
+}
+

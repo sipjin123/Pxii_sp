@@ -114,4 +114,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "PXII|AbilitySystem")
 	const class UPxiiAttributeSet* AttributeSet;
+	virtual float OnGetCurrentHealth_Implementation() override;
+	virtual float OnGetCurrentMaxHealth_Implementation() override;
 };
