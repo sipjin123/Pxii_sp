@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
 #include "PxiiCharacter.h"
+#include "Enum/PxiiEnemyType.h"
 #include "PxiiCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "Targeting/Targetable.h"
@@ -67,6 +68,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapons")
 	TObjectPtr<USkeletalMeshComponent> MeshRef;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool HasDirectorCommand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	ENPCState CurrentDirectorCommand;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsExecutingOffensive;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool IsAttacking;
