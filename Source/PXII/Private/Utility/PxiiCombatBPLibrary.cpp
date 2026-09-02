@@ -619,3 +619,47 @@ APawn* UPxiiCombatBPLibrary::GetPawnInFrontByBoxTrace(UObject* WorldContextObjec
     }
     return Cast<APawn>(Hit.GetActor());
 }
+
+TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount)
+{
+    TArray<int32> AttackTypes;
+    if (AttackerCount<=0)
+    {
+        return AttackTypes;
+    }
+    AttackTypes.Reserve(AttackerCount);
+    for (int32 i=0;i<AttackerCount;++i)
+    {
+        const int32 Roll=FMath::RandRange(0,99);
+        if (Roll<60)
+        {
+            AttackTypes.Add(0);
+        }
+        else if (Roll<90)
+        {
+            AttackTypes.Add(1);
+        }
+        else
+        {
+            AttackTypes.Add(2);
+        }
+    }
+    if (AttackerCount>1)
+    {
+        bool bHasSpecialOrPowerful=false;
+        for (const int32 AttackType : AttackTypes)
+        {
+            if (AttackType==1||AttackType==2)
+            {
+                bHasSpecialOrPowerful=true;
+                break;
+            }
+        }
+        if (!bHasSpecialOrPowerful)
+        {
+            const int32 Index=FMath::RandRange(0,AttackTypes.Num()-1);
+            AttackTypes[Index]=FMath::RandBool()?1:2;
+        }
+    }
+    return AttackTypes;
+}
