@@ -578,3 +578,25 @@ TArray<FVector> UPxiiMathBPLibrary::GenerateStrafeNodes(AActor* SourceActor,AAct
 	}
 	return Nodes;
 }
+
+TArray<int32> UPxiiMathBPLibrary::GetUniqueRandomIndices(int32 TotalNumber, int32 TargetNumber)
+{
+	TArray<int32> Indices;
+	if (TotalNumber<=0||TargetNumber<=0)
+	{
+		return Indices;
+	}
+	TargetNumber=FMath::Min(TargetNumber,TotalNumber);
+	Indices.Reserve(TotalNumber);
+	for (int32 i=0;i<TotalNumber;++i)
+	{
+		Indices.Add(i);
+	}
+	for (int32 i=Indices.Num()-1;i>0;--i)
+	{
+		const int32 RandomIndex=FMath::RandRange(0,i);
+		Indices.Swap(i,RandomIndex);
+	}
+	Indices.SetNum(TargetNumber);
+	return Indices;
+}

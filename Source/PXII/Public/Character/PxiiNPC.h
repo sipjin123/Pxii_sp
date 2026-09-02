@@ -7,6 +7,7 @@
 #include "PxiiCharacter.h"
 #include "Enum/PxiiEnemyType.h"
 #include "PxiiCharacterBase.h"
+#include "AI/PxiiCombatDirector.h"
 #include "GameFramework/Character.h"
 #include "Targeting/Targetable.h"
 #include "PxiiNPC.generated.h"
@@ -14,6 +15,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAnimEventBroadcastEnemy, int32, Payload, float, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttackState, bool, IsEnabled, int32, Payload);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCommandExecuteState, bool, IsSuccess, AActor*, Origin);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCommandState, bool, IsInstant);
 UCLASS()
 class PXII_API APxiiNPC : public ACharacter, public IAbilitySystemInterface, public IPxiiCombatInterface, public ITargetable
 {
@@ -73,7 +76,13 @@ public:
 	bool HasDirectorCommand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
-	ENPCState CurrentDirectorCommand;
+	bool IsAutonomous;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool StopWithinProximity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	FDirectorCommand CurrentDirectorCommand;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool IsExecutingOffensive;
@@ -109,6 +118,12 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FAttackState OnAbilityEnded;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FCommandState OnDirectorUpdated;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FCommandExecuteState OnCommandExecuted;
 	
 	UPROPERTY(BlueprintReadWrite)
 	AActor* LastKnownAttacker;

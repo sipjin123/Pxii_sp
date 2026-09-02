@@ -3,6 +3,7 @@
 
 #include "AI/PxiiCombatDirector.h"
 
+#include "Character/PxiiNPC.h"
 #include "Interface/PxiiCombatInterface.h"
 
 // Sets default values
@@ -27,7 +28,7 @@ void APxiiCombatDirector::Tick(float DeltaTime)
 
 }
 
-void APxiiCombatDirector::RegisterSquadMember(AActor* Member, EEnemy EnemyType)
+void APxiiCombatDirector::RegisterSquadMember(APxiiNPC* Member, EEnemy EnemyType)
 {
 	if (!IsValid(Member))
 	{
@@ -49,7 +50,7 @@ void APxiiCombatDirector::RegisterSquadMember(AActor* Member, EEnemy EnemyType)
 	SquadMembers.Add(NewMember);
 }
 
-void APxiiCombatDirector::UnregisterSquadMember(AActor* Member)
+void APxiiCombatDirector::UnregisterSquadMember(APxiiNPC* Member)
 {
 	if (!IsValid(Member))
 	{
@@ -120,6 +121,25 @@ float APxiiCombatDirector::GetEnemyCombatValue(EEnemy EnemyType) const
 		return 2.f;
 	default:
 		return 1.f;
+	}
+}
+
+void APxiiCombatDirector::GrantNewCommandToActor(FDirectorCommand NewCommand, AActor* SquadMemeber, AActor* NewTarget)
+{
+	if (!SquadMemeber) return;
+	
+	APxiiNPC* NpcActor = Cast<APxiiNPC>(SquadMemeber);
+	if (NpcActor && NewTarget)
+	{
+		FDirectorCommand NewCommandData;
+		NewCommandData.Payload = NewCommand.Payload;
+		NewCommandData.CommandType = NewCommand.CommandType;
+		NewCommandData.TargetActor = NewTarget;
+		NewCommandData.Delay = NewCommandData.Delay;
+		NewCommandData.bHasCommandCleared = true;
+		NpcActor->CurrentDirectorCommand = NewCommandData;
+		NpcActor->HasDirectorCommand = true;
+		NpcActor->OnDirectorUpdated.Broadcast(false);
 	}
 }
 

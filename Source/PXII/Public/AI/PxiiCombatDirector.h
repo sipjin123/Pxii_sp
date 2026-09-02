@@ -7,19 +7,42 @@
 #include "GameFramework/Actor.h"
 #include "PxiiCombatDirector.generated.h"
 
+class APxiiNPC;
+
 USTRUCT(BlueprintType)
 struct FPxiiSquadMember
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<AActor> Actor=nullptr;
+	TObjectPtr<APxiiNPC> Actor=nullptr;
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemy EnemyType=EEnemy::Brawler;
 
 	UPROPERTY(BlueprintReadOnly)
 	float CombatValue=1.f;
+};
+
+USTRUCT(BlueprintType)
+struct FDirectorCommand
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bHasCommandCleared = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int32 Payload = 0;
+	
+	UPROPERTY(BlueprintReadWrite)
+	ENPCState CommandType = ENPCState::Default;
+
+	UPROPERTY(BlueprintReadWrite)
+	AActor* TargetActor;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float Delay = 0.f;
 };
 
 UCLASS()
@@ -41,10 +64,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat|Squad")
-	void RegisterSquadMember(AActor* Member,EEnemy EnemyType);
+	void RegisterSquadMember(APxiiNPC* Member,EEnemy EnemyType);
 
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat|Squad")
-	void UnregisterSquadMember(AActor* Member);
+	void UnregisterSquadMember(APxiiNPC* Member);
 
 	UFUNCTION(BlueprintPure,Category="PXII|Combat|Squad")
 	float GetRemainingSquadStrength() const;
@@ -57,4 +80,13 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Combat|Squad")
 	float GetEnemyCombatValue(EEnemy EnemyType) const;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 PendingCommands;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int32 GeneratedCommands;
+	
+	UFUNCTION(BlueprintCallable)
+	void GrantNewCommandToActor(FDirectorCommand NewCommand, AActor* SquadMemeber, AActor* NewTarget);
 };

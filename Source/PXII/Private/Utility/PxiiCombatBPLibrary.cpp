@@ -61,16 +61,21 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
 		
         if (UPxiiCombatRegistrySubsystem* Spawner = SourceActor->GetWorld()->GetSubsystem<UPxiiCombatRegistrySubsystem>())
         {
-            FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(Spawner->GetGenericDamageEffect(), 1.0f, ContextHandle);
-            if(SpecHandle.IsValid())
-            {
-                // Add the magnitude value as a tag with payload.
-                const FGameplayTag DamageTag = FGameplayTag::RequestGameplayTag(FName("Combat.Damage"));
-                SpecHandle.Data->SetSetByCallerMagnitude(DamageTag, Magnitude);
+            const EFactionType SourceFaction = IPxiiCombatInterface::Execute_GetFaction(SourceActor);
+            const EFactionType TargetFaction = IPxiiCombatInterface::Execute_GetFaction(TargetActor);
 
-                InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+            if (SourceFaction != TargetFaction){
+                FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(Spawner->GetGenericDamageEffect(), 1.0f, ContextHandle);
+                if(SpecHandle.IsValid())
+                {
+                    // Add the magnitude value as a tag with payload.
+                    const FGameplayTag DamageTag = FGameplayTag::RequestGameplayTag(FName("Combat.Damage"));
+                    SpecHandle.Data->SetSetByCallerMagnitude(DamageTag, Magnitude);
+
+                    InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+                }
+                RegisterHitStatusEffectOnly(SourceActor, TargetActor, result, Magnitude, HitEffectType);
             }
-            RegisterHitStatusEffectOnly(SourceActor, TargetActor, result, Magnitude, HitEffectType);
         }
     }
     else

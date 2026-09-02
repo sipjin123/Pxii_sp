@@ -261,22 +261,29 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 			
 			const bool IsBossUnit = false;
 			const APawn* CharRef = Cast<APawn>(CurrHitActor);
-			if (IsBossUnit)
+
+			const EFactionType SourceFaction = IPxiiCombatInterface::Execute_GetFaction(GetOwner());
+			const EFactionType TargetFaction = IPxiiCombatInterface::Execute_GetFaction(CurrHitActor);
+
+			if (SourceFaction != TargetFaction)
 			{
-				// Process Body Part
-			}
-			else
-			{
-				HitTracedActors.Add(CurrHitActor);
-				if (CharRef)
+				if (IsBossUnit)
 				{
-					//for (int i = 0; i < 10 ; i++) // Simulating Spamming in network
-					ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
-					//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
+					// Process Body Part
 				}
 				else
 				{
-					// Process Body Part
+					HitTracedActors.Add(CurrHitActor);
+					if (CharRef)
+					{
+						//for (int i = 0; i < 10 ; i++) // Simulating Spamming in network
+						ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
+						//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
+					}
+					else
+					{
+						// Process Body Part
+					}
 				}
 			}
 		}
