@@ -13,8 +13,12 @@ public:
 	virtual void Initialize(FItemSaveData saveData) override;
 	virtual void Initialize(FPrimaryAssetId assetId) override;
 
-	virtual FItemSaveData GetSaveData() override;
 	virtual UBaseItemData* GetData() override;
+
+	UFUNCTION(BlueprintPure)
+	virtual UEquipmentItemData* GetEquipmentData();
+
+	virtual FItemSaveData GetSaveData() override;
 	
 private:
 

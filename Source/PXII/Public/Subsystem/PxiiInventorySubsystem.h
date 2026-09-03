@@ -7,13 +7,14 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, UBaseItemData*, itemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemove, FGuid, instanceId);
 
-UCLASS()
+UCLASS(BlueprintType)
 class PXII_API UPxiiInventorySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
 public:
 
+	UFUNCTION(BlueprintCallable)
 	void Initialize();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -25,12 +26,20 @@ public:
 	void FillSaveData_Implementation(FInventorySaveData& inventoryData);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void AddItemToInventory(UBaseItemData* itemData);
-	void AddItemToInventory_Implementation(UBaseItemData* itemData);
+	void AddItemToInventory(UBaseItemData* inItemData);
+	void AddItemToInventory_Implementation(UBaseItemData* inItemData);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void RemoveItemToInventory(FGuid instanceId);
 	void RemoveItemToInventory_Implementation(FGuid instanceId);
+
+	bool TryAddItemStack(UBaseItemData* InItemData);
+
+	UFUNCTION(BlueprintPure)
+	TArray<UBaseItem*> GetAllItemWithAssetId(FPrimaryAssetId assetId);
+	
+	UFUNCTION(BlueprintPure)
+	bool GetAllItems(TArray<UBaseItem*>& OutResult);
 
 private:
 

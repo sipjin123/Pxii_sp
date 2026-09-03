@@ -14,11 +14,11 @@ struct FEquipmentSlotContainer
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<UEquipmentSlot>> Slots;
 };
 
-UCLASS()
+UCLASS(BlueprintType)
 class PXII_API UPxiiEquipmentSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -33,7 +33,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnEquipmentChanged OnEquipmentChanged;
-	
+
+	UFUNCTION(BlueprintCallable)
 	void Initialize();
 	void FillEquipmentSaveData(FEquipmentSaveData& saveData);
 
@@ -50,8 +51,8 @@ public:
 	bool SwapItem_Implementation(EEquipmentSlot slotType, UBaseItem* item);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void UnequipItem(EEquipmentSlot slotType);
-	void UnequipItem_Implementation(EEquipmentSlot slotType);
+	bool UnequipItem(EEquipmentSlot slotType, int32 slotIndex);
+	bool UnequipItem_Implementation(EEquipmentSlot slotType, int32 slotIndex);
 
 	UFUNCTION(BlueprintPure)
 	UEquipmentSlot* GetAvailableSlot(EEquipmentSlot slotType, bool ignoreAvailability = false);
@@ -59,11 +60,17 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSlotOccupied(EEquipmentSlot slotType);
 
+	UFUNCTION(BlueprintPure)
+	FEquipmentSlotContainer GetSlotContainerOfType(EEquipmentSlot slotType);
+
+	UFUNCTION(BlueprintPure)
+	UEquipmentSlot* GetSlotIndexOfType(EEquipmentSlot SlotType, int32 slotIndex);
+	
 protected:
 	UEquipmentSlot* CreateEquipmentSlot(EEquipmentSlot slot, int32 slotINdex);
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TMap<EEquipmentSlot, FEquipmentSlotContainer> EquipmentSlots;
 };

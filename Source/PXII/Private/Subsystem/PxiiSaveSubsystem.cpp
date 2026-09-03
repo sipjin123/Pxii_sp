@@ -1,5 +1,8 @@
 ﻿#include "Subsystem/PxiiSaveSubsystem.h"
 
+#include "Components/PxiiEquipmentComponent.h"
+#include "Components/PxiiInventoryComponent.h"
+#include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerState/PxiiPlayerState.h"
 
@@ -32,6 +35,18 @@ bool UPxiiSaveSubsystem::SaveGame()
 	if (PlayerState)
 	{
 		PlayerState->FillSaveData(CurrentSaveData->Player);
+	}
+
+	UPxiiInventoryComponent* inventory = PC->GetPawn()->GetComponentByClass<UPxiiInventoryComponent>();
+	if(inventory)
+	{
+		inventory->FillSaveData(CurrentSaveData->Inventory);
+	}
+
+	UPxiiEquipmentComponent* equipComp = PC->GetPawn()->GetComponentByClass<UPxiiEquipmentComponent>();
+	if(equipComp)
+	{
+		equipComp->FillSaveData(CurrentSaveData->Equipment);
 	}
 
 	return UGameplayStatics::SaveGameToSlot(CurrentSaveData, SaveSlot, UserIndex);

@@ -1,5 +1,6 @@
 ﻿#include "Subsystem/PxiiEquipmentSubsystem.h"
 #include "Subsystem/PxiiSaveSubsystem.h"
+#include "Utility/PXIILogUtility.h"
 
 void UPxiiEquipmentSubsystem::Initialize()
 {
@@ -36,14 +37,20 @@ void UPxiiEquipmentSubsystem::Initialize()
 void UPxiiEquipmentSubsystem::FillEquipmentSaveData(FEquipmentSaveData& saveData)
 {
 	saveData.EquipmentSaveData.Empty();
+	
 	for(const auto& itemData : EquipmentSlots)
 	{
 		FEquipmentSlotSaveContainer slotContainer;
-		for(const auto& slotData : itemData.Value.Slots)
+		for(const TObjectPtr<UEquipmentSlot>& slotData : itemData.Value.Slots)
 		{
 			slotContainer.Slots.Add(slotData->GetSaveData());
 		}
 		saveData.EquipmentSaveData.Add(itemData.Key, slotContainer);
+
+		for(const auto& cont : slotContainer.Slots)
+		{
+			PXII_LOG(ELogCategory::Equipment, Log, TEXT("cont: assetID: %s InstanceID: %s"), *cont.AssetId.ToString(), *cont.InstanceId.ToString());
+		}
 	}
 }
 
@@ -66,7 +73,10 @@ void UPxiiEquipmentSubsystem::LoadEquipmentSaveData_Implementation(const FEquipm
 			}
 
 			FEquipmentSlotSaveData data = slotSaveData.GetSlot(slot->GetSlotIndex());
-			slot->LoadSaveData(data);
+			if(data.isEquipped)
+			{
+				slot->LoadSaveData(data);
+			}
 		}
 	}
 }
@@ -78,9 +88,19 @@ bool UPxiiEquipmentSubsystem::EquipItem_Implementation(EEquipmentSlot slotType, 
 	{
 		return false;
 	}
+	
+	if(!item)
+	{
+		return false;
+	}
 
 	UEquipmentItem* equipmentItem  = NewObject<UEquipmentItem>(this);
 	equipmentItem->Initialize(item->GetSaveData());
+	if(!equipmentItem)
+	{
+		return false;
+	}
+	
 	return slot->EquipItem(equipmentItem);
 }
 
@@ -102,9 +122,21 @@ bool UPxiiEquipmentSubsystem::SwapItem_Implementation(EEquipmentSlot slotType, U
 	return slot->EquipItem(equipmentItem);
 }
 
-void UPxiiEquipmentSubsystem::UnequipItem_Implementation(EEquipmentSlot slotType)
+bool UPxiiEquipmentSubsystem::UnequipItem_Implementation(EEquipmentSlot slotType, int32 slotIndex)
 {
-	
+	UEquipmentSlot* slot = GetSlotIndexOfType(slotType, slotIndex);
+	if(!slot)
+	{
+		return false;
+	}
+
+	if(!slot->IsSlotOccupied())
+	{
+		return false;
+	}
+
+	slot->UnequipItem();
+	return true;
 }
 
 UEquipmentSlot* UPxiiEquipmentSubsystem::GetAvailableSlot(EEquipmentSlot slotType, bool ignoreAvailability)
@@ -161,6 +193,32 @@ bool UPxiiEquipmentSubsystem::IsSlotOccupied(EEquipmentSlot slotType)
 	);
 
 	return bHasEquipped;
+}
+
+FEquipmentSlotContainer UPxiiEquipmentSubsystem::GetSlotContainerOfType(EEquipmentSlot slotType)
+{
+	if(!EquipmentSlots.Contains(slotType))
+	{
+		return FEquipmentSlotContainer();
+	}
+
+	return EquipmentSlots[slotType];
+}
+
+UEquipmentSlot* UPxiiEquipmentSubsystem::GetSlotIndexOfType(EEquipmentSlot SlotType, int32 slotIndex)
+{
+	FEquipmentSlotContainer cont = GetSlotContainerOfType(SlotType);
+	const int32 index = cont.Slots.IndexOfByPredicate([slotIndex](const UEquipmentSlot* slot)
+	{
+		return slot->GetSlotIndex() == slotIndex;
+	});
+
+	if(index == INDEX_NONE)
+	{
+		return nullptr;
+	}
+
+	return cont.Slots[index];
 }
 
 UEquipmentSlot* UPxiiEquipmentSubsystem::CreateEquipmentSlot(EEquipmentSlot slot, int32 slotIndex)

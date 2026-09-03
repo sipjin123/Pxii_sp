@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Engine/DataAsset.h"
+#include "Engine/Texture2D.h"
 #include "BaseItemData.generated.h"
 
 UENUM(BlueprintType)
@@ -16,14 +17,14 @@ class PXII_API UBaseItemData : public UPrimaryDataAsset
 	
 public:
 
-	UPROPERTY(BlueprintReadOnly)
-	FPrimaryAssetId AssetId;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText ItemDisplayName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EItemType ItemType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> Icon;

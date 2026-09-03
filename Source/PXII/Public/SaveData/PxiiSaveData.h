@@ -77,19 +77,21 @@ struct FEquipmentSlotSaveData : public FItemSaveData
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 SlotIndex;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	bool isEquipped;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FEquipmentSlotSaveContainer
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(BlueprintReadOnly)
 	TArray<FEquipmentSlotSaveData> Slots;
 
 	bool HasSlot(int32 slotIndex) const 
@@ -125,7 +127,7 @@ struct FEquipmentSaveData
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TMap<EEquipmentSlot, FEquipmentSlotSaveContainer> EquipmentSaveData;
 };
 
@@ -145,18 +147,18 @@ class PXII_API UPxiiSaveData : public USaveGame
 
 public:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FPlayerData Player;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FCheckpointData Checkpoint;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FCustomizationSaveData Customization;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FEquipmentSaveData Equipment;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FInventorySaveData Inventory;
 };

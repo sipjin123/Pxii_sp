@@ -1,5 +1,6 @@
 ﻿#include "Item/BaseItem.h"
 #include "Engine/AssetManager.h"
+#include "Utility/PXIILogUtility.h"
 
 void UBaseItem::Initialize(FPrimaryAssetId assetId)
 {
@@ -25,26 +26,39 @@ UBaseItemData* UBaseItem::GetData()
 	return BaseItemData;
 }
 
-int32 UBaseItem::GetItemQuantity()
+int32 UBaseItem::GetItemQuantity() const
 {
 	return Quantity;
+}
+
+void UBaseItem::AddStack()
+{
+	Quantity++;
 }
 
 FItemSaveData UBaseItem::GetSaveData()
 {
 	FItemSaveData data = FItemSaveData();
-	data.AssetId = BaseItemData->AssetId;
+	data.AssetId = BaseItemData->GetPrimaryAssetId();
 	data.InstanceId = GetInstanceId();
 	data.Quantity = GetItemQuantity();
 
+	PXII_LOG(ELogCategory::Inventory, Log, TEXT("SAVED DATA: ID: %s | InstanceID: %s | Quantity: %d"),
+		*data.AssetId.ToString(), *data.InstanceId.ToString(), data.Quantity);
+
 	return data;
+}
+
+bool UBaseItem::CanStack() const
+{
+	return GetItemQuantity() < BaseItemData->MaxStackSize;
 }
 
 UBaseItemData* UBaseItem::GetItemData(FPrimaryAssetId assetId)
 {
 	UAssetManager& manager = UAssetManager::Get();
 	FSoftObjectPath assetPath = manager.GetPrimaryAssetPath(assetId);
-
+	PXII_LOG(ELogCategory::Inventory, Log, TEXT("ASSET ID: %s"), *assetId.ToString());
 	if (assetPath.IsValid())
 	{
 		UBaseItemData* ItemData = Cast<UBaseItemData>(assetPath.TryLoad());

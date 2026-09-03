@@ -1,5 +1,6 @@
 ﻿#include "Subsystem/PxiiInventorySubsystem.h"
 #include "Engine/AssetManager.h"
+#include "Utility/PXIILogUtility.h"
 
 void UPxiiInventorySubsystem::Initialize()
 {
@@ -26,10 +27,16 @@ void UPxiiInventorySubsystem::FillSaveData_Implementation(FInventorySaveData& in
 	}
 }
 
-void UPxiiInventorySubsystem::AddItemToInventory_Implementation(UBaseItemData* itemData)
+void UPxiiInventorySubsystem::AddItemToInventory_Implementation(UBaseItemData* inItemData)
 {
+	if(TryAddItemStack(inItemData))
+	{
+		PXII_LOG(ELogCategory::Inventory, Log, TEXT("Item is added as stack"));
+		return;
+	}
+	
 	UBaseItem* item =  NewObject<UBaseItem>(this);
-	item->Initialize(itemData->AssetId);
+	item->Initialize(inItemData->GetPrimaryAssetId());
 	ItemData.Add(item->GetInstanceId(), item);
 }
 
@@ -41,6 +48,44 @@ void UPxiiInventorySubsystem::RemoveItemToInventory_Implementation(FGuid instanc
 	}
 
 	ItemData.Remove(instanceId);
+}
+
+bool UPxiiInventorySubsystem::TryAddItemStack(UBaseItemData* InItemData)
+{
+	bool isSuccess = false;
+	TArray<UBaseItem*> potentialItem = GetAllItemWithAssetId(InItemData->GetPrimaryAssetId());
+	for (UBaseItem* item : potentialItem)
+	{
+		if(!item->CanStack())
+		{
+			continue;
+		}
+
+		item->AddStack();
+		isSuccess = true;
+	}
+
+	return isSuccess;
+}
+
+TArray<UBaseItem*> UPxiiInventorySubsystem::GetAllItemWithAssetId(FPrimaryAssetId assetId)
+{
+	TArray<UBaseItem*> filteredItem;
+	for(const auto& item : ItemData)
+	{
+		if(item.Value->GetData()->GetPrimaryAssetId() == assetId)
+		{
+			filteredItem.Add(item.Value);
+		}
+	}
+	
+	return filteredItem;
+}
+
+bool UPxiiInventorySubsystem::GetAllItems(TArray<UBaseItem*>& OutResult)
+{
+	ItemData.GenerateValueArray(OutResult);
+	return !ItemData.IsEmpty();
 }
 
 

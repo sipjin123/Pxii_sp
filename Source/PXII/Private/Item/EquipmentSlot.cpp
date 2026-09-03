@@ -1,5 +1,6 @@
 ﻿#include "Item/EquipmentSlot.h"
 #include "Item/EquipmentItem.h"
+#include "Utility/PXIILogUtility.h"
 
 void UEquipmentSlot::Initialize(EEquipmentSlot InSlotType, int32 InSlotIndex)
 {
@@ -24,6 +25,10 @@ bool UEquipmentSlot::EquipItem(UEquipmentItem* InEquipmentItem)
 	EquippedItem = InEquipmentItem;
 	IsOccupied = true;
 
+	PXII_LOG(ELogCategory::Equipment, Log, TEXT("Item Name: %s"), *EquippedItem->GetData()->GetPrimaryAssetId().ToString());
+
+	OnSlotUpdated.Broadcast();
+	
 	return true;
 }
 
@@ -32,6 +37,13 @@ void UEquipmentSlot::UnequipItem()
 	//TODO(DZ) : Handle Unequip of GE/GA if any
 	IsOccupied = false;
 	EquippedItem = nullptr;
+
+	if(!EquippedItem)
+	{
+		PXII_LOG(ELogCategory::Equipment, Log, TEXT("Item unequipped"));
+	}
+
+	OnSlotUpdated.Broadcast();
 }
 
 bool UEquipmentSlot::IsSlotOccupied() const
@@ -41,13 +53,12 @@ bool UEquipmentSlot::IsSlotOccupied() const
 
 UEquipmentItemData* UEquipmentSlot::GetEquippedItem() const
 {
-	if(IsSlotOccupied())
+	if(!IsSlotOccupied())
 	{
 		return nullptr;
 	}
-
-	UEquipmentItemData* data = Cast<UEquipmentItemData>(EquippedItem->GetData());
-	return data;
+	
+	return EquippedItem->GetEquipmentData();
 }
 
 EEquipmentSlot UEquipmentSlot::GetSlotType() const
@@ -65,9 +76,13 @@ FEquipmentSlotSaveData UEquipmentSlot::GetSaveData()
 	FEquipmentSlotSaveData data = FEquipmentSlotSaveData();
 	data.isEquipped = IsSlotOccupied();
 	data.SlotIndex = GetSlotIndex();
-	data.Quantity = 1;
-	data.AssetId = EquippedItem->GetData()->AssetId;
-	data.InstanceId = EquippedItem->GetInstanceId();
+	data.Quantity = 0;
+	if(EquippedItem)
+	{
+		data.Quantity = 1;
+		data.AssetId = EquippedItem->GetData()->GetPrimaryAssetId();
+		data.InstanceId = EquippedItem->GetInstanceId();		
+	}
 
 	return data;
 }

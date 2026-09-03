@@ -3,7 +3,7 @@
 #include "SaveData/PxiiSaveData.h"
 #include "BaseItem.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType)
 class PXII_API UBaseItem : public UObject
 {
 	GENERATED_BODY()
@@ -13,16 +13,24 @@ public:
 	
 	virtual void Initialize(FPrimaryAssetId assetId);
 	virtual void Initialize(FItemSaveData saveData);
-	
+
+	UFUNCTION(BlueprintPure)
 	FGuid GetInstanceId();
 
+	UFUNCTION(BlueprintPure)
 	virtual UBaseItemData* GetData();
 
-	int32 GetItemQuantity();
+	UFUNCTION(BlueprintPure)
+	int32 GetItemQuantity() const;
+
+	UFUNCTION(BlueprintCallable)
+	void AddStack();
 
 	virtual FItemSaveData GetSaveData();
 
-private:
+	bool CanStack() const;
+
+protected:
 	
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	FGuid InstanceId;
