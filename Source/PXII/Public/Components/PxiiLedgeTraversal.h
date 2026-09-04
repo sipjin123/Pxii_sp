@@ -20,8 +20,7 @@ enum class ELedgeHangState : uint8
 	Shimmying,     // actively moving along the ledge
 	TurningCorner, // navigating an inside/outside corner
 	ClimbingUp,    // exiting via mantle
-	DroppingOff    // exiting via release/fall
-	,
+	DroppingOff,   // exiting via release/fall,
 	Jumping
 };
 
@@ -82,7 +81,7 @@ public:
 	void PlayShimmyMontage_Implementation(UAnimMontage* montage, FLedgeHangInfo ledgeInfo);
 	
 	UFUNCTION(BlueprintCallable)
-	void PostShimmy(FLedgeHangInfo ledgeInfo);
+	void PostShimmy(FLedgeHangInfo ledgeInfo, bool isInterrupted);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PlayLedgeJump(UAnimMontage* montage, FLedgeHangInfo ledgeInfo);
@@ -126,6 +125,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Ledge Traversal|Detection")
     float GrabTraceDistance = 90.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ledge Traversal|Detection", meta = (AllowPrivateAccess = "true"))
+	float MinShimmyDistance = 40.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Ledge Traversal|Detection", meta = (AllowPrivateAccess = "true"))
+	float MaxShimmyDistance = 200.0f;
+
     UPROPERTY(EditDefaultsOnly, Category = "Ledge Traversal|Detection", meta = (AllowPrivateAccess = "true"))
     float MinGrabHeight = 100.0f;
 
@@ -156,6 +160,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ledge Traversal|Jump")
 	float MaxHorizontalLedgeJumpDistance = 400.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Ledge Traversal|Jump")
+	FVector MotionWarpOffsetDown;
+
+	UPROPERTY(EditAnywhere, Category = "Ledge Traversal|Jump")
+	FVector MotionWarpOffsetUp;
 	
     // --- Shimmy ---
     UPROPERTY(EditDefaultsOnly, Category = "Ledge Traversal|Shimmy")
@@ -231,6 +241,9 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimInstance> AnimInst;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ForwardOffset = 200.f;
 	
 	UPROPERTY()
 	TObjectPtr<UCapsuleComponent> CapsuleComp;
@@ -243,16 +256,18 @@ private:
     float CurrentShimmyInput = 0.0f;
 	
 	
-    FLedgeHangInfo TraceForLedge(const FVector& FromLocation, const FVector& Forward) const;
+    FLedgeHangInfo TraceForLedge(const FVector& FromLocation, const FVector& Forward, bool isShimmy = false) const;
     FLedgeHangInfo TraceForLedgeAtOffset(float LateralOffset) const;
 	FLedgeHangInfo TraceForLedgeJump(const FVector2D& JumpInput) const;
 	
     void UpdateShimmy(float DeltaTime);
-	void UpdateMotionWarp(const FLedgeHangInfo& LedgeInfo);
+	void UpdateMotionWarp(const FLedgeHangInfo& LedgeInfo, FVector InOffsetVector = FVector::ZeroVector);
     void HandleCornerTransition(const FLedgeHangInfo& NewLedgeInfo, bool bIsInsideCorner);
-    void SnapToLedge(const FLedgeHangInfo& LedgeInfo);
+    void SnapToLedge(const FLedgeHangInfo& LedgeInfo, bool snapToLocation = false);
 
 	UAnimInstance* GetAnimInstance();
+
+	void ToggleCollision(bool disable);
 
     UFUNCTION()
     void OnClimbMontageEnded(UAnimMontage* Montage, bool bInterrupted);

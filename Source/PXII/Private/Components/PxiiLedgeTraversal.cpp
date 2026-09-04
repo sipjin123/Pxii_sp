@@ -33,71 +33,6 @@ void UPxiiLedgeTraversal::BeginPlay()
     }
 }
 
-FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedge(const FVector& FromLocation, const FVector& Forward) const
-{
-    FLedgeHangInfo Info;
-    if (!OwnerCharacter)
-    {
-        return Info;   
-    }
-
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(OwnerCharacter);
-
-    // Forward trace to find wall
-    FVector TraceEnd = FromLocation + (Forward * GrabTraceDistance);
-    FHitResult WallHit;
-    if (!GetWorld()->LineTraceSingleByChannel(WallHit, FromLocation, TraceEnd, ECC_Visibility, Params))
-    {
-        DrawDebugSphere(GetWorld(), FromLocation, 5.0f, 8, FColor::Cyan, false,DebugDuration);
-        DrawDebugLine(GetWorld(), FromLocation, TraceEnd, FColor::Red, false,DebugDuration, 0, 2.0f);
-        return Info;
-    }
-    
-    DrawDebugLine(GetWorld(), FromLocation, TraceEnd, WallHit.bBlockingHit ? FColor::Red : FColor::Green, false,
-DebugDuration, 0, 2.0f);
-
-    if (WallHit.bBlockingHit)
-    {
-        DrawDebugSphere(GetWorld(), WallHit.ImpactPoint, 5.0f, 8, FColor::Yellow, false,DebugDuration);
-    }
-    
-    // Downward trace from above the wall hit to find the actual edge
-    FVector ProbeStart = WallHit.ImpactPoint + (Forward * -5.0f) + FVector(0, 0, MaxGrabHeight * 0.5f);
-    FVector ProbeEnd = ProbeStart - FVector(0, 0, MaxGrabHeight);
-
-    FHitResult EdgeHit;
-    
-    if (!GetWorld()->LineTraceSingleByChannel(EdgeHit, ProbeStart, ProbeEnd, ECC_Visibility, Params))
-    {
-        return Info;
-    }
-
-    DrawDebugLine(GetWorld(), ProbeStart, ProbeEnd, EdgeHit.bBlockingHit ? FColor::Red : FColor::Green, false,
-    DebugDuration, 0, 2.0f);
-
-    if (EdgeHit.bBlockingHit)
-    {
-        DrawDebugSphere(GetWorld(), EdgeHit.ImpactPoint, 5.0f, 8, FColor::Yellow, false,DebugDuration);
-    }
-
-    float Height = EdgeHit.ImpactPoint.Z - OwnerCharacter->GetActorLocation().Z;
-    PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG: ImpactPoint: %s  OwnerLocation: %s Height: %f"), *EdgeHit.ImpactPoint.ToString(), *OwnerCharacter->GetActorLocation().ToString(), Height );
-    if (Height < MinGrabHeight || Height > MaxGrabHeight)
-    {
-        return Info;
-    }
-
-    // Ledge direction — perpendicular to the wall normal, on the horizontal plane
-    Info.WallNormal = WallHit.ImpactNormal;
-    Info.LedgeDirection = FVector::CrossProduct(FVector::UpVector, WallHit.ImpactNormal).GetSafeNormal();
-    Info.EdgeLocation = EdgeHit.ImpactPoint;
-    Info.ObstacleHeight = Height;
-    Info.bValid = true;
-
-    return Info;
-}
-
 void UPxiiLedgeTraversal::UpdateMovementMode_Implementation(FName movementMode)
 {
     
@@ -206,8 +141,8 @@ bool UPxiiLedgeTraversal::TryLedgeJump(FVector2D JumpInput)
     }
 
     CurrentState = ELedgeHangState::Jumping;
-    
-    UAnimMontage* DirMontage = (JumpInput.Y > 0) ? LedgeJumpMontage : LedgeDownMontage;
+    bool isUpDir = JumpInput.Y > 0;
+    UAnimMontage* DirMontage = isUpDir ? LedgeJumpMontage : LedgeDownMontage;
     if(!FMath::IsNearlyZero(JumpInput.X))
     {
         DirMontage = (JumpInput.X > 0) ? LedgeRightJumpMontage : LedgeLeftMontage;
@@ -216,20 +151,13 @@ bool UPxiiLedgeTraversal::TryLedgeJump(FVector2D JumpInput)
     {
         PlayLedgeJump(DirMontage, TargetLedge);
     }
-    else
-    {
-        // No montage authored — snap directly, same fallback pattern as HandleCornerTransition
-        CurrentLedge = TargetLedge;
-        SnapToLedge(CurrentLedge);
-        CurrentState = ELedgeHangState::Hanging;
-    }
 
     return true;
-    
 }
 
 void UPxiiLedgeTraversal::PlayLedgeEntry_Implementation(UAnimMontage* montage, FLedgeHangInfo ledgeInfo)
 {
+    ToggleCollision(true);
     CurrentLedge = ledgeInfo;
     UpdateMotionWarp(CurrentLedge);
     CurrentHangLocation = GetAdjustedLedgeLocation(ledgeInfo);
@@ -237,7 +165,8 @@ void UPxiiLedgeTraversal::PlayLedgeEntry_Implementation(UAnimMontage* montage, F
 
 void UPxiiLedgeTraversal::PostLedgeEntry(FLedgeHangInfo ledgeInfo)
 {
-    SnapToLedge(ledgeInfo);
+    ToggleCollision(false);
+    SnapToLedge(ledgeInfo, true);
     CurrentState = ELedgeHangState::Hanging;
 }
 
@@ -249,17 +178,17 @@ void UPxiiLedgeTraversal::PlayShimmyMontage_Implementation(UAnimMontage* montage
     CurrentHangLocation = GetAdjustedLedgeLocation(ledgeInfo);
 }
 
-void UPxiiLedgeTraversal::PostShimmy(FLedgeHangInfo ledgeInfo)
+void UPxiiLedgeTraversal::PostShimmy(FLedgeHangInfo ledgeInfo, bool isInterrupted)
 {
     CanShimmy = true;
-    SnapToLedge(CurrentLedge);
+    SnapToLedge(CurrentLedge, !isInterrupted);
     CurrentState = ELedgeHangState::Hanging;
-    PXII_LOG(ELogCategory::LedgeTraversal, Log, TEXT("Post SHIMY"));
+    PXII_LOG(ELogCategory::LedgeTraversal, Log, TEXT("Post SHIMY : INTERRUPTED: %s"), isInterrupted ? TEXT("YES") : TEXT("NO"));
 }
 
 void UPxiiLedgeTraversal::PlayLedgeJump_Implementation(UAnimMontage* montage, FLedgeHangInfo ledgeInfo)
 {
-    SetShimmyInput(0.0f);
+    ToggleCollision(true);
     CurrentLedge = ledgeInfo;
     UpdateMotionWarp(CurrentLedge);
     CurrentHangLocation = GetAdjustedLedgeLocation(ledgeInfo);
@@ -267,11 +196,13 @@ void UPxiiLedgeTraversal::PlayLedgeJump_Implementation(UAnimMontage* montage, FL
 
 void UPxiiLedgeTraversal::PostLedgeJump(FLedgeHangInfo ledgeInfo)
 {
-    SnapToLedge(ledgeInfo);
+    SetShimmyInput(0.0f);
+    ToggleCollision(false);
+    SnapToLedge(ledgeInfo, true);
     CurrentState = ELedgeHangState::Hanging;
 }
 
-void UPxiiLedgeTraversal::SnapToLedge(const FLedgeHangInfo& LedgeInfo)
+void UPxiiLedgeTraversal::SnapToLedge(const FLedgeHangInfo& LedgeInfo, bool snapToLocation)
 {
     CapsuleHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
     CapsuleRadius = CapsuleComp->GetScaledCapsuleRadius();
@@ -286,6 +217,10 @@ void UPxiiLedgeTraversal::SnapToLedge(const FLedgeHangInfo& LedgeInfo)
     HangRotation.Roll = 0.0f;
 
     OwnerCharacter->SetActorRotation(HangRotation);
+    if(snapToLocation)
+    {
+        OwnerCharacter->SetActorLocation(HangLocation);
+    }
 
     DrawDebugSphere(GetWorld(), HangLocation, 25.0f, 8, FColor::Yellow, false,DebugDuration);
 
@@ -301,6 +236,18 @@ UAnimInstance* UPxiiLedgeTraversal::GetAnimInstance()
     return AnimInst;
 }
 
+void UPxiiLedgeTraversal::ToggleCollision(bool disable)
+{
+    if(disable)
+    {
+        CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
+    else
+    {
+        CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    }
+}
+
 void UPxiiLedgeTraversal::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -311,166 +258,13 @@ void UPxiiLedgeTraversal::TickComponent(float DeltaTime, ELevelTick TickType, FA
     }
 }
 
-FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedgeAtOffset(float LateralOffset) const
+void UPxiiLedgeTraversal::UpdateMotionWarp(const FLedgeHangInfo& LedgeInfo, FVector InOffsetVector)
 {
-    FVector ProbeOrigin = CurrentHangLocation
-        + (CurrentLedge.LedgeDirection * LateralOffset)
-        + FVector(0, 0, 40.0f);
-
-    return TraceForLedge(ProbeOrigin, -CurrentLedge.WallNormal * 1.0f); // trace toward the wall
-}
-
-FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedgeJump(const FVector2D& JumpInput) const
-{
-    FLedgeHangInfo Info;
-    if (!OwnerCharacter || CurrentState == ELedgeHangState::None)
+    if (MotionWarpingComp)
     {
-        return Info;   
-    }
-
-    
-    // Build a world-space jump direction from lateral (along ledge) and outward (away from wall) input
-    float lateralDir = FMath::Sign(JumpInput.X);
-    float verticalDir = FMath::Sign(JumpInput.Y);
-
-    FVector JumpDirection = FVector(0.f, lateralDir, verticalDir);
-    if (JumpDirection.IsNearlyZero())
-    {
-        JumpDirection = FVector::UpVector;
-    }
-
-    JumpDirection = JumpDirection.GetSafeNormal();
-
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(OwnerCharacter);
-    
-    FVector LaunchOrigin = CurrentHangLocation + (CurrentLedge.LedgeDirection * -JumpDirection.Y * MaxHorizontalLedgeJumpDistance)
-        + (FVector::UpVector * JumpDirection.Z * MaxLedgeJumpDistance)
-        + FVector(0, 0, 40.0f);
-
-    FVector TraceEnd = LaunchOrigin + (-CurrentLedge.WallNormal * GrabTraceDistance);
-
-    // if(!FMath::IsNearlyZero(JumpInput.X))
-    // {
-    //     LaunchOrigin = CurrentHangLocation + (FVector::ForwardVector * 5.f) + (FVector::RightVector * JumpInput.X * MaxHorizontalLedgeJumpDistance);
-    //     TraceEnd = LaunchOrigin + (FVector::UpVector * MaxLedgeJumpDistance);
-    // }
-
-    FHitResult WallHit;
-    if (!GetWorld()->LineTraceSingleByChannel(WallHit, LaunchOrigin, TraceEnd, ECC_Visibility, Params))
-    {
-        DrawDebugSphere(GetWorld(), LaunchOrigin, 5.0f, 8, FColor::Green, false, DebugDuration);
-        DrawDebugLine(GetWorld(), LaunchOrigin, TraceEnd, FColor::Green, false,
-    DebugDuration, 0, 2.0f);
-        return Info;
-    }
-
-    DrawDebugSphere(GetWorld(), LaunchOrigin, 5.0f, 8, FColor::Orange, false, DebugDuration);
-    DrawDebugLine(GetWorld(), LaunchOrigin, TraceEnd, FColor::Orange, false, DebugDuration, 0, 2.0f);
-
-    if (!WallHit.bBlockingHit)
-    {
-        return Info;
-    }
-
-    DrawDebugSphere(GetWorld(), WallHit.ImpactPoint, 5.0f, 8, FColor::Blue, false, DebugDuration);
-
-    // Reject the wall we're already hanging on, so a near-zero input doesn't just re-grab in place
-    if (FVector::DotProduct(WallHit.ImpactNormal, CurrentLedge.WallNormal) > 0.9f
-        && FVector::DistSquared(WallHit.ImpactPoint, CurrentLedge.EdgeLocation) < FMath::Square(MinLedgeJumpDistance))
-    {
-        return Info;
-    }
-
-    // Downward probe from above the wall hit to find the actual edge, same approach as TraceForLedge
-    FVector jumpDir = FVector::UpVector * JumpInput.Y;
-    FVector ImpactPointOffset = WallHit.ImpactPoint;
-    FVector ProbeStart = ImpactPointOffset + (jumpDir * 5.0f) + (jumpDir * MaxLedgeJumpDistance);
-    FVector ProbeEnd = ProbeStart - jumpDir * MaxLedgeJumpDistance;
-
-    /* SHIMY EDGE Trace Reference
-    FVector ProbeStart = WallHit.ImpactPoint + (Forward * -5.0f) + FVector(0, 0, MaxGrabHeight * 0.5f);
-    FVector ProbeEnd = ProbeStart - FVector(0, 0, MaxGrabHeight);
-    */
-    if(!FMath::IsNearlyZero(JumpInput.X))
-    {
-        jumpDir = FVector::DownVector;
-        ImpactPointOffset = WallHit.ImpactPoint + FVector::UpVector * 100.0f + (CurrentLedge.WallNormal * 5.0f);
-        ProbeStart = ImpactPointOffset + (jumpDir * 5.0f);
-        ProbeEnd = ProbeStart + jumpDir * MaxLedgeJumpDistance;    
-    }
-
-    if(!FMath::IsNearlyZero(JumpInput.Y))
-    {
-        jumpDir = FVector::UpVector * JumpInput.Y;
-        ProbeStart = ImpactPointOffset + (jumpDir * 5.0f);
-        ProbeEnd = ProbeStart - (jumpDir * MaxLedgeJumpDistance);
-
-        if(JumpInput.Y < 0)
-        {
-            // ProbeStart = GetLedgeLocation() + (jumpDir * 5.0f) + (jumpDir * 60.0f);
-            ProbeStart = ImpactPointOffset + (jumpDir * 5.0f) + (jumpDir * 60.0f);
-            ProbeEnd = ProbeStart + jumpDir * MaxLedgeJumpDistance;
-        }
-    }
-
-    
-    DrawDebugSphere(GetWorld(), ProbeStart, 10.0f, 8, FColor::Yellow, false, DebugDuration);
-    DrawDebugLine(GetWorld(), ProbeStart, ProbeEnd, FColor::Orange, false, DebugDuration, 0, 2.0f);
-
-    FHitResult EdgeHit;
-    if (!GetWorld()->LineTraceSingleByChannel(EdgeHit, ProbeStart, ProbeEnd, ECC_Visibility, Params))
-    {
-        return Info;
-    }
-    
-    if (!EdgeHit.bBlockingHit)
-    {
-        return Info;
-    }
-
-    DrawDebugSphere(GetWorld(), EdgeHit.ImpactPoint, 10.0f, 20, FColor::Emerald, false, DebugDuration);
-
-    // Height delta relative to the ledge we're leaving, not the character root — we're mid-air, not standing
-    const float HeightDelta = FMath::Abs(EdgeHit.ImpactPoint.Z - CurrentLedge.EdgeLocation.Z);
-    if (HeightDelta > LedgeJumpMaxHeightDelta)
-    {
-        return Info;
-    }
-
-    const float JumpDistance = FVector::Dist(CurrentLedge.EdgeLocation, EdgeHit.ImpactPoint);
-    if(!FMath::IsNearlyZero(JumpDirection.Z))
-    {
-        if (JumpDistance < MinLedgeJumpDistance || JumpDistance > MaxLedgeJumpDistance)
-        {
-            return Info;
-        }        
-    }
-    else
-    {
-        if ( JumpDistance < MinHorizontalLedgeJumpDistance || JumpDistance > MaxHorizontalLedgeJumpDistance)
-        {
-            return Info;
-        }
-    }
-
-
-    Info.WallNormal = WallHit.ImpactNormal;
-    Info.LedgeDirection = FVector::CrossProduct(FVector::RightVector, WallHit.ImpactNormal).GetSafeNormal();
-    Info.EdgeLocation = EdgeHit.ImpactPoint;
-    Info.ObstacleHeight = EdgeHit.ImpactPoint.Z - OwnerCharacter->GetActorLocation().Z;
-    Info.bValid = true;
-
-    return Info;
-}
-
-void UPxiiLedgeTraversal::UpdateMotionWarp(const FLedgeHangInfo& LedgeInfo)
-{
-    if (!MotionWarpingComp)
-    {
-        FVector TopSurface = LedgeInfo.EdgeLocation + (LedgeInfo.WallNormal * CapsuleRadius) + FVector(0, 0, HangHandOffsetZ - CapsuleHalfHeight);
+        FVector TopSurface = GetAdjustedLedgeLocation(LedgeInfo);
         MotionWarpingComp->AddOrUpdateWarpTargetFromLocation(MotionWarpKey, TopSurface);
-        DrawDebugSphere(GetWorld(), TopSurface, 5.0f, 8, FColor::Purple, false,DebugDuration);
+        DrawDebugSphere(GetWorld(), TopSurface, 5.0f, 8, FColor::Green, false,DebugDuration);
     }
 }
 
@@ -552,6 +346,225 @@ void UPxiiLedgeTraversal::DropOff()
 
     CurrentState = ELedgeHangState::None;
     //MovementComp->SetMovementMode(MOVE_Falling);
+}
+
+FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedge(const FVector& FromLocation, const FVector& Forward, bool isShimmy) const
+{
+    FLedgeHangInfo Info;
+    if (!OwnerCharacter)
+    {
+        return Info;   
+    }
+
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(OwnerCharacter);
+
+    // Forward trace to find wall
+    FVector TraceEnd = FromLocation + (Forward * GrabTraceDistance);
+    FHitResult WallHit;
+    if (!GetWorld()->LineTraceSingleByChannel(WallHit, FromLocation, TraceEnd, ECC_Visibility, Params))
+    {
+        DrawDebugSphere(GetWorld(), FromLocation, 5.0f, 8, FColor::Cyan, false,DebugDuration);
+        DrawDebugLine(GetWorld(), FromLocation, TraceEnd, FColor::Red, false,DebugDuration, 0, 2.0f);
+        return Info;
+    }
+    
+    DrawDebugLine(GetWorld(), FromLocation, TraceEnd, WallHit.bBlockingHit ? FColor::Red : FColor::Green, false,
+DebugDuration, 0, 2.0f);
+
+    if (WallHit.bBlockingHit)
+    {
+        DrawDebugSphere(GetWorld(), WallHit.ImpactPoint, 5.0f, 8, FColor::Yellow, false,DebugDuration);
+    }
+    
+    // Downward trace from above the wall hit to find the actual edge
+    FVector ProbeStart = WallHit.ImpactPoint + (Forward * -5.0f) + FVector(0, 0, MaxGrabHeight * 0.5f);
+    FVector ProbeEnd = ProbeStart - FVector(0, 0, MaxGrabHeight);
+
+    FHitResult EdgeHit;
+    
+    if (!GetWorld()->LineTraceSingleByChannel(EdgeHit, ProbeStart, ProbeEnd, ECC_Visibility, Params))
+    {
+        return Info;
+    }
+
+    DrawDebugLine(GetWorld(), ProbeStart, ProbeEnd, EdgeHit.bBlockingHit ? FColor::Red : FColor::Green, false,
+    DebugDuration, 0, 2.0f);
+
+    if (EdgeHit.bBlockingHit)
+    {
+        DrawDebugSphere(GetWorld(), EdgeHit.ImpactPoint, 5.0f, 8, FColor::Yellow, false,DebugDuration);
+    }
+
+    float Height = EdgeHit.ImpactPoint.Z - OwnerCharacter->GetActorLocation().Z;
+    PXII_LOG(ELogCategory::General, Log, TEXT("DZ_LOG: ImpactPoint: %s  OwnerLocation: %s Height: %f"), *EdgeHit.ImpactPoint.ToString(), *OwnerCharacter->GetActorLocation().ToString(), Height );
+
+    float min = isShimmy ? MinShimmyDistance : MinGrabHeight;
+    float max = isShimmy ? MaxShimmyDistance : MaxGrabHeight;
+    
+    if (Height < min || Height > max)
+    {
+        PXII_LOG(ELogCategory::LedgeTraversal, Log, TEXT("DZ_LOG: Height: %f"), Height );
+        return Info;
+    }
+    
+    // Ledge direction — perpendicular to the wall normal, on the horizontal plane
+    Info.WallNormal = WallHit.ImpactNormal;
+    Info.LedgeDirection = FVector::CrossProduct(FVector::UpVector, WallHit.ImpactNormal).GetSafeNormal();
+    Info.EdgeLocation = EdgeHit.ImpactPoint;
+    Info.ObstacleHeight = Height;
+    Info.bValid = true;
+
+    return Info;
+}
+
+FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedgeAtOffset(float LateralOffset) const
+{
+    PXII_LOG(ELogCategory::LedgeTraversal, Log, TEXT("Ledge Direction: %s"), *CurrentLedge.LedgeDirection.ToString());
+    FVector ProbeOrigin = CurrentHangLocation
+        + (CurrentLedge.LedgeDirection * LateralOffset)
+        + FVector(0, 0, 40.0f);
+
+    return TraceForLedge(ProbeOrigin, -CurrentLedge.WallNormal * 1.0f, true); // trace toward the wall
+}
+
+FLedgeHangInfo UPxiiLedgeTraversal::TraceForLedgeJump(const FVector2D& JumpInput) const
+{
+    FLedgeHangInfo Info;
+    if (!OwnerCharacter || CurrentState == ELedgeHangState::None)
+    {
+        return Info;   
+    }
+
+    
+    // Build a world-space jump direction from lateral (along ledge) and outward (away from wall) input
+    float lateralDir = FMath::Sign(JumpInput.X);
+    float verticalDir = FMath::Sign(JumpInput.Y);
+
+    FVector JumpDirection = FVector(0.f, lateralDir, verticalDir);
+    if (JumpDirection.IsNearlyZero())
+    {
+        JumpDirection = FVector::UpVector;
+    }
+
+    JumpDirection = JumpDirection.GetSafeNormal();
+
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(OwnerCharacter);
+
+    float verticalDist = FMath::Max(JumpDirection.Z * MaxLedgeJumpDistance, 0.0f);
+    FVector LaunchOrigin = CurrentHangLocation + (CurrentLedge.LedgeDirection * -JumpDirection.Y * MaxHorizontalLedgeJumpDistance)
+        + (FVector::UpVector * verticalDist)
+        + FVector(0, 0, 40.0f);
+
+    FVector TraceEnd = LaunchOrigin + (-CurrentLedge.WallNormal * GrabTraceDistance);
+
+    FHitResult WallHit;
+    if (!GetWorld()->LineTraceSingleByChannel(WallHit, LaunchOrigin, TraceEnd, ECC_Visibility, Params))
+    {
+        DrawDebugSphere(GetWorld(), LaunchOrigin, 5.0f, 8, FColor::Green, false, DebugDuration);
+        DrawDebugLine(GetWorld(), LaunchOrigin, TraceEnd, FColor::Green, false,
+    DebugDuration, 0, 2.0f);
+        return Info;
+    }
+
+    DrawDebugSphere(GetWorld(), LaunchOrigin, 5.0f, 8, FColor::Orange, false, DebugDuration);
+    DrawDebugLine(GetWorld(), LaunchOrigin, TraceEnd, FColor::Orange, false, DebugDuration, 0, 2.0f);
+
+    if (!WallHit.bBlockingHit)
+    {
+        return Info;
+    }
+
+    DrawDebugSphere(GetWorld(), WallHit.ImpactPoint, 5.0f, 8, FColor::Blue, false, DebugDuration);
+
+    // Reject the wall we're already hanging on, so a near-zero input doesn't just re-grab in place
+    if (FVector::DotProduct(WallHit.ImpactNormal, CurrentLedge.WallNormal) > 0.9f
+        && FVector::DistSquared(WallHit.ImpactPoint, CurrentLedge.EdgeLocation) < FMath::Square(MinLedgeJumpDistance))
+    {
+        return Info;
+    }
+
+    // Downward probe from above the wall hit to find the actual edge, same approach as TraceForLedge
+    FVector jumpDir = FVector::UpVector * JumpInput.Y;
+    FVector ImpactPointOffset = WallHit.ImpactPoint + (WallHit.ImpactNormal * 5.0f); 
+    FVector ProbeStart = ImpactPointOffset + (jumpDir * 5.0f) + (jumpDir * MaxLedgeJumpDistance);
+    FVector ProbeEnd = ProbeStart - jumpDir * MaxLedgeJumpDistance;
+
+    /* SHIMY EDGE Trace Reference
+    FVector ProbeStart = WallHit.ImpactPoint + (Forward * -5.0f) + FVector(0, 0, MaxGrabHeight * 0.5f);
+    FVector ProbeEnd = ProbeStart - FVector(0, 0, MaxGrabHeight);
+    */
+    if(!FMath::IsNearlyZero(JumpInput.X))
+    {
+        jumpDir = FVector::DownVector;
+        ImpactPointOffset = WallHit.ImpactPoint + FVector::UpVector * 100.0f + (CurrentLedge.WallNormal * 5.0f);
+        ProbeStart = ImpactPointOffset + (jumpDir * 5.0f);
+        ProbeEnd = ProbeStart + jumpDir * MaxLedgeJumpDistance;    
+    }
+
+    if(!FMath::IsNearlyZero(JumpInput.Y))
+    {
+        jumpDir = FVector::UpVector * JumpInput.Y;
+        ProbeStart = ImpactPointOffset + (jumpDir * 5.0f);
+        ProbeEnd = ProbeStart - (jumpDir * MaxLedgeJumpDistance);
+
+        if(JumpInput.Y < 0)
+        {
+            // ProbeStart = GetLedgeLocation() + (jumpDir * 5.0f) + (jumpDir * 60.0f);
+            ProbeStart = ImpactPointOffset + (jumpDir * 5.0f);
+            ProbeEnd = ProbeStart + jumpDir * MaxLedgeJumpDistance;
+        }
+    }
+
+    
+    DrawDebugSphere(GetWorld(), ProbeStart, 10.0f, 8, FColor::Yellow, false, DebugDuration);
+    DrawDebugLine(GetWorld(), ProbeStart, ProbeEnd, FColor::Orange, false, DebugDuration, 0, 2.0f);
+
+    FHitResult EdgeHit;
+    if (!GetWorld()->LineTraceSingleByChannel(EdgeHit, ProbeStart, ProbeEnd, ECC_Visibility, Params))
+    {
+        return Info;
+    }
+    
+    if (!EdgeHit.bBlockingHit)
+    {
+        return Info;
+    }
+
+    DrawDebugSphere(GetWorld(), EdgeHit.ImpactPoint, 10.0f, 20, FColor::Emerald, false, DebugDuration);
+
+    // Height delta relative to the ledge we're leaving, not the character root — we're mid-air, not standing
+    const float HeightDelta = FMath::Abs(EdgeHit.ImpactPoint.Z - CurrentLedge.EdgeLocation.Z);
+    if (HeightDelta > LedgeJumpMaxHeightDelta)
+    {
+        return Info;
+    }
+
+    const float JumpDistance = FVector::Dist(CurrentLedge.EdgeLocation, EdgeHit.ImpactPoint);
+    if(!FMath::IsNearlyZero(JumpDirection.Z))
+    {
+        if (JumpDistance < MinLedgeJumpDistance || JumpDistance > MaxLedgeJumpDistance)
+        {
+            return Info;
+        }        
+    }
+    else
+    {
+        if ( JumpDistance < MinHorizontalLedgeJumpDistance || JumpDistance > MaxHorizontalLedgeJumpDistance)
+        {
+            return Info;
+        }
+    }
+
+
+    Info.WallNormal = WallHit.ImpactNormal;
+    Info.LedgeDirection = FVector::CrossProduct(FVector::UpVector, WallHit.ImpactNormal).GetSafeNormal();
+    Info.EdgeLocation = EdgeHit.ImpactPoint;
+    Info.ObstacleHeight = EdgeHit.ImpactPoint.Z - OwnerCharacter->GetActorLocation().Z;
+    Info.bValid = true;
+
+    return Info;
 }
 
 ELedgeHangState UPxiiLedgeTraversal::GetState() const
