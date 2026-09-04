@@ -23,6 +23,9 @@ public:
 	float DamageMagnitude = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
+	float UTCTime = 0.f;
+
+	UPROPERTY(BlueprintReadWrite)
 	bool bIsCritical = false;
 
 	UPROPERTY(BlueprintReadWrite)

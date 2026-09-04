@@ -89,6 +89,9 @@ public:
 	void NotifyHitTarget(AActor* Target, FDamageNotifPayload Payload);
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void NotifyHasReceivedDamage(AActor* Damager, FDamageNotifPayload Payload);
+
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void RegisterLastKnownAttacker(AActor* Target, float Damage);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")

@@ -118,12 +118,23 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 			return;
 		}
 
-		FDamageNotifPayload NewPayload;
-		NewPayload.bIsCritical = isCritical;
-		NewPayload.DamageMagnitude = IncomingDamage;
-		NewPayload.TargetActor = TargetActor;
-		NewPayload.HitType = HitEffectType;
-		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, NewPayload);
+		// TODO: Clean and optimize damage notifs
+		FDamageNotifPayload AttackerPayload;
+		AttackerPayload.bIsCritical = isCritical;
+		AttackerPayload.DamageMagnitude = IncomingDamage;
+		AttackerPayload.TargetActor = TargetActor;
+		AttackerPayload.HitType = HitEffectType;
+		AttackerPayload.UTCTime = (float)FDateTime::UtcNow().ToUnixTimestamp();
+		
+		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, AttackerPayload);
+		
+		FDamageNotifPayload DefenderPayload;
+		DefenderPayload.bIsCritical = isCritical;
+		DefenderPayload.DamageMagnitude = IncomingDamage;
+		DefenderPayload.TargetActor = SourceActor;
+		DefenderPayload.HitType = HitEffectType;
+		DefenderPayload.UTCTime = (float)FDateTime::UtcNow().ToUnixTimestamp();
+		IPxiiCombatInterface::Execute_NotifyHasReceivedDamage(TargetActor, SourceActor, DefenderPayload);
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().HealthProperty, EGameplayModOp::Additive, -IncomingDamage));

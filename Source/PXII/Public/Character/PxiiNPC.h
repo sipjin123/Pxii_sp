@@ -12,6 +12,7 @@
 #include "Targeting/Targetable.h"
 #include "PxiiNPC.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHasTakenPlayerDamage, AActor*, PlayerRef, FDamageNotifPayload, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAnimEventBroadcastEnemy, int32, Payload, float, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttackState, bool, IsEnabled, int32, Payload);
@@ -121,6 +122,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FCommandState OnDirectorUpdated;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FHasTakenPlayerDamage HasTakenPlayerDamage;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FCommandExecuteState OnCommandExecuted;

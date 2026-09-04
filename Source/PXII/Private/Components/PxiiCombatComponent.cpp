@@ -133,7 +133,11 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 		{
 			DrawDebugSphere(GetWorld(), TipLocation, 10.f, 12, FColor::Yellow, false, TraceDuration);
 		}
-		
+	
+		UKismetSystemLibrary::BoxTraceMulti(GetOwner(), StartLoc, EndLoc, BoxHalfExtent, BoxOrientation,
+			UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, DrawDebugTrace, OutHits, true,
+			FLinearColor::Green, FLinearColor::Red, TraceDuration);
+		/*
 		UKismetSystemLibrary::BoxTraceMultiForObjects(
 			GetOwner(),
 			StartLoc, EndLoc,
@@ -142,7 +146,7 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 			ObjectTypes, false,
 			ActorsToIgnore, DrawDebugTrace, OutHits, true,
 			FColor::Green, FColor::Red, TraceDuration
-		);
+		);*/
 	}
 	SlashDataArray = OutHits;
 	
@@ -200,7 +204,12 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 					BoxOrientation = MeleeRef->GetActorRotation();
 				}
 			}
-		
+
+			UKismetSystemLibrary::BoxTraceMulti(GetOwner(), HandLocation, EndLoc, BoxHalfExtent, BoxOrientation,
+				UEngineTypes::ConvertToTraceType(ECC_Visibility), false,
+				ActorsToIgnore, DrawDebugTrace, DepthOutHits, true,
+				FLinearColor::White, FLinearColor::Green, TraceDuration);
+			/*
 			UKismetSystemLibrary::BoxTraceMultiForObjects(
 				GetOwner(),
 				HandLocation, EndLoc,
@@ -209,7 +218,7 @@ void UPxiiCombatComponent::ProcessDepthSlash(FVector EndLoc)
 				ObjectTypes, false,
 				ActorsToIgnore, DrawDebugTrace, DepthOutHits, true,
 				FColor::Cyan, FColor::Emerald, TraceDuration
-			);
+			);*/
 		}
 	}
 	for (FHitResult OutHitParam : DepthOutHits)
