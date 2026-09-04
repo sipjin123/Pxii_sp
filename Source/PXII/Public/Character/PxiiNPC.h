@@ -75,6 +75,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	float LastHitTime = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	int32 OngoingHitCount = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool HasDirectorCommand;
@@ -148,4 +151,5 @@ protected:
 	const class UPxiiAttributeSet* AttributeSet;
 	virtual float OnGetCurrentHealth_Implementation() override;
 	virtual float OnGetCurrentMaxHealth_Implementation() override;
+	virtual void NotifyHasReceivedDamage_Implementation(AActor* Damager, FDamageNotifPayload Payload) override;
 };

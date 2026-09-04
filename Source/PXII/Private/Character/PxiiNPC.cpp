@@ -179,3 +179,18 @@ float APxiiNPC::OnGetCurrentMaxHealth_Implementation()
 	
 	return AttributeSet->MaxHealth.GetCurrentValue();
 }
+
+void APxiiNPC::NotifyHasReceivedDamage_Implementation(AActor* Damager, FDamageNotifPayload Payload)
+{
+	if (GetWorld()->GetTimeSeconds() - LastHitTime > 5.f)
+	{
+		OngoingHitCount = 0;
+	} else
+	{
+		OngoingHitCount++;
+	}
+	
+	LastHitTime = GetWorld()->GetTimeSeconds();
+	HasTakenPlayerDamage.Broadcast(Damager, Payload);
+	IPxiiCombatInterface::NotifyHasReceivedDamage_Implementation(Damager, Payload);
+}
