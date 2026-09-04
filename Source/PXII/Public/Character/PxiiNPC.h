@@ -74,6 +74,9 @@ public:
 	TObjectPtr<USkeletalMeshComponent> MeshRef;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	float LastHitTime = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool HasDirectorCommand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")

@@ -4,6 +4,7 @@
 #include "GAS/GECalculations/GEEC_DynamicDamage.h"
 
 #include "AbilitySystemComponent.h"
+#include "Engine/World.h"
 #include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "Interface/PxiiCombatInterface.h"
@@ -124,16 +125,16 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		AttackerPayload.DamageMagnitude = IncomingDamage;
 		AttackerPayload.TargetActor = TargetActor;
 		AttackerPayload.HitType = HitEffectType;
-		AttackerPayload.UTCTime = (float)FDateTime::UtcNow().ToUnixTimestamp();
+		AttackerPayload.UTCTime = SourceActor->GetWorld()->GetTimeSeconds();
 		
 		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, AttackerPayload);
 		
 		FDamageNotifPayload DefenderPayload;
 		DefenderPayload.bIsCritical = isCritical;
 		DefenderPayload.DamageMagnitude = IncomingDamage;
-		DefenderPayload.TargetActor = SourceActor;
+		DefenderPayload.TargetActor = TargetActor;
 		DefenderPayload.HitType = HitEffectType;
-		DefenderPayload.UTCTime = (float)FDateTime::UtcNow().ToUnixTimestamp();
+		DefenderPayload.UTCTime = SourceActor->GetWorld()->GetTimeSeconds();
 		IPxiiCombatInterface::Execute_NotifyHasReceivedDamage(TargetActor, SourceActor, DefenderPayload);
 	}
 	//OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetCombatStatCapture().WasCriticalHitProperty, EGameplayModOp::Override, bIsCritical ? 1.0 : 0.0));
