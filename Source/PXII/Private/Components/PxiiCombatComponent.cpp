@@ -276,8 +276,10 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 					HitTracedActors.Add(CurrHitActor);
 					if (CharRef)
 					{
-						//for (int i = 0; i < 10 ; i++) // Simulating Spamming in network
-						ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
+						const float RandomOffset=50.f;
+						FVector NewImpactPoint = CurrHitActor->GetActorLocation()+FVector(FMath::RandRange(-RandomOffset,RandomOffset),FMath::RandRange(-RandomOffset,RandomOffset),0.f);
+						ProcessUnitDamage(CurrHitActor, NewImpactPoint, 10.f, EDamageSource::Melee);
+						//ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
 						//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
 					}
 					else
