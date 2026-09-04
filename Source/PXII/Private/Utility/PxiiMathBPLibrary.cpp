@@ -211,7 +211,7 @@ bool UPxiiMathBPLibrary::GetRandomValidLocationActorDirection(const AActor* Acto
 
 		if (bHit)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[CRS] ----------------------------Hit: %s"), HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("None"));
+			//UE_LOG(LogTemp, Warning, TEXT("[CRS] ----------------------------Hit: %s"), HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("None"));
 			continue;
 		}
 

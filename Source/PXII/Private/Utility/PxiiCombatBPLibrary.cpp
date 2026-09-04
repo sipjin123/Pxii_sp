@@ -88,7 +88,7 @@ void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AAct
 {
     if (true)//if(HitEffectType != EHitEffectType::Default)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Should Apply Infliction: %s"), *StaticEnum<EHitEffectType>()->GetNameStringByValue(static_cast<int64>(HitEffectType)));
+        //UE_LOG(LogTemp, Warning, TEXT("Should Apply Infliction: %s"), *StaticEnum<EHitEffectType>()->GetNameStringByValue(static_cast<int64>(HitEffectType)));
         FHitResult HitResult;
         HitResult.ImpactPoint = result.ImpactPoint;
         HitResult.Location = result.Location;
