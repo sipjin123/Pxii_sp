@@ -130,6 +130,9 @@ public:
 	FCommandState OnDirectorUpdated;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FHasUnitBeenKilled HasUnitBeenKilled;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FHasTakenPlayerDamage HasTakenPlayerDamage;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
@@ -143,6 +146,9 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EFactionType FactionType;
+
+	UPROPERTY(BlueprintReadWrite)
+	APxiiCombatDirector* CombatDirectorRef;
 	
 	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
@@ -152,4 +158,7 @@ protected:
 	virtual float OnGetCurrentHealth_Implementation() override;
 	virtual float OnGetCurrentMaxHealth_Implementation() override;
 	virtual void NotifyHasReceivedDamage_Implementation(AActor* Damager, FDamageNotifPayload Payload) override;
+
+	virtual void KillThisUnit_Implementation(AActor* Killer, FKillUnitPayload Payload) override;
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
 };

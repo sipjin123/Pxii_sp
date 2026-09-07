@@ -60,6 +60,9 @@ public:
 	//bool ApplyDamage(const FPxiiDamageData& DamageData);
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
+	void KillThisUnit(AActor* Killer, FKillUnitPayload Payload);
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")
 	void OnDeath();
 
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Combat")

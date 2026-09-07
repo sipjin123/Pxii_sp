@@ -32,6 +32,31 @@ public:
 	EHitEffectType HitType;
 };
 
+USTRUCT(BlueprintType)
+struct FKillUnitPayload
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	AActor* KillerActor;
+
+	UPROPERTY(BlueprintReadWrite)
+	float LastDamageInflicted = 0.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	float UTCTime = 0.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsCritical = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	EHitEffectType HitType;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 Payload;
+};
+
 UCLASS()
 class PXII_API UPxiiCombatPayloads : public UObject
 {

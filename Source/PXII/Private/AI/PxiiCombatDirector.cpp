@@ -48,6 +48,15 @@ void APxiiCombatDirector::RegisterSquadMember(APxiiNPC* Member, EEnemy EnemyType
 	NewMember.EnemyType=EnemyType;
 	NewMember.CombatValue=GetEnemyCombatValue(EnemyType);
 	SquadMembers.Add(NewMember);
+	Member->CombatDirectorRef = this;
+	if (EnemyType == EEnemy::Shielder || EnemyType == EEnemy::Warrior || EnemyType == EEnemy::Mage)
+	{
+		SecondarySquad.Add(NewMember);
+	}
+	else
+	{
+		PrimarySquad.Add(NewMember);
+	}
 }
 
 void APxiiCombatDirector::UnregisterSquadMember(APxiiNPC* Member)
@@ -106,6 +115,14 @@ float APxiiCombatDirector::GetInitialSquadStrength() const
 	return Strength;
 }
 
+void APxiiCombatDirector::NotifyUnitDeath(APxiiNPC* NewDeadUnit)
+{
+	MoveSquadMemberToDeadUnits(NewDeadUnit);
+
+	FKillUnitPayload KillPayload;
+	HasUnitBeenKilled.Broadcast(NewDeadUnit, KillPayload);
+}
+
 float APxiiCombatDirector::GetEnemyCombatValue(EEnemy EnemyType) const
 {
 	switch (EnemyType)
@@ -122,6 +139,41 @@ float APxiiCombatDirector::GetEnemyCombatValue(EEnemy EnemyType) const
 	default:
 		return 1.f;
 	}
+}
+
+bool APxiiCombatDirector::MoveSquadMemberToDeadUnits(APxiiNPC* NPC)
+{
+	if (!NPC) return false;
+	for (int32 i = 0;i < PrimarySquad.Num(); ++i)
+	{
+		if (PrimarySquad[i].Actor==NPC)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Exist as Primary: %s"), *NPC->GetName());
+			DeadUnits.Add(PrimarySquad[i]);
+			PrimarySquad.RemoveAt(i);
+		}
+	}
+	for (int32 i = 0;i < SecondarySquad.Num(); ++i)
+	{
+		if (SecondarySquad[i].Actor==NPC)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Exist as Secondary: %s"), *NPC->GetName());
+			DeadUnits.Add(SecondarySquad[i]);
+			SecondarySquad.RemoveAt(i);
+		}
+	}
+	
+	for (int32 i = 0;i < SquadMembers.Num(); ++i)
+	{
+		if (SquadMembers[i].Actor==NPC)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Exist as Squad: %s"), *NPC->GetName());
+			DeadUnits.Add(SquadMembers[i]);
+			SquadMembers.RemoveAt(i);
+			return true;
+		}
+	}
+	return false;
 }
 
 void APxiiCombatDirector::GrantNewCommandToActor(FDirectorCommand NewCommand, AActor* SquadMemeber, AActor* NewTarget)

@@ -128,6 +128,17 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		AttackerPayload.UTCTime = SourceActor->GetWorld()->GetTimeSeconds();
 		
 		IPxiiCombatInterface::Execute_NotifyHitTarget(SourceActor, TargetActor, AttackerPayload);
+
+		if (IPxiiCombatInterface::Execute_OnGetCurrentHealth(TargetActor) - IncomingDamage <= 0)
+		{
+			FKillUnitPayload KillPayload;
+			KillPayload.KillerActor = SourceActor;
+			KillPayload.LastDamageInflicted = IncomingDamage;
+			KillPayload.bIsCritical = isCritical;
+			KillPayload.UTCTime = SourceActor->GetWorld()->GetTimeSeconds();
+			
+			IPxiiCombatInterface::Execute_KillThisUnit(TargetActor, SourceActor, KillPayload);
+		}
 		
 		FDamageNotifPayload DefenderPayload;
 		DefenderPayload.bIsCritical = isCritical;

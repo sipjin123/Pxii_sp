@@ -3,6 +3,7 @@
 
 #include "Character/PxiiNPC.h"
 
+#include "AI/PxiiCombatDirector.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Enum/PxiiDamageType.h"
@@ -95,6 +96,9 @@ void APxiiNPC::BeginPlay()
 	{
 		UE_LOG(LogTempBaseCharacter, Error, TEXT("Missing Ability Component!"));
 	}
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPxiiAttributeSet::GetHealthAttribute())
+	.AddUObject(this, &APxiiNPC::OnHealthChanged);
 }
 
 void APxiiNPC::OnStaggerMeterChanged(const FOnAttributeChangeData& Data)
@@ -193,4 +197,19 @@ void APxiiNPC::NotifyHasReceivedDamage_Implementation(AActor* Damager, FDamageNo
 	LastHitTime = GetWorld()->GetTimeSeconds();
 	HasTakenPlayerDamage.Broadcast(Damager, Payload);
 	IPxiiCombatInterface::NotifyHasReceivedDamage_Implementation(Damager, Payload);
+}
+
+void APxiiNPC::KillThisUnit_Implementation(AActor* Killer, FKillUnitPayload Payload)
+{
+	if (CombatDirectorRef)
+	{
+		CombatDirectorRef->NotifyUnitDeath(this);
+	}
+	HasUnitBeenKilled.Broadcast(Killer, Payload);
+	IPxiiCombatInterface::KillThisUnit_Implementation(Killer, Payload);
+}
+
+void APxiiNPC::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	//UE_LOG(LogTemp, Log, TEXT("Health: %f -> %f"), Data.OldValue, Data.NewValue);
 }

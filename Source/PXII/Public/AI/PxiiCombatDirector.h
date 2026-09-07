@@ -8,6 +8,7 @@
 #include "PxiiCombatDirector.generated.h"
 
 class APxiiNPC;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHasUnitBeenKilled, AActor*, PlayerRef, FKillUnitPayload, Payload);
 
 USTRUCT(BlueprintType)
 struct FPxiiSquadMember
@@ -78,9 +79,27 @@ public:
 	UPROPERTY(BlueprintReadOnly,Category="PXII|Combat|Squad")
 	TArray<FPxiiSquadMember> SquadMembers;
 
+	UPROPERTY(BlueprintReadOnly,Category="PXII|Combat|Squad")
+	TArray<FPxiiSquadMember> PrimarySquad;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FHasUnitBeenKilled HasUnitBeenKilled;
+	
+	UPROPERTY(BlueprintReadOnly,Category="PXII|Combat|Squad")
+	TArray<FPxiiSquadMember> SecondarySquad;
+
+	UPROPERTY(BlueprintReadOnly,Category="PXII|Combat|Squad")
+	TArray<FPxiiSquadMember> DeadUnits;
+
+	UFUNCTION(BlueprintCallable,Category="PXII|Combat|Squad")
+	void NotifyUnitDeath(APxiiNPC* NewDeadUnit);
+	
 	UFUNCTION(BlueprintPure,Category="PXII|Combat|Squad")
 	float GetEnemyCombatValue(EEnemy EnemyType) const;
-
+	
+	UFUNCTION(BlueprintCallable,Category="PXII|Combat|Squad")
+	bool MoveSquadMemberToDeadUnits(APxiiNPC* NPC);
+	
 	UPROPERTY(BlueprintReadWrite)
 	int32 PendingCommands;
 	
