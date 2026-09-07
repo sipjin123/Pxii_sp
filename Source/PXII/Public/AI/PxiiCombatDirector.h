@@ -104,8 +104,18 @@ public:
 	int32 PendingCommands;
 	
 	UPROPERTY(BlueprintReadWrite)
+	int32 SuccessfulCommands;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float PreviousCommandSuccessRate;
+	
+	UPROPERTY(BlueprintReadWrite)
 	int32 GeneratedCommands;
 	
 	UFUNCTION(BlueprintCallable)
 	void GrantNewCommandToActor(FDirectorCommand NewCommand, AActor* SquadMemeber, AActor* NewTarget);
+	
+	UFUNCTION(BlueprintPure,Category="PXII|Combat|Squad")
+	APxiiNPC* GetHealPriority(AActor* Querier,const TArray<FPxiiSquadMember>& Enemies);
+	
 };

@@ -195,3 +195,62 @@ void APxiiCombatDirector::GrantNewCommandToActor(FDirectorCommand NewCommand, AA
 	}
 }
 
+APxiiNPC* APxiiCombatDirector::GetHealPriority(AActor* Querier, const TArray<FPxiiSquadMember>& Enemies)
+{
+	if (!IsValid(Querier)||Enemies.Num()<=0)
+	{
+		return nullptr;
+	}
+	APxiiNPC* BestTarget=nullptr;
+	float BestScore=-1.f;
+	const float MaxDistance=3000.f;
+	for (const FPxiiSquadMember& Enemy : Enemies)
+	{
+		if (Enemy.Actor == Querier) continue;
+		
+		APxiiNPC* NPC=Enemy.Actor;
+		
+		if (NPC->Implements<UPxiiCombatInterface>())
+		{
+			if (!IsValid(NPC))
+			{
+				continue;
+			}
+			const float MaxHealth=IPxiiCombatInterface::Execute_OnGetCurrentMaxHealth(NPC);
+			
+			// Skip Dead
+			if (MaxHealth<=0.f)
+			{
+				continue;
+			}
+			
+			// Normalize health to 0-1, where 0 is dead and 1 is full health.
+			const float HealthPercent=FMath::Clamp(IPxiiCombatInterface::Execute_OnGetCurrentHealth(NPC)/MaxHealth,0.f,1.f);
+
+			// Only heal targets that need health
+			if (HealthPercent>=0.8f)
+			{
+				continue;
+			}
+			
+			// Invert health so lower health produces a higher priority score.
+			const float HealthScore=1.f-HealthPercent;
+			
+			// Get distance between the healer and the potential heal target.
+			const float Distance=FVector::Dist(Querier->GetActorLocation(),NPC->GetActorLocation());
+			
+			// Normalize distance to 0-1 and invert it so closer targets have higher priority.
+			const float DistanceScore=1.f-FMath::Clamp(Distance/MaxDistance,0.f,1.f);
+			
+			// Combine health and distance, giving health 70% influence and distance 30%.
+			const float Score=(HealthScore*0.7f)+(DistanceScore*0.3f);
+			if (Score>BestScore)
+			{
+				BestScore=Score;
+				BestTarget=NPC;
+			}
+		}
+	}
+	return BestTarget;
+}
+
