@@ -38,6 +38,7 @@ enum class ENPCState:uint8
 	Wait=7 UMETA(DisplayName="Wait"),
 	SearchingTarget=8 UMETA(DisplayName="SearchingTarget"),
 	Assessment=9 UMETA(DisplayName="Assessment"),
+	Protect=10 UMETA(DisplayName="Protect"),
 };
 
 UENUM(BlueprintType)
