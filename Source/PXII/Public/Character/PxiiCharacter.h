@@ -9,6 +9,7 @@
 #include "Weapon/PxiiWeaponMelee.h"
 #include "Weapon/PxiiWeaponRange.h"
 #include "GameplayEffectExtension.h"
+#include "Enum/PxiiEnemyType.h"
 #include "PxiiCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAnimEventBroadcast, int32, Payload);
@@ -69,6 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsObstructed() { return bIsObstructed; }
 
+	UPROPERTY(BlueprintReadWrite)
+	EEnemy LastStolenAbility;
+		
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetIsADSEnabled(bool isEnabled); 
 
