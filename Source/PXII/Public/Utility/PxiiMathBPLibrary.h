@@ -78,4 +78,10 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Math")
 	static TArray<int32> GetUniqueRandomIndices(int32 TotalNumber,int32 TargetNumber);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Math")
+	static bool RollChance(float RandomChanceValue)
+	{
+		return FMath::FRandRange(0.0f, 100.0f) <= RandomChanceValue;
+	}
 };
