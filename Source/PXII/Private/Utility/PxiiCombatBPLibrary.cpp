@@ -612,7 +612,8 @@ APawn* UPxiiCombatBPLibrary::GetPawnInFrontByBoxTrace(UObject* WorldContextObjec
     FHitResult Hit;
     TArray<AActor*> ActorsToIgnore;
     ActorsToIgnore.Add(SourceActor);
-    const bool bHit=UKismetSystemLibrary::BoxTraceSingle(World,Start,End,BoxExtent,SourceActor->GetActorRotation(),TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hit,true);
+    const bool bHit=UKismetSystemLibrary::BoxTraceSingle(World,Start,End,BoxExtent,SourceActor->GetActorRotation(),
+        TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hit,true, FLinearColor::Green, FLinearColor::Red, 1.f);
     if (!bHit)
     {
         return nullptr;
