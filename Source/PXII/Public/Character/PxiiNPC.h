@@ -86,6 +86,9 @@ public:
 	bool HasDirectorCommand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsUnitFlying;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool IsAutonomous;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
