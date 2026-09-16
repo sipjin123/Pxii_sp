@@ -632,17 +632,21 @@ TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount
     for (int32 i=0;i<AttackerCount;++i)
     {
         const int32 Roll=FMath::RandRange(0,99);
-        if (Roll<60)
+        if (Roll<50)
         {
             AttackTypes.Add(0);
         }
-        else if (Roll<90)
+        else if (Roll<75)
         {
             AttackTypes.Add(1);
         }
-        else
+        else if (Roll<90)
         {
             AttackTypes.Add(2);
+        }
+        else
+        {
+            AttackTypes.Add(3);
         }
     }
     if (AttackerCount>1)
@@ -650,7 +654,7 @@ TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount
         bool bHasSpecialOrPowerful=false;
         for (const int32 AttackType : AttackTypes)
         {
-            if (AttackType==1||AttackType==2)
+            if (AttackType==1||AttackType==2||AttackType==3)
             {
                 bHasSpecialOrPowerful=true;
                 break;
@@ -659,7 +663,7 @@ TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount
         if (!bHasSpecialOrPowerful)
         {
             const int32 Index=FMath::RandRange(0,AttackTypes.Num()-1);
-            AttackTypes[Index]=FMath::RandBool()?1:2;
+            AttackTypes[Index]=FMath::RandRange(1,3);
         }
     }
     return AttackTypes;
