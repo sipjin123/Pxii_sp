@@ -42,6 +42,10 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 {
 	//Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
+	if (!(ExecutionParams.GetSourceAbilitySystemComponent()->GetAvatarActor() && ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor()))
+	{
+		return;
+	}
 	AActor* SourceActor = Cast<AActor>(ExecutionParams.GetSourceAbilitySystemComponent()->GetAvatarActor());
 	AActor* TargetActor = Cast<AActor>(ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor());
 	
