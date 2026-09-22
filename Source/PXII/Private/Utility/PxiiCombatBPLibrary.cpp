@@ -120,6 +120,9 @@ void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AAct
         case EHitEffectType::Ministun:
             DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Ministun"));
             break;
+        case EHitEffectType::Shock:
+            DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Zap"));
+            break;
         case EHitEffectType::Flinch:
             DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Flinch"));
             break;
