@@ -15,6 +15,8 @@ class PXII_API UPxiiDebugTraceBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure,Category="Utility")
+	static bool IsEditor();
 	
 	UFUNCTION(BlueprintCallable, Category="Debug", meta=(WorldContext="WorldContextObject"))
 	static void DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color, float Duration);

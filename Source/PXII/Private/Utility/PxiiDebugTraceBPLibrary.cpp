@@ -6,6 +6,11 @@
 #include "DrawDebugHelpers.h"
 
 
+bool UPxiiDebugTraceBPLibrary::IsEditor()
+{
+	return GIsEditor && !IsRunningGame();
+}
+
 void UPxiiDebugTraceBPLibrary::DrawDebugSphereSimple(UObject* WorldContextObject, FVector Location, float Radius, FLinearColor Color, float Duration)
 {
 	if (!WorldContextObject) return;
