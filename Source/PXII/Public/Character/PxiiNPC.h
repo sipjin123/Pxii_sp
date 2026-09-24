@@ -133,6 +133,9 @@ public:
 	FAttackState OnAbilityEnded;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
+	FAttackState OnAbilityFailed;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")
 	FCommandState OnDirectorUpdated;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Combat")

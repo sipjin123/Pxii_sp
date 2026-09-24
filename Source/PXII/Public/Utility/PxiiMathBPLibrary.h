@@ -94,4 +94,13 @@ public:
 		float ZigZagWidth,
 		TArray<FVector>& OutVectors
 	);
+	
+	UFUNCTION(BlueprintPure,Category="Utility|Vector")
+	static FVector GetTargetSideCoordinate(
+		const FVector& SourceLocation,
+		const FRotator& SourceRotation,
+		const FVector& TargetLocation,
+		float OffsetDistance,
+		bool bRight
+	);
 };

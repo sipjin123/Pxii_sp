@@ -635,3 +635,23 @@ bool UPxiiMathBPLibrary::GenerateZigZagVectors(const FVector& Origin, const FRot
 
 	return true;
 }
+
+FVector UPxiiMathBPLibrary::GetTargetSideCoordinate(const FVector& SourceLocation, const FRotator& SourceRotation,
+	const FVector& TargetLocation, float OffsetDistance, bool bRight)
+{
+	const FVector ToTarget =
+	(TargetLocation - SourceLocation).GetSafeNormal();
+
+	if (ToTarget.IsNearlyZero())
+	{
+		return TargetLocation;
+	}
+
+	const FVector CasterRight =
+		SourceRotation.RotateVector(FVector::RightVector);
+
+	const float Side =
+		bRight ? 1.0f : -1.0f;
+
+	return TargetLocation + (CasterRight * OffsetDistance * Side);
+}
