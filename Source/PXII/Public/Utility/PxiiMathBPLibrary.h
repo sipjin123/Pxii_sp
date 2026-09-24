@@ -84,4 +84,14 @@ public:
 	{
 		return FMath::FRandRange(0.0f, 100.0f) <= RandomChanceValue;
 	}
+
+	UFUNCTION(BlueprintPure,Category="Utility|Vector")
+	static bool GenerateZigZagVectors(
+		const FVector& Origin,
+		const FRotator& Rotation,
+		const FVector& TargetLocation,
+		int32 NodeCount,
+		float ZigZagWidth,
+		TArray<FVector>& OutVectors
+	);
 };

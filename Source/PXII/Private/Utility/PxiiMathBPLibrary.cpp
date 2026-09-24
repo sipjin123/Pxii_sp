@@ -600,3 +600,38 @@ TArray<int32> UPxiiMathBPLibrary::GetUniqueRandomIndices(int32 TotalNumber, int3
 	Indices.SetNum(TargetNumber);
 	return Indices;
 }
+
+bool UPxiiMathBPLibrary::GenerateZigZagVectors(const FVector& Origin, const FRotator& Rotation,
+	const FVector& TargetLocation, int32 NodeCount, float ZigZagWidth, TArray<FVector>& OutVectors)
+{
+	OutVectors.Reset();
+
+	if (NodeCount <= 0 || ZigZagWidth < 0.0f)
+	{
+		return false;
+	}
+
+	const FVector Direction = (TargetLocation - Origin).GetSafeNormal();
+
+	if (Direction.IsNearlyZero())
+	{
+		return false;
+	}
+
+	const FVector Right = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
+	const float TotalDistance = FVector::Distance(Origin,TargetLocation);
+
+	OutVectors.Reserve(NodeCount);
+
+	for (int32 i = 0; i < NodeCount; ++i)
+	{
+		const float Alpha = static_cast<float>(i + 1) / static_cast<float>(NodeCount + 1);
+		const FVector CenterPoint = FMath::Lerp(Origin,TargetLocation,Alpha);
+
+		const float Side = (i % 2 == 0) ? ZigZagWidth : -ZigZagWidth;
+
+		OutVectors.Add(CenterPoint + (Right * Side));
+	}
+
+	return true;
+}
