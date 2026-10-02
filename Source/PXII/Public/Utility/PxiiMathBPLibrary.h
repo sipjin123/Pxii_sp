@@ -103,4 +103,7 @@ public:
 		float OffsetDistance,
 		bool bRight
 	);
+
+	UFUNCTION(BlueprintPure,Category="Math|Input")
+	static FVector GetScreenRelativeInputDebug(UObject* WorldContextObject,FVector PlayerLocation,float InputX,float InputY,FRotator ControlRotation,float DebugDistance, float DebugTime = .5f);
 };

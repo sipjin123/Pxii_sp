@@ -655,3 +655,21 @@ FVector UPxiiMathBPLibrary::GetTargetSideCoordinate(const FVector& SourceLocatio
 
 	return TargetLocation + (CasterRight * OffsetDistance * Side);
 }
+
+FVector UPxiiMathBPLibrary::GetScreenRelativeInputDebug(UObject* WorldContextObject, FVector PlayerLocation,
+	float InputX, float InputY, FRotator ControlRotation, float DebugDistance, float DebugTime)
+{
+	const FRotator YawRotation(0.f,ControlRotation.Yaw,0.f);
+	const FVector Forward=FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector Right=FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	FVector Direction=(Forward*InputY)+(Right*InputX);
+	Direction.Z=0.f;
+	Direction=Direction.GetSafeNormal();
+	if(UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull))
+	{
+		const FVector DebugLocation=PlayerLocation+(Direction*DebugDistance);
+		DrawDebugSphere(World,DebugLocation,25.f,12,FColor::Red,false,DebugTime);
+		DrawDebugLine(World,PlayerLocation,DebugLocation,FColor::Yellow,false,DebugTime,0,3.f);
+	}
+	return Direction;
+}
