@@ -93,7 +93,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	const bool bIsTargetDodge = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(PerfectDodgeTag);
 	
 	bool isCritical = false;
-	//UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
+	UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
 
 	if (bIsTargetBlocking)
 		IncomingDamage *= .5f;
