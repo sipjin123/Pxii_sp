@@ -83,6 +83,9 @@ public:
 	int32 OngoingHitCount = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	int32 OngoingAttackCount = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	bool HasDirectorCommand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
