@@ -673,3 +673,14 @@ FVector UPxiiMathBPLibrary::GetScreenRelativeInputDebug(UObject* WorldContextObj
 	}
 	return Direction;
 }
+
+FVector UPxiiMathBPLibrary::GetPositionBehindTarget(AActor* TargetActor, AActor* Player, float DistanceBehind)
+{
+	if (!IsValid(TargetActor)||!IsValid(Player))
+	{
+		return FVector::ZeroVector;
+	}
+	const FVector PillarLocation=TargetActor->GetActorLocation();
+	const FVector Direction=(PillarLocation-Player->GetActorLocation()).GetSafeNormal2D();
+	return PillarLocation+(Direction*DistanceBehind);
+}

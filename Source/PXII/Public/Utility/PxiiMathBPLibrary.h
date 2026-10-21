@@ -106,4 +106,7 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="Math|Input")
 	static FVector GetScreenRelativeInputDebug(UObject* WorldContextObject,FVector PlayerLocation,float InputX,float InputY,FRotator ControlRotation,float DebugDistance, float DebugTime = .5f);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Combat")
+	static FVector GetPositionBehindTarget(AActor* TargetActor,AActor* Player,float DistanceBehind);
 };

@@ -4,6 +4,7 @@
 #include "Utility/PxiiCombatBPLibrary.h"
 
 #include "Character/PxiiNPC.h"
+#include "Combat/PxiiPillarActor.h"
 #include "Settings/CombatDeveloperSettings.h"
 #include "Utility/PxiiDebugTraceBPLibrary.h"
 #include "Utility/PXIILogUtility.h"
@@ -13,6 +14,7 @@
 #include "Enum/PxiiDamageType.h"
 #include "Enum/PxiiEnemyType.h"
 #include "Interface/PxiiDamageableInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
 
@@ -671,3 +673,49 @@ TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount
     }
     return AttackTypes;
 }
+
+AActor* UPxiiCombatBPLibrary::GetBestPillarInRadius(UObject* WorldContextObject, FVector Origin, float Radius,
+    bool bLowestHealth, bool bFurthest)
+{
+    if (!WorldContextObject||Radius<=0.f)
+    {
+        return nullptr;
+    }
+    UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
+    if (!World)
+    {
+        return nullptr;
+    }
+    TArray<AActor*> Pillars;
+    UGameplayStatics::GetAllActorsOfClass(World,APxiiPillarActor::StaticClass(),Pillars);
+    AActor* BestPillar=nullptr;
+    float BestValue=bFurthest&&!bLowestHealth?-TNumericLimits<float>::Max():TNumericLimits<float>::Max();
+    for (AActor* Pillar : Pillars)
+    {
+        if (!IsValid(Pillar))
+        {
+            continue;
+        }
+        const float Distance=FVector::Dist(Origin,Pillar->GetActorLocation());
+        if (Distance>Radius)
+        {
+            continue;
+        }
+        float Value=Distance;
+        if (bLowestHealth)
+        {
+            if (!Pillar->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
+            {
+                continue;
+            }
+            Value=IPxiiCombatInterface::Execute_OnGetCurrentHealth(Pillar);
+        }
+        if ((bFurthest&&!bLowestHealth&&Value>BestValue)||((!bFurthest||bLowestHealth)&&Value<BestValue))
+        {
+            BestValue=Value;
+            BestPillar=Pillar;
+        }
+    }
+    return BestPillar;
+}
+
