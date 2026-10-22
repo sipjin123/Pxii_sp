@@ -24,9 +24,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(BlueprintReadOnly,Category="Combat")
+	UPROPERTY(BlueprintReadWrite, Category="Combat")
 	int32 HitCount=0;
 
+	UPROPERTY(BlueprintReadWrite,Category="Combat")
+	AActor* LastInteractor;
+
+	UPROPERTY(BlueprintReadWrite,Category="Combat")
+	TArray<AActor*> HitActors;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateLastInteractor(AActor* NewActor) { LastInteractor = NewActor; }
+	
 	UPROPERTY(BlueprintReadOnly,Category="Combat")
 	int32 MaxHitCount=0;
 

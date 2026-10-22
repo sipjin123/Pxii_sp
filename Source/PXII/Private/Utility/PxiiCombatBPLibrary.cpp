@@ -690,9 +690,14 @@ AActor* UPxiiCombatBPLibrary::GetBestPillarInRadius(UObject* WorldContextObject,
     UGameplayStatics::GetAllActorsOfClass(World,APxiiPillarActor::StaticClass(),Pillars);
     AActor* BestPillar=nullptr;
     float BestValue=bFurthest&&!bLowestHealth?-TNumericLimits<float>::Max():TNumericLimits<float>::Max();
-    for (AActor* Pillar : Pillars)
+    for (AActor* PillarEntry : Pillars)
     {
+        APxiiPillarActor* Pillar = Cast<APxiiPillarActor>(PillarEntry);
         if (!IsValid(Pillar))
+        {
+            continue;
+        }
+        if (Pillar->HitCount < 1)
         {
             continue;
         }
@@ -704,11 +709,7 @@ AActor* UPxiiCombatBPLibrary::GetBestPillarInRadius(UObject* WorldContextObject,
         float Value=Distance;
         if (bLowestHealth)
         {
-            if (!Pillar->GetClass()->ImplementsInterface(UPxiiCombatInterface::StaticClass()))
-            {
-                continue;
-            }
-            Value=IPxiiCombatInterface::Execute_OnGetCurrentHealth(Pillar);
+            Value=Pillar->HitCount;
         }
         if ((bFurthest&&!bLowestHealth&&Value>BestValue)||((!bFurthest||bLowestHealth)&&Value<BestValue))
         {
