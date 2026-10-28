@@ -684,3 +684,19 @@ FVector UPxiiMathBPLibrary::GetPositionBehindTarget(AActor* TargetActor, AActor*
 	const FVector Direction=(PillarLocation-Player->GetActorLocation()).GetSafeNormal2D();
 	return PillarLocation+(Direction*DistanceBehind);
 }
+
+bool UPxiiMathBPLibrary::IsActorBetween(AActor* Source, AActor* InBetweenActor, AActor* Target, float MaxDistance)
+{
+	if (!IsValid(Source)||!IsValid(InBetweenActor)||!IsValid(Target)||MaxDistance<0.f)
+	{
+		return false;
+	}
+	const FVector SourceLocation=Source->GetActorLocation();
+	const FVector AnchorLocation=InBetweenActor->GetActorLocation();
+	const FVector TargetLocation=Target->GetActorLocation();
+	const FVector Direction=(TargetLocation-AnchorLocation).GetSafeNormal2D();
+	const FVector ToSource=(SourceLocation-AnchorLocation);
+	const float Distance=ToSource.Size2D();
+	const float AlongDirection=FVector::DotProduct(ToSource.GetSafeNormal2D(),Direction);
+	return Distance<=MaxDistance&&AlongDirection<0.f;
+}

@@ -109,4 +109,8 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Combat")
 	static FVector GetPositionBehindTarget(AActor* TargetActor,AActor* Player,float DistanceBehind);
+
+	
+	UFUNCTION(BlueprintPure,Category="PXII|Combat")
+	static bool IsActorBetween(AActor* Source,AActor* InBetweenActor,AActor* Target,float MaxDistance);
 };
