@@ -18,6 +18,18 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReturnToPool, APxiiProjectileBase*);
 
+USTRUCT()
+struct FProjectileHitEffects
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category= "Projectile")
+	TArray<TSubclassOf<UGameplayEffect>> TargetHitGE;
+
+	UPROPERTY(EditDefaultsOnly, Category= "Projectile")
+	TArray<TSubclassOf<UGameplayEffect>> PlayerHitGE;
+};
+
 UCLASS()
 class PXII_API APxiiProjectileBase : public AActor
 {
@@ -37,6 +49,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<UGameplayEffect> DamageGE;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	FProjectileHitEffects ProjectileHitEffect;
 	
 	UPROPERTY()
 	UAbilitySystemComponent* InstigatorASC;
@@ -94,6 +109,10 @@ public:
 	
 	virtual void ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result);
 
+	virtual void ApplyPlayerProjectileHitEffect();
+	
+	virtual void ApplyTargetProjectileHitEffect(AActor* TargetActor);
+	
 	UFUNCTION(BlueprintPure, Category = "Projectile")
 	float GetDamage(const FHitResult& result);
 

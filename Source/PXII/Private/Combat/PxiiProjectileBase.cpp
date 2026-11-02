@@ -268,7 +268,7 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 				}
 			}
 			float finalDMG = GetDamage(result);
-			//PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
+			PXII_LOG(ELogCategory::Projectile, Log, TEXT("Apply Damage to %s -> Final DMG: %f"), *GetNameSafe(TargetActor), finalDMG);
 			PlayerCombatComp->ProcessUnitDamage(TargetActor, result.ImpactPoint, finalDMG,  EDamageSource::Range);
 		} else
 		{
@@ -300,6 +300,14 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 		}
 	}
+
+	APxiiNPC* ProjectileTarget = Cast<APxiiNPC>(TargetActor);
+	if(ProjectileTarget != nullptr)
+	{
+		ApplyPlayerProjectileHitEffect();
+		ApplyTargetProjectileHitEffect(TargetActor);		
+	}
+
 
 	/* DZ - Reapply this to combat registry
 	const UPxiiAttributeSet* AttributeSet = IPxiiCombatInterface::Execute_GetAttributeSet(CurrHitActor);
@@ -341,6 +349,73 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 		}
 	}
 	//*/
+}
+
+void APxiiProjectileBase::ApplyPlayerProjectileHitEffect()
+{
+	if(ProjectileHitEffect.PlayerHitGE.IsEmpty())
+	{
+		PXII_LOG(ELogCategory::Projectile, Log, TEXT("DZ_LOG : Projectile Hit Player Effect Empty"));
+		return;
+	}
+
+	for(const TSubclassOf<UGameplayEffect>& effectClass : ProjectileHitEffect.PlayerHitGE)
+	{
+		FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(this);
+		ContextHandle.AddInstigator(InstigatorActor, WeaponOwner);
+
+		IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(WeaponOwner);
+		if (TargetASI)
+		{
+			UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+			if (TargetASC)
+			{
+				FGameplayEffectSpecHandle SpecHandle =	InstigatorASC->MakeOutgoingSpec(effectClass, 1.0f, ContextHandle);
+				if (SpecHandle.IsValid())
+				{
+					FActiveGameplayEffectHandle activeHandle = InstigatorASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+					if (activeHandle.WasSuccessfullyApplied())
+					{
+						PXII_LOG(ELogCategory::Projectile, Log, TEXT("DZ_LOG : Gameplay Effect applied successfully"));
+					}
+					else
+					{
+						PXII_LOG(ELogCategory::Projectile, Log, TEXT("DZ_LOG : Gameplay Effect application failed"));
+					}
+				}
+			}
+		}
+	}
+}
+
+void APxiiProjectileBase::ApplyTargetProjectileHitEffect(AActor* TargetActor)
+{
+	if(ProjectileHitEffect.TargetHitGE.IsEmpty())
+	{
+		return;
+	}
+
+	for(const TSubclassOf<UGameplayEffect>& effectClass : ProjectileHitEffect.TargetHitGE)
+	{
+		FGameplayEffectContextHandle ContextHandle = InstigatorASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(this);
+		ContextHandle.AddInstigator(InstigatorActor, WeaponOwner);
+
+		IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+		if (TargetASI)
+		{
+			UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+			if (TargetASC)
+			{
+				FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(effectClass->StaticClass(), 1.0f, ContextHandle);
+				if(SpecHandle.IsValid())
+				{
+					InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+				}
+			}
+		}
+	}
 }
 
 float APxiiProjectileBase::GetDamage(const FHitResult& result)

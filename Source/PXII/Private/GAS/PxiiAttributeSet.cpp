@@ -35,6 +35,11 @@ UPxiiAttributeSet::UPxiiAttributeSet()
 	
 	Defense.SetBaseValue(10.0f);
 	AttackDamage.SetBaseValue(10.0f);
+	CurrentBlasterCharge.SetBaseValue(0.0f);
+	MaxBlasterCharge.SetBaseValue(7.0f);
+	BaseChargeDmg.SetBaseValue(80.0f);
+	MaxChargeDmg.SetBaseValue(200.0f);
+	MaxChargeBonusPrc.SetBaseValue(0.5f);
 }
 
 void UPxiiAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

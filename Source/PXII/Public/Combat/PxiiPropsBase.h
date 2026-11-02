@@ -7,6 +7,8 @@
 #include "Structs/PxiiPropsData.h"
 #include "PxiiPropsBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDestructState, bool, IsDestroyed, float, Magnitude);
+
 UCLASS()
 class PXII_API APxiiPropsBase : public AActor
 {
@@ -25,5 +27,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UPROPERTY(BlueprintReadWrite)
 	EPropsType PropType;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 CurrentPropLife = 10;
+	UPROPERTY(BlueprintReadWrite)
+	int32 MaxPropLife = 10;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsDestroyed;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FDestructState DestructState;
 };

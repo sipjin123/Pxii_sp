@@ -77,6 +77,9 @@ public:
 	bool IsStrafing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool IsPropCollisionActive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	float LastHitTime = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
@@ -155,6 +158,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	AActor* LastKnownTarget;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AActor*> CollidedActors;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EFactionType FactionType;

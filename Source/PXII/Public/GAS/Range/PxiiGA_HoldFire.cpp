@@ -14,8 +14,12 @@ void UPxiiGA_HoldFire::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	AActor* Avatar = ActorInfo->AvatarActor.Get();
-    
-	APxiiCharacter* SelfCharacter = Cast<APxiiCharacter>(Avatar);
+
+	if(SelfCharacter == nullptr)
+	{
+		SelfCharacter = Cast<APxiiCharacter>(Avatar);
+	}
+	
 	if (SelfCharacter && SelfCharacter->Implements<UPxiiCombatInterface>())
 	{
 		APxiiWeaponRange* WeaponRef = IPxiiCombatInterface::Execute_GetWeaponBaseRange(SelfCharacter);

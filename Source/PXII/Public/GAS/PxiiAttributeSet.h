@@ -121,5 +121,25 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
 	FGameplayAttributeData SpeedModifier;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, SpeedModifier);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
+	FGameplayAttributeData CurrentBlasterCharge;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, CurrentBlasterCharge);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
+	FGameplayAttributeData MaxBlasterCharge;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxBlasterCharge);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
+	FGameplayAttributeData BaseChargeDmg;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, BaseChargeDmg);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
+	FGameplayAttributeData MaxChargeDmg;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxChargeDmg);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
+	FGameplayAttributeData MaxChargeBonusPrc;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxChargeBonusPrc);
 	
 };

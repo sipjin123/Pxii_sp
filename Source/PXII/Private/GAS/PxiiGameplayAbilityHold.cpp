@@ -1,12 +1,14 @@
 ﻿#include "GAS/PxiiGameplayAbilityHold.h"
 
 #include "Async/ParkingLot.h"
+#include "Character/PxiiCharacter.h"
 
 void UPxiiGameplayAbilityHold::ActivateAbility(const FGameplayAbilitySpecHandle Handle,	const FGameplayAbilityActorInfo* OwnerInfo,
                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, OwnerInfo, ActivationInfo, TriggerEventData);
-
+	AActor* Avatar = OwnerInfo->AvatarActor.Get();
+	SelfCharacter = Cast<APxiiCharacter>(Avatar);
 	HoldTime = GetWorld()->GetTimeSeconds();
 }
 
