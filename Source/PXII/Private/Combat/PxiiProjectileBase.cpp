@@ -52,11 +52,13 @@ void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHi
 	
 	if(DamageGE && !InstigatorASC)
 	{
+		PXII_LOG(ELogCategory::Projectile, Log, TEXT("APPLY DAMAGE FAIL RETURNING!"));
 		return;
 	}
 
 	if(ExplosionRadius > 0.0f)
 	{
+		SpawnAOEImpact();
 		PXII_LOG(ELogCategory::Projectile, Log, TEXT("AOE DETECTED getting actor within impact radius"));
 
 		FCollisionQueryParams collisionParam;
@@ -446,6 +448,32 @@ FGameplayTag APxiiProjectileBase::GetPoolTag()
 	return PoolTag;
 }
 
+void APxiiProjectileBase::CheckDistanceTrigger_Implementation()
+{
+	const float Distance = FVector::Dist(StartingLocation, GetActorLocation());
+
+	if (Distance >= TriggerDistance)
+	{
+		OnDistanceReached();
+		GetWorld()->GetTimerManager().ClearTimer(DistanceCheckTimerHandle);
+	}
+}
+
+void APxiiProjectileBase::OnDistanceReached_Implementation()
+{
+	FHitResult hitResult;
+	hitResult.ImpactPoint = GetActorLocation();
+	hitResult.Location = GetActorLocation();
+	
+	ApplyDamage(nullptr, hitResult);
+	ReturnProjecileToPool();
+}
+
+void APxiiProjectileBase::SpawnAOEImpact_Implementation()
+{
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("DZ_LOG:: SPAWN AOE EFFECT"));
+}
+
 EPhysicalSurface APxiiProjectileBase::GetSurfaceType(const FHitResult& hit)
 {
 	if (hit.PhysMaterial.IsValid())
@@ -485,6 +513,11 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 		GetWorldTimerManager().ClearTimer(LifetimeTimerHandle);
 	}
 
+	if (DistanceCheckTimerHandle.IsValid() && GetWorldTimerManager().IsTimerActive(DistanceCheckTimerHandle))
+	{
+		GetWorldTimerManager().ClearTimer(DistanceCheckTimerHandle);
+	}
+
 	// Only start timer when needed
 	if (bIsInUse)
 	{
@@ -497,6 +530,18 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 			Lifetime,
 			false
 		);
+
+		StartingLocation = GetActorLocation();
+		if(bDistanceTriggered)
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				DistanceCheckTimerHandle,
+				this,
+				&APxiiProjectileBase::CheckDistanceTrigger,
+				CheckInterval,
+				true
+			);
+		}
 	}
 }
 
@@ -509,7 +554,7 @@ void APxiiProjectileBase::OnHit_Implementation(UPrimitiveComponent* HitComp, AAc
 	{
 		return;
 	}
-
+	
 	ApplyDamage(OtherActor, TraceInformation.HitResult);
 	SpawnImpactEffects(TraceInformation.HitResult);
 	ReturnProjecileToPool();

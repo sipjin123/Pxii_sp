@@ -12,6 +12,23 @@
 #include "Targeting/Targetable.h"
 #include "PxiiNPC.generated.h"
 
+USTRUCT(BlueprintType)
+struct FPxiiHitTracker
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FDateTime DateTimeUTC;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 Value=0;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	AActor* LastAttacker;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IsRangedAtk;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHasTakenPlayerDamage, AActor*, PlayerRef, FDamageNotifPayload, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAnimEventBroadcastEnemy, int32, Payload, float, Magnitude);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHitEffectType, EHitEffectType, EffectType, int32, Magnitude);
@@ -167,6 +184,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	APxiiCombatDirector* CombatDirectorRef;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FPxiiHitTracker> HitTrackerData;
 	
 	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
@@ -179,4 +199,11 @@ protected:
 
 	virtual void KillThisUnit_Implementation(AActor* Killer, FKillUnitPayload Payload) override;
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void IncrementHitTracker(FPxiiHitTracker& HitTracker,AActor* Target, bool IsRangedAtk);
+	
+	UFUNCTION(BlueprintCallable)
+	static bool IsRangedAttackFrequent(const TArray<FPxiiHitTracker>& HitTrackerDataNew);
 };

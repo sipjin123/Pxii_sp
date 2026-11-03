@@ -47,6 +47,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Projectile")
 	AActor* WeaponOwner;
 
+	UPROPERTY(EditAnywhere, Category = "Distance Trigger")
+	float TriggerDistance = 1000.f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Distance Trigger")
+	FVector StartingLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Distance Trigger")
+	bool bDistanceTriggered = false;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<UGameplayEffect> DamageGE;
 
@@ -120,8 +129,6 @@ public:
 
 	FGameplayTag GetPoolTag();
 
-	
-
 protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (AllowPrivateAccess = "true"))
@@ -159,7 +166,27 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile|VFX", meta = (AllowPrivateAccess = "true"))
 	float ProjectileSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Distance Trigger")
+	float CheckInterval = 0.05f;
+
+	FTimerHandle DistanceCheckTimerHandle;
 	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void CheckDistanceTrigger();
+	
+	virtual void CheckDistanceTrigger_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnDistanceReached();
+
+	virtual void OnDistanceReached_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SpawnAOEImpact();
+
+	virtual void SpawnAOEImpact_Implementation();
+
 private:
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))

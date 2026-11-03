@@ -9,6 +9,24 @@
 #include "Weapon/PxiiWeaponBase.h"
 #include "PxiiWeaponRange.generated.h"
 
+USTRUCT(BlueprintType)
+struct FMuzzleEffect
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|VFX")
+	TArray<TObjectPtr<UNiagaraSystem>> MuzzleEffect;
+};
+
+USTRUCT(BlueprintType)
+struct FMuzzleEffectComp
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|VFX")
+	TArray<TObjectPtr<UNiagaraComponent>> MuzzleEffectComp;
+};
+
 /**
  * 
  */
@@ -23,9 +41,14 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PlayMuzzleFlash();
+	void PlayMuzzleFlash(FName MuzzleName = "Default");
 
-	virtual void PlayMuzzleFlash_Implementation();
+	virtual void PlayMuzzleFlash_Implementation(FName MuzzleName = "Default");
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopMuzzleFlash(FName MuzzleName = "Default");
+
+	virtual void StopMuzzleFlash_Implementation(FName MuzzleName = "Default");
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PlayWeaponSfx();
@@ -36,7 +59,7 @@ public:
 	
 	UPxiiRecoilPattern* GetHipRecoil();
 
-	TArray<UNiagaraSystem*> GetSystem();
+	// TArray<UNiagaraSystem*> GetSystem();
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
@@ -49,10 +72,10 @@ private:
 	TObjectPtr<UPxiiWeaponSfxData> WeaponSfx;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX")
-	TArray<UNiagaraComponent*> MuzzleFlashComponents;
+	TMap<FName, FMuzzleEffectComp> MuzzleFlashComponents;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX", meta = (AllowPrivateAccess = "true"))
-	TArray<TObjectPtr<UNiagaraSystem>> MuzzleFlashEffect;
+	TMap<FName, FMuzzleEffect> MuzzleFlashEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|VFX", meta = (AllowPrivateAccess = "true"))
 	FName MuzzleSocketName = "Muzzle";

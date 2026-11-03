@@ -31,26 +31,38 @@ void APxiiWeaponRange::BeginPlay()
 	{
 		MuzzleFlashComponents.Empty();
 		int32 index = 0;
-		for(UNiagaraSystem* system : MuzzleFlashEffect)
+		for(TPair<FName, FMuzzleEffect> system : MuzzleFlashEffect)
 		{
-			if(!system)
+			TArray<UNiagaraSystem*> effects = system.Value.MuzzleEffect;
+			if(effects.IsEmpty())
 			{
 				continue;
 			}
+			FMuzzleEffectComp comp;
+			for(UNiagaraSystem* effect : effects)
+			{
+				if(!effect)
+				{
+					continue;
+				}
 
-			FString vfxName = "MuzzleFlash-" + FString::FromInt(index);
-			UNiagaraComponent* MuzzleFlashComponent = NewObject<UNiagaraComponent>(this, FName(*vfxName));
-			MuzzleFlashComponent->AttachToComponent(SKWeapon, FAttachmentTransformRules::SnapToTargetIncludingScale, MuzzleSocketName);
+				FString vfxName = "MuzzleFlash-" + FString::FromInt(index);
+				UNiagaraComponent* MuzzleFlashComponent = NewObject<UNiagaraComponent>(this, FName(*vfxName));
+				MuzzleFlashComponent->AttachToComponent(SKWeapon, FAttachmentTransformRules::SnapToTargetIncludingScale, MuzzleSocketName);
 
-			MuzzleFlashComponent->SetupAttachment(SKWeapon, MuzzleSocketName);
-			MuzzleFlashComponent->RegisterComponent();
+				MuzzleFlashComponent->SetupAttachment(SKWeapon, MuzzleSocketName);
+				MuzzleFlashComponent->RegisterComponent();
 
-			MuzzleFlashComponent->SetAutoActivate(false);
-			MuzzleFlashComponent->SetAsset(system);
-			HasMuzzleFlash = true;
+				MuzzleFlashComponent->SetAutoActivate(false);
+				MuzzleFlashComponent->SetAsset(effect);
+				MuzzleFlashComponent->Deactivate();
+				HasMuzzleFlash = true;
 
-			index++;
-			MuzzleFlashComponents.Add(MuzzleFlashComponent);
+				index++;
+				comp.MuzzleEffectComp.Add(MuzzleFlashComponent);
+			}
+			
+			MuzzleFlashComponents.Add(system.Key, comp);
 		}
 	}
 	else
@@ -59,16 +71,39 @@ void APxiiWeaponRange::BeginPlay()
 	}
 }
 
-void APxiiWeaponRange::PlayMuzzleFlash_Implementation()
+void APxiiWeaponRange::PlayMuzzleFlash_Implementation(FName MuzzleName)
 {
 	if(!HasMuzzleFlash)
 	{
 		return;
 	}
 
-	for(UNiagaraComponent* comp : MuzzleFlashComponents)
+	if(!MuzzleFlashComponents.Contains(MuzzleName))
+	{
+		return;
+	}
+	FMuzzleEffectComp comps = MuzzleFlashComponents[MuzzleName];
+	for(UNiagaraComponent* comp : comps.MuzzleEffectComp)
 	{
 		comp->Activate(true);
+	}
+}
+
+void APxiiWeaponRange::StopMuzzleFlash_Implementation(FName MuzzleName)
+{
+	if(!HasMuzzleFlash)
+	{
+		return;
+	}
+
+	if(!MuzzleFlashComponents.Contains(MuzzleName))
+	{
+		return;
+	}
+	FMuzzleEffectComp comps = MuzzleFlashComponents[MuzzleName];
+	for(UNiagaraComponent* comp : comps.MuzzleEffectComp)
+	{
+		comp->Deactivate();
 	}
 }
 
@@ -119,7 +154,7 @@ UPxiiRecoilPattern* APxiiWeaponRange::GetHipRecoil()
 	return HipRecoil;
 }
 
-TArray<UNiagaraSystem*> APxiiWeaponRange::GetSystem()
-{
-	return MuzzleFlashEffect;
-}
+// TArray<UNiagaraSystem*> APxiiWeaponRange::GetSystem()
+// {
+// 	return MuzzleFlashEffect;
+// }

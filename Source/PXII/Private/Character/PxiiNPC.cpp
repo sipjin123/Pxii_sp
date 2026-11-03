@@ -213,3 +213,50 @@ void APxiiNPC::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Health: %f -> %f"), Data.OldValue, Data.NewValue);
 }
+
+void APxiiNPC::IncrementHitTracker(FPxiiHitTracker& HitTracker,AActor* Target, bool IsRangedAtk)
+{
+	if (!IsValid(Target))
+	{
+		return;
+	}
+	if (HitTracker.LastAttacker!=Target)
+	{
+		HitTracker.Value=0;
+		HitTracker.LastAttacker=Target;
+		HitTracker.IsRangedAtk=IsRangedAtk;
+	}
+	HitTracker.Value++;
+	HitTracker.DateTimeUTC=FDateTime::UtcNow();
+	if (HitTrackerData.Num()>=10)
+	{
+		HitTrackerData.RemoveAt(0);
+	}
+	HitTrackerData.Add(HitTracker);
+
+	if (true)
+	{
+		for (const FPxiiHitTracker& Entry : HitTrackerData)
+		{
+			const double SecondsAgo=(FDateTime::UtcNow()-Entry.DateTimeUTC).GetTotalSeconds();
+			UE_LOG(LogTemp,Log,TEXT("Hit Time: %s | Seconds Ago: %.2f | Attacker: %s | Ranged: %s"),*Entry.DateTimeUTC.ToString(),SecondsAgo,IsValid(Entry.LastAttacker)?*Entry.LastAttacker->GetActorNameOrLabel():TEXT("Invalid"),Entry.IsRangedAtk?TEXT("Yes"):TEXT("No"));
+		}
+	}
+}
+
+bool APxiiNPC::IsRangedAttackFrequent(const TArray<FPxiiHitTracker>& HitTrackerDataNew)
+{
+	if (HitTrackerDataNew.Num()==0)
+	{
+		return false;
+	}
+	int32 RangedCount=0;
+	for (const FPxiiHitTracker& Hit : HitTrackerDataNew)
+	{
+		if (Hit.IsRangedAtk)
+		{
+			RangedCount++;
+		}
+	}
+	return RangedCount*2>=HitTrackerDataNew.Num();
+}

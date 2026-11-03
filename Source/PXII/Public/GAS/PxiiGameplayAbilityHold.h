@@ -29,7 +29,7 @@ public:
 
 protected:
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	APxiiCharacter* SelfCharacter;
 
 private:

@@ -6,10 +6,11 @@
 void UPxiiGameplayAbilityHold::ActivateAbility(const FGameplayAbilitySpecHandle Handle,	const FGameplayAbilityActorInfo* OwnerInfo,
                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, OwnerInfo, ActivationInfo, TriggerEventData);
 	AActor* Avatar = OwnerInfo->AvatarActor.Get();
 	SelfCharacter = Cast<APxiiCharacter>(Avatar);
 	HoldTime = GetWorld()->GetTimeSeconds();
+
+	Super::ActivateAbility(Handle, OwnerInfo, ActivationInfo, TriggerEventData);
 }
 
 void UPxiiGameplayAbilityHold::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

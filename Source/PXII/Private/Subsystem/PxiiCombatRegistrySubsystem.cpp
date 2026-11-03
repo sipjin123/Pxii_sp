@@ -9,6 +9,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
+#include "Character/PxiiNPC.h"
 #include "Enum/PxiiDamageType.h"
 #include "Utility/PxiiCombatBPLibrary.h"
 #include "Utility/PXIILogUtility.h"
@@ -233,6 +234,16 @@ void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActo
 		if (bLogFlow)
 			UE_LOG(LogTemp, Warning, TEXT("[CRS] %d -------------------------------------- Damage Applied, Remain {%d} INDEX: {%d} --  {%d}"), CurrentTickIndex, DamageQueue.Num(), DamageSource, HitEffectType);
 		SourceASC->ApplyGameplayEffectSpecToTarget(*ParrySpecHandle.Data.Get(), TargetASC);
+
+		// NOTE: Convert this to Interface Later
+		//------------------------------------------------------------
+		if (APxiiNPC* NpcRef = Cast<APxiiNPC>(Target))
+		{
+			FPxiiHitTracker Params;
+			Params.IsRangedAtk= DamageSource == EDamageSource::Range;
+			NpcRef->IncrementHitTracker(Params, Source, DamageSource == EDamageSource::Range);
+		}
+		//------------------------------------------------------------
 		
 		FHitResult HitResult;
 		HitResult.ImpactPoint = HitCoords;
