@@ -39,4 +39,9 @@ public:
 	void ShowImpactVfx(const FVector& impactLocation, const FVector& hitDirection);
 
 	void ShowImpactVfx_Implementation(const FVector& impactLocation, const FVector& hitDirection);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayCameraShake(EHitImpact hitImpact);
+
+	void PlayCameraShake_Implementation(EHitImpact hitImpact);
 };

@@ -169,13 +169,16 @@ void UPxiiCombatRegistrySubsystem::ProcessDamageRegistry(const FQueuedDamage& Da
 			if (bLogFlow)
 				UE_LOG(LogTemp, Warning, TEXT("[CRS] %d ---- Process Damage, Remain {%d}"), CurrentTickIndex, DamageQueue.Num());
 			EHitEffectType EffectType = static_cast<EHitEffectType>(DamageEntry.HitData.Flags);
+			EHitDirection HitDirection = static_cast<EHitDirection>(DamageEntry.HitData.HitDirection);
+
 			ApplySingleDamageEffect(
 				DamageEntry.Source.Get(),
 				DamageEntry.HitData.Target.Get(),
 				DamageEntry.HitData.Damage,
 				DamageEntry.HitData.HitCoord,
 				EffectType,
-				DamageEntry.HitData.DamageSource
+				DamageEntry.HitData.DamageSource,
+				HitDirection
 			);
 
 			//UE_LOG(LogTemp, Warning, TEXT("[CRS] ---------------------------- HIT FLAG Remain {%d}"), DamageEntry.HitData.Flags);
@@ -190,7 +193,7 @@ void UPxiiCombatRegistrySubsystem::ProcessDamageRegistry(const FQueuedDamage& Da
 	}
 }
 
-void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords, EHitEffectType HitEffectType, EDamageSource DamageSource)
+void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords, EHitEffectType HitEffectType, EDamageSource DamageSource, EHitDirection HitDirection)
 {
 	if (!Source->HasAuthority()) return;
 	
@@ -248,7 +251,7 @@ void UPxiiCombatRegistrySubsystem::ApplySingleDamageEffect(AActor* Source, AActo
 		FHitResult HitResult;
 		HitResult.ImpactPoint = HitCoords;
 		HitResult.Location = HitCoords;
-		UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(Source, Target, HitResult, 0.f, HitEffectType);
+		UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(Source, Target, HitResult, 0.f, HitEffectType, HitDirection);
 	}
 }
 

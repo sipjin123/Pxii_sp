@@ -123,3 +123,24 @@ FHitStopData APxiiWeaponMelee::GetHitStopData(EHitImpact hitImpact)
 	return HitStopData[hitImpact];
 }
 
+UCameraShakeAsset* APxiiWeaponMelee::GetCameraShakeImpact(EHitImpact hitImpact)
+{
+	if(ArmbladeEffectData == nullptr)
+	{
+		return nullptr;
+	}
+
+	auto CameraShake = ArmbladeEffectData->ImpactCameraShake;
+	if(CameraShake.IsEmpty())
+	{
+		return nullptr;
+	}
+
+	if(!CameraShake.Contains(hitImpact))
+	{
+		return nullptr;
+	}
+
+	return CameraShake[hitImpact];
+}
+

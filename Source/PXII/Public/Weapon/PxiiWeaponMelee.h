@@ -34,5 +34,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FHitStopData GetHitStopData(EHitImpact hitImpact);
+
+	UFUNCTION(BlueprintPure)
+	UCameraShakeAsset* GetCameraShakeImpact(EHitImpact hitImpact);
 	
 };

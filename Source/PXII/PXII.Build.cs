@@ -30,6 +30,7 @@ public class PXII : ModuleRules
 			"HairStrandsCore",
 			"ApplicationCore",
 			"MotionWarping",
+			"GameplayCameras",
 			
 			// UI
 			"UMG",

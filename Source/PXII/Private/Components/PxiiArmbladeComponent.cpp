@@ -55,4 +55,10 @@ void UPxiiArmbladeComponent::ResetHitStop_Implementation()
 
 void UPxiiArmbladeComponent::ShowImpactVfx_Implementation(const FVector& impactLocation, const FVector& hitDirection)
 {
+	
+}
+
+void UPxiiArmbladeComponent::PlayCameraShake_Implementation(EHitImpact hitImpact)
+{
+	
 }

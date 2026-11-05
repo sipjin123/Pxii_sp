@@ -70,10 +70,10 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable)
-	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
+	static void RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection);
 	
 	UFUNCTION(BlueprintCallable)
-	static void RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType);
+	static void RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection);
 
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat")
 	static TArray<AActor*> MultiSphereTraceTargetChain(UObject* WorldContextObject, AActor* Owner, FVector Origin, FVector Direction, float Distance,

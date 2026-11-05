@@ -65,8 +65,9 @@ void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector 
 }
 
 
-void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact)
+void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact, EHitImpact CameraImpact)
 {
+	CameraImpactType = CameraImpact;
 	HitImpactType = HitImpact;
 	HitDirectionType = HitDirection;
 	HitEffectType = NewHitEffectType;
@@ -183,6 +184,8 @@ void UPxiiCombatComponent::EndHitTrace()
 	{
 		armbladeComp->ResetHitStop();
 	}
+	CameraImpactType = EHitImpact::Invalid;
+	HitImpactType = EHitImpact::Invalid;
 	HasPreviousTrace = false;
 	LengthExtension = 0.f;
 	if (CharacterRef && CharacterRef->Implements<UPxiiCombatInterface>())
@@ -308,6 +311,7 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 					
 					ArmbladeComponent->ApplyHitStop(HitImpactType);
 					ArmbladeComponent->ShowImpactVfx(OutHitParam.ImpactPoint, hitDirection);
+					ArmbladeComponent->PlayCameraShake(CameraImpactType);
 				}
 				
 				if (IsBossUnit)
@@ -404,6 +408,7 @@ void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc,
 					Hit.Target = TargetUnit;
 					Hit.Damage = TotalDamage;
 					Hit.Flags  = static_cast<uint8>(HitEffectType);
+					Hit.HitDirection  = static_cast<uint8>(HitDirectionType);
 					Hit.HitCoord = HitLoc;
 					Hit.DamageSource = DamageSource;
 

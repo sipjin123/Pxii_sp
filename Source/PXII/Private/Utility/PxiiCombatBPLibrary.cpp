@@ -37,7 +37,7 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     return false;
 }
 
-void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType)
+void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection)
 {
     UAbilitySystemComponent* InstigatorASC = nullptr;
     if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(SourceActor))
@@ -76,7 +76,7 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
 
                     InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
                 }
-                RegisterHitStatusEffectOnly(SourceActor, TargetActor, result, Magnitude, HitEffectType);
+                RegisterHitStatusEffectOnly(SourceActor, TargetActor, result, Magnitude, HitEffectType, HitDirection);
             }
         }
     }
@@ -86,7 +86,7 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
     }
 }
 
-void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType)
+void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection)
 {
     if (true)//if(HitEffectType != EHitEffectType::Default)
     {
@@ -101,8 +101,12 @@ void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AAct
             new FGameplayAbilityTargetData_SingleTargetHit(HitResult)
         );
 
+        UPxiiHitEventData* HitData = NewObject<UPxiiHitEventData>(SourceActor);
+        HitData->HitDirectionType = HitDirection;
+        
         Payload.TargetData = TargetDataHandle;
         Payload.Instigator = SourceActor;
+        Payload.OptionalObject = HitData;
         
         FGameplayTag DynamicTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Character.Infliction.Flinch"));
         switch (HitEffectType)

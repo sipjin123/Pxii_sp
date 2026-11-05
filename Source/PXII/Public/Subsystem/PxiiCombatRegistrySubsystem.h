@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameplayEffect.h"
+#include "Components/PxiiHitFeedbackComponent.h"
 #include "Data/PxiiAbilityData.h"
 #include "Enum/PxiiDamageType.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
@@ -30,6 +31,9 @@ struct FDamageHit
 
 	UPROPERTY(BlueprintReadWrite)
 	uint8 Flags = 0;
+
+	UPROPERTY(BlueprintReadWrite)
+	uint8 HitDirection = 0;
 	
 	UPROPERTY(BlueprintReadWrite)
 	EDamageSource DamageSource = EDamageSource::None;
@@ -65,7 +69,7 @@ public:
 	void ManualTick();
 	void ProcessDamageRegistry(const FQueuedDamage& DamageEntry);
 	void ApplySingleDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords,
-								 EHitEffectType HitEffectType, EDamageSource DamageSource);
+								 EHitEffectType HitEffectType, EDamageSource DamageSource, EHitDirection HitDirection);
 	void ApplyDPSDamageEffect(AActor* Source, AActor* Target, float Damage, FVector HitCoords, float period,
 								float duration, EHitEffectType HitEffectType, EDamageSource DamageSource);
 

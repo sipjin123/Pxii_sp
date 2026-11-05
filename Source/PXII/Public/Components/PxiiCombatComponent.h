@@ -45,7 +45,7 @@ public:
 	bool ShowDebugLine;
 	
 	UFUNCTION(BlueprintCallable)
-	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact);
+	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact, EHitImpact CameraImpact);
 
 	UPROPERTY(BlueprintReadWrite)
 	EHitEffectType HitEffectType;
@@ -55,6 +55,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	EHitImpact HitImpactType;
+	
+	UPROPERTY(BlueprintReadOnly)
+	EHitImpact CameraImpactType;
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector PreviousStartTrace;

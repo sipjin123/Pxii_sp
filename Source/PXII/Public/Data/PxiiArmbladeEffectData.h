@@ -1,13 +1,26 @@
 ﻿#pragma once
+#include "Components/PxiiHitFeedbackComponent.h"
+#include "Core/CameraShakeAsset.h"
 #include "PxiiArmbladeEffectData.generated.h"
 
-UENUM()
+UCLASS(BlueprintType)
+class PXII_API UPxiiHitEventData : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	EHitDirection HitDirectionType = EHitDirection::Front;
+};
+
+UENUM(BlueprintType)
 enum class EHitImpact : uint8
 {
 	Light,
 	Medium,
 	Heavy,
 	Finisher,
+	Invalid,
 };
 
 USTRUCT(BlueprintType)
@@ -73,6 +86,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<EHitImpact, FHitStopData> HitStopMap;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<EHitImpact, TObjectPtr<UCameraShakeAsset>> ImpactCameraShake;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FImpactSoundEffect DefaultImpactSFX;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Impact")
