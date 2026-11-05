@@ -7,6 +7,16 @@
 #include "PxiiEnemyType.generated.h"
 
 UENUM(BlueprintType)
+enum class ECombateState:uint8
+{
+	Default=0 UMETA(DisplayName="Default"),
+	Aggressive=1 UMETA(DisplayName="Aggressive"),
+	Defensive=2 UMETA(DisplayName="Defensive"),
+	Enraged=3 UMETA(DisplayName="Enraged"),
+	Dying=4 UMETA(DisplayName="Dying"),
+};
+
+UENUM(BlueprintType)
 enum class EEnemyType:uint8
 {
 	None=0 UMETA(DisplayName="None"),

@@ -187,6 +187,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FPxiiHitTracker> HitTrackerData;
+
+	UPROPERTY(BlueprintReadWrite)
+	ECombateState CombateState;
 	
 	virtual void RegisterLastKnownAttacker_Implementation(AActor* Target, float Damage) override;
 protected:
