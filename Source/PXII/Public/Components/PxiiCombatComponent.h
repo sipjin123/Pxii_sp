@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PxiiArmbladeComponent.h"
+#include "PxiiHitFeedbackComponent.h"
 #include "Components/ActorComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "Character/PxiiCharacterBase.h"
@@ -43,10 +45,31 @@ public:
 	bool ShowDebugLine;
 	
 	UFUNCTION(BlueprintCallable)
-	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType);
+	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact);
 
 	UPROPERTY(BlueprintReadWrite)
 	EHitEffectType HitEffectType;
+
+	UPROPERTY(BlueprintReadOnly)
+	EHitDirection HitDirectionType;
+
+	UPROPERTY(BlueprintReadOnly)
+	EHitImpact HitImpactType;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector PreviousStartTrace;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector PreviousEndTrace;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector CurrentStartTrace;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector CurrentEndTrace;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool HasPreviousTrace;
 	
 	UFUNCTION(BlueprintCallable)
 	void ProcessHitTrace(FVector SocketLoc);
@@ -71,6 +94,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, const FDpsData& Damage, EDamageSource DamageSource);
+
+	UFUNCTION(BlueprintPure)
+	UPxiiArmbladeComponent* GetArmbladeComponent();
 	
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> HitTracedActors;
@@ -128,4 +154,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName SocketTarget;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPxiiArmbladeComponent> ArmbladeComponent;
 };

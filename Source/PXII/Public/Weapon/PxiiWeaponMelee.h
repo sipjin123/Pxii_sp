@@ -20,6 +20,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UPxiiArmbladeEffectData> ArmbladeEffectData;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlaySlashSFX();
+
+	void PlaySlashSFX_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlaySlashImpact(EPhysicalSurface SurfaceType, const FVector& impactLocation);
+
+	void PlaySlashImpact_Implementation(EPhysicalSurface SurfaceType, const FVector& impactLocation);
+
+	FImpactSoundEffect GetImpactSoundEffect(EPhysicalSurface SurfaceType);
+
+	UFUNCTION(BlueprintPure)
+	FHitStopData GetHitStopData(EHitImpact hitImpact);
 	
 };

@@ -4,14 +4,16 @@
 UENUM(BlueprintType)
 enum class EHitDirection : uint8
 {
-	Front      UMETA(DisplayName = "Front"),
-	FrontLeft  UMETA(DisplayName = "Front Left"),
-	Left       UMETA(DisplayName = "Left"),
-	BackLeft   UMETA(DisplayName = "Back Left"),
-	Back       UMETA(DisplayName = "Back"),
-	BackRight  UMETA(DisplayName = "Back Right"),
-	Right      UMETA(DisplayName = "Right"),
-	FrontRight UMETA(DisplayName = "Front Right")
+	Up          UMETA(DisplayName = "Up"),
+	UpRight     UMETA(DisplayName = "Up Right"),
+	Right       UMETA(DisplayName = "Right"),
+	DownRight   UMETA(DisplayName = "Down Right"),
+	Down        UMETA(DisplayName = "Down"),
+	DownLeft    UMETA(DisplayName = "Down Left"),
+	Left        UMETA(DisplayName = "Left"),
+	UpLeft      UMETA(DisplayName = "Up Left"),
+	Front		UMETA(DisplayName = "Front"),
+	Back		UMETA(DisplayName = "Back")
 };
 
 

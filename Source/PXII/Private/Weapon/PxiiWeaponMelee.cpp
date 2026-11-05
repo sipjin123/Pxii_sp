@@ -5,14 +5,14 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void APxiiWeaponMelee::PlaySlashSFX()
+void APxiiWeaponMelee::PlaySlashSFX_Implementation()
 {
-	FWeaponSlashSfx weaponSlashSfx = ArmbladeEffectData->ArmbladeSlashSfx;
 	if(ArmbladeEffectData == nullptr)
 	{
 		return;
 	}
-
+	
+	FWeaponSlashSfx weaponSlashSfx = ArmbladeEffectData->ArmbladeSlashSfx;
 	if(weaponSlashSfx.WeaponSfx.IsEmpty())
 	{
 		return;
@@ -46,3 +46,80 @@ void APxiiWeaponMelee::PlaySlashSFX()
 	);
 	
 }
+
+void APxiiWeaponMelee::PlaySlashImpact_Implementation(EPhysicalSurface SurfaceType, const FVector& impactLocation)
+{
+	if(ArmbladeEffectData == nullptr)
+	{
+		return;
+	}
+
+	FImpactSoundEffect weaponImpactSfx = GetImpactSoundEffect(SurfaceType);
+	if(weaponImpactSfx.ImpactSfx.IsEmpty())
+	{
+		return;
+	}
+
+	
+	int32 soundIndex = FMath::RandRange(0, weaponImpactSfx.ImpactSfx.Num() - 1);
+	USoundBase* soundCue = weaponImpactSfx.ImpactSfx[soundIndex];
+	if(!soundCue)
+	{
+		return;
+	}
+
+	const float MinVolume = FMath::Min(weaponImpactSfx.MinVolumeMultiplier, weaponImpactSfx.MaxVolumeMultiplier);
+	const float MaxVolume = FMath::Max(weaponImpactSfx.MinVolumeMultiplier, weaponImpactSfx.MaxVolumeMultiplier);
+
+	const float VolumeMult = FMath::FRandRange(MinVolume, MaxVolume);
+	
+	const float MinPitch = FMath::Min(weaponImpactSfx.MinPitchMultiplier, weaponImpactSfx.MaxPitchMultiplier);
+	const float MaxPitch = FMath::Max(weaponImpactSfx.MinPitchMultiplier, weaponImpactSfx.MaxPitchMultiplier);
+
+	const float PitchMult = FMath::FRandRange(MinPitch, MaxPitch);
+
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		soundCue,
+		impactLocation,
+		FRotator::ZeroRotator,
+		VolumeMult,       // Volume multiplier
+		PitchMult       // Pitch multiplier
+	);
+}
+
+FImpactSoundEffect APxiiWeaponMelee::GetImpactSoundEffect(EPhysicalSurface SurfaceType)
+{
+	if (const FImpactSoundEffect* Found = ArmbladeEffectData->ArmbladeImpactSFX.Find(SurfaceType))
+	{
+		return *Found;
+	}
+
+	return ArmbladeEffectData->DefaultImpactSFX;
+	
+}
+
+FHitStopData APxiiWeaponMelee::GetHitStopData(EHitImpact hitImpact)
+{
+	if(ArmbladeEffectData == nullptr)
+	{
+		return FHitStopData();
+	}
+
+	auto HitStopData = ArmbladeEffectData->HitStopMap;
+	if(HitStopData.IsEmpty())
+	{
+		return FHitStopData();
+	}
+
+	if(!HitStopData.Contains(hitImpact))
+	{
+		auto data = HitStopData.CreateConstIterator();
+		auto& defaultValue = data->Value;
+
+		return defaultValue;
+	}
+
+	return HitStopData[hitImpact];
+}
+

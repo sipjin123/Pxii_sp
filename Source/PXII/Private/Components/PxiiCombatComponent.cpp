@@ -65,8 +65,10 @@ void UPxiiCombatComponent::TriggerProjectileTrace(FVector ImpactNormal, FVector 
 }
 
 
-void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType)
+void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact)
 {
+	HitImpactType = HitImpact;
+	HitDirectionType = HitDirection;
 	HitEffectType = NewHitEffectType;
 	HitTracedActors.Empty();
 	TraceIndex = 0;
@@ -93,6 +95,21 @@ void UPxiiCombatComponent::ProcessHitTrace(FVector SocketLoc)
 
 void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc, bool drawTrace )
 {
+	if(!HasPreviousTrace)
+	{
+		CurrentStartTrace = StartLoc;
+		CurrentEndTrace = EndLoc;
+		HasPreviousTrace = true;
+		
+		return;
+	}
+
+	PreviousEndTrace = CurrentEndTrace;
+	PreviousStartTrace = CurrentStartTrace;
+	
+	CurrentStartTrace = StartLoc;
+	CurrentEndTrace = EndLoc;
+	
 	if (LogSlashLogic)
 		UE_LOG(LogTemp, Warning, TEXT("Slash Trace: TraceLogic Index:%d"), TraceIndex);
 	constexpr float Radius = 15.f;
@@ -161,6 +178,12 @@ void UPxiiCombatComponent::ProcessHitTraceLogic(FVector StartLoc, FVector EndLoc
 
 void UPxiiCombatComponent::EndHitTrace()
 {
+	UPxiiArmbladeComponent* armbladeComp = GetArmbladeComponent();
+	if(armbladeComp)
+	{
+		armbladeComp->ResetHitStop();
+	}
+	HasPreviousTrace = false;
 	LengthExtension = 0.f;
 	if (CharacterRef && CharacterRef->Implements<UPxiiCombatInterface>())
 	{
@@ -276,6 +299,17 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 
 			if (SourceFaction != TargetFaction)
 			{
+				UPxiiArmbladeComponent* armbladeComp = GetArmbladeComponent();
+				if(ArmbladeComponent)
+				{
+					FVector previousLoc = (PreviousStartTrace + PreviousEndTrace) * 0.5f;
+					FVector currentLoc = (CurrentStartTrace + CurrentEndTrace) * 0.5f;
+					FVector hitDirection = (currentLoc - previousLoc).GetSafeNormal();
+					
+					ArmbladeComponent->ApplyHitStop(HitImpactType);
+					ArmbladeComponent->ShowImpactVfx(OutHitParam.ImpactPoint, hitDirection);
+				}
+				
 				if (IsBossUnit)
 				{
 					// Process Body Part
@@ -413,4 +447,16 @@ void UPxiiCombatComponent::ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, 
 			}
 		}
 	}
+}
+
+UPxiiArmbladeComponent* UPxiiCombatComponent::GetArmbladeComponent()
+{
+	if(ArmbladeComponent)
+	{
+		return ArmbladeComponent;
+	}
+
+	ArmbladeComponent = GetOwner()->GetComponentByClass<UPxiiArmbladeComponent>();
+	
+	return ArmbladeComponent;
 }
