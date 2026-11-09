@@ -107,6 +107,32 @@ void APxiiWeaponRange::StopMuzzleFlash_Implementation(FName MuzzleName)
 	}
 }
 
+void APxiiWeaponRange::ResetVent_Implementation()
+{
+	
+}
+
+float APxiiWeaponRange::GetDamage(float hitDistance, float bulletBonusDamage, bool isCritical)
+{
+	if(BlasterData == nullptr)
+	{
+		return 1.0f;
+	}
+	
+	float critMult = isCritical ? BlasterData->CriticalMultiplier : 1.0f;
+	if(BlasterData->EnableDistanceFalloff)
+	{
+		float startDist = FMath::Min(BlasterData->DistanceFalloffStart, BlasterData->DistanceFalloffEnd);
+		float endDist = FMath::Max(BlasterData->DistanceFalloffStart, BlasterData->DistanceFalloffEnd);
+		float fallOffDistance = (hitDistance - startDist) / FMath::Max(endDist - startDist, 1);
+		float alpha = FMath::Clamp(fallOffDistance, 0, 1);
+		float Damage = FMath::Lerp(BlasterData->MinimumDamage + bulletBonusDamage, BlasterData->BaseDamage + bulletBonusDamage, 1.0f - alpha);
+		return Damage * critMult; 
+	}
+
+	return (BlasterData->BaseDamage + bulletBonusDamage) * critMult;
+}
+
 void APxiiWeaponRange::PlayWeaponSfx_Implementation()
 {
 	if(!WeaponSfx)

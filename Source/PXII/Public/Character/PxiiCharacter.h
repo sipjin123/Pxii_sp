@@ -98,4 +98,7 @@ public:
 	FAnimEventBroadcast AnimEventBroadcast;
 
 	virtual void ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource) override;
+
+	UFUNCTION(BlueprintPure)
+	virtual float GetRangeWeaponDamage(float hitDistance, float bulletBonusDamage = 0.0f, bool isCritical = false);
 };

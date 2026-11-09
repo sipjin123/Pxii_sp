@@ -125,6 +125,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Projectile")
 	float GetDamage(const FHitResult& result);
 
+	UFUNCTION(BlueprintPure)
+	float GetBulletBonusDamage();
+
 	void SetProjectileTag(FGameplayTag inTag);
 
 	FGameplayTag GetPoolTag();
@@ -195,8 +198,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	bool DrawDebug;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	float BaseDMG;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage", meta=(AllowPrivateAccess = "true"))
+	float BulletBonusDamage = 0.0f;
 	
 	bool bIsInUse = false;
 

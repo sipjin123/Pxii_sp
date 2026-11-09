@@ -422,6 +422,17 @@ void APxiiProjectileBase::ApplyTargetProjectileHitEffect(AActor* TargetActor)
 
 float APxiiProjectileBase::GetDamage(const FHitResult& result)
 {
+	float distance = FVector::Distance(GetActorLocation(), StartingLocation);
+	float Damage = BaseDMG;
+	APxiiCharacter* character = Cast<APxiiCharacter>(WeaponOwner);
+	float debugWeaponDmg = 0.0f;
+	if(character)
+	{
+		bool isCritical = result.BoneName == FName("head");
+		debugWeaponDmg = character->GetRangeWeaponDamage(distance, 0.0f, isCritical);
+		Damage = character->GetRangeWeaponDamage(distance, GetBulletBonusDamage(), isCritical);
+	}
+	
 	if(!result.GetActor())
 	{
 		return 0.0f;
@@ -433,8 +444,14 @@ float APxiiProjectileBase::GetDamage(const FHitResult& result)
 		float dist = FVector::Dist(result.ImpactPoint, result.GetActor()->GetActorLocation());
 		fallOffModifier = FMath::Clamp(1.0f - (dist / ExplosionRadius), 0.0f, 1.0f);
 	}
-	
-	return BaseDMG * fallOffModifier;
+	float finalDmg = Damage * fallOffModifier;
+	PXII_LOG(ELogCategory::Projectile, Log, TEXT("DZ_LOG:: Bullet Damage : %f Weapon Damage: %f Final Dmg: %f"), GetBulletBonusDamage(), debugWeaponDmg,  finalDmg);
+	return finalDmg;
+}
+
+float APxiiProjectileBase::GetBulletBonusDamage()
+{
+	return BulletBonusDamage + BaseDMG;
 }
 
 void APxiiProjectileBase::SetProjectileTag(FGameplayTag inTag)

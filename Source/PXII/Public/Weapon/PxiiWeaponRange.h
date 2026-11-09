@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraSystem.h"
+#include "Data/PxiiBlasterData.h"
 #include "Data/PxiiRecoilPattern.h"
 #include "Data/PxiiWeaponSfxData.h"
 #include "Weapon/PxiiWeaponBase.h"
@@ -34,6 +35,7 @@ UCLASS()
 class PXII_API APxiiWeaponRange : public APxiiWeaponBase
 {
 	GENERATED_BODY()
+
 public:
 	
 	APxiiWeaponRange();
@@ -53,6 +55,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PlayWeaponSfx();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetVent();
+
+	void ResetVent_Implementation();
+
+	UFUNCTION(BlueprintPure)
+	float GetDamage(float hitDistance, float bulletBonusDamage = 0.0f, bool isCritical = false);
+
 	virtual void PlayWeaponSfx_Implementation();
 
 	UPxiiRecoilPattern* GetAdsRecoil();
@@ -60,8 +70,12 @@ public:
 	UPxiiRecoilPattern* GetHipRecoil();
 
 	// TArray<UNiagaraSystem*> GetSystem();
+
 private:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UPxiiBlasterData> BlasterData;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UPxiiRecoilPattern> AdsRecoil;
 	

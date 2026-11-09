@@ -122,6 +122,10 @@ public:
 	FGameplayAttributeData SpeedModifier;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, SpeedModifier);
 
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Primary")
+	FGameplayAttributeData AttackDamageMultiplier;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, AttackDamageMultiplier);
+
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
 	FGameplayAttributeData CurrentBlasterCharge;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, CurrentBlasterCharge);

@@ -8,6 +8,7 @@
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GAS/PxiiAbilitySystemComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTempCharacter);
 // Called when the game starts or when spawned
@@ -93,5 +94,18 @@ void APxiiCharacter::ProcessDamageData_Implementation(AActor* SourceActor, float
 	//UE_LOG(LogTempCharacter, Log, TEXT("Dmg_LOG:: DMG: %f"), Damage);
 	Cast<UPxiiPlayerCombatComponent>(CombatComponent)->GrantYinYang(YinYangType, Damage, false);
 	Super::ProcessDamageData_Implementation(SourceActor, Damage, DamageSource);
+}
+
+float APxiiCharacter::GetRangeWeaponDamage(float hitDistance, float bulletBonusDamage, bool isCritical)
+{
+	if(!CurrentWeaponRanged)
+	{
+		return 0.0f;
+	}
+
+	float playerDMG = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageAttribute());
+	float dmgMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageMultiplierAttribute());
+	
+	return (playerDMG * dmgMultiplier) + CurrentWeaponRanged->GetDamage(hitDistance, bulletBonusDamage, isCritical);
 }
 
