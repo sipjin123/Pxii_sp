@@ -234,7 +234,7 @@ void APxiiNPC::IncrementHitTracker(FPxiiHitTracker& HitTracker,AActor* Target, b
 	}
 	HitTrackerData.Add(HitTracker);
 
-	if (true)
+	if (false)
 	{
 		for (const FPxiiHitTracker& Entry : HitTrackerData)
 		{
