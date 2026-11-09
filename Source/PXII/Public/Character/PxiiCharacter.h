@@ -9,6 +9,7 @@
 #include "Weapon/PxiiWeaponMelee.h"
 #include "Weapon/PxiiWeaponRange.h"
 #include "GameplayEffectExtension.h"
+#include "MoverComponent.h"
 #include "Enum/PxiiEnemyType.h"
 #include "PxiiCharacter.generated.h"
 
@@ -59,6 +60,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnJumpTriggered();
 	void OnJumpTriggered_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SnapTurn(float AngleRotation);
+	
+	void SnapTurn_Implementation(float AngleRotation);
 	
 	void ProcessBlasterFired_Implementation();
 	

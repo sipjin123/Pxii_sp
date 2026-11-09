@@ -8,6 +8,7 @@
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DefaultMovementSet/InstantMovementEffects/BasicInstantMovementEffects.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTempCharacter);
@@ -43,6 +44,35 @@ void APxiiCharacter::OnJumpStarted_Implementation()
 void APxiiCharacter::OnJumpTriggered_Implementation()
 {
 	
+}
+
+void APxiiCharacter::SnapTurn_Implementation(float AngleRotation)
+{
+	if (!MoverComponent)
+		return;
+
+	// Get current Mover transform
+	const FTransform CurrentTransform =
+		MoverComponent->GetUpdatedComponentTransform();
+
+	// Calculate new rotation
+	FRotator NewRotation = CurrentTransform.Rotator();
+
+	NewRotation.Yaw = FMath::UnwindDegrees(AngleRotation);
+
+	// Create instant movement effect
+	TSharedPtr<FTeleportEffect> TurnEffect =
+		MakeShared<FTeleportEffect>();
+
+	// Preserve current location
+	TurnEffect->TargetLocation = CurrentTransform.GetLocation();
+
+	// Apply new rotation
+	TurnEffect->TargetRotation = NewRotation;
+	TurnEffect->bUseActorRotation = false;
+
+	// Queue effect through Mover
+	MoverComponent->QueueInstantMovementEffect(TurnEffect);
 }
 
 void APxiiCharacter::ProcessBlasterFired_Implementation()
