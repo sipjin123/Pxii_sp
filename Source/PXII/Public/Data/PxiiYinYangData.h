@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "GameplayEffect.h"
 #include "Engine/DataAsset.h"
 #include "PxiiYinYangData.generated.h"
 
@@ -49,15 +50,39 @@ class PXII_API UPxiiYinYangData : public UPrimaryDataAsset
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Yin = 50.0f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Yang = 50.0f;
+	float YinStress;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UResourceGenerationCost> DefaultRangeCost;
+	TObjectPtr<UGameplayEffect> YinStressGE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float YinOverwhelm;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UGameplayEffect> YinOverwhelmGE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float YinFull;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UGameplayEffect> YinFullGE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float YangStress;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UGameplayEffect> YangStressGE;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UResourceGenerationCost> DefaultMeleeCost;
+	float YangOverwhelm;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UGameplayEffect> YangOverwhelmGE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float YangFull;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UGameplayEffect> YangFullGE;
 	
 };

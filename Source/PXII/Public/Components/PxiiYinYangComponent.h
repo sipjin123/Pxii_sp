@@ -13,12 +13,41 @@ class PXII_API UPxiiYinYangComponent : public UActorComponent
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ApplyCost(UResourceGenerationCost* cost);
-	void ApplyCost_Implementation(UResourceGenerationCost* cost);
+	void ApplyCost(EWeaponResourceType WeaponType, float cost);
+	void ApplyCost_Implementation(EWeaponResourceType WeaponType, float cost);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyYinYangStressEffect(EWeaponResourceType WeaponType);
+	void ApplyYinYangStressEffect_Implementation(EWeaponResourceType WeaponType);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void DisableYinYangStressEffect(EWeaponResourceType WeaponType);
+	void DisableYinYangStressEffect_Implementation(EWeaponResourceType WeaponType);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyYinYangOverwhelmEffect(EWeaponResourceType WeaponType);
+	void ApplyYinYangOverwhelmEffect_Implementation(EWeaponResourceType WeaponType);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void DisableYinYangOverwhelmEffect(EWeaponResourceType WeaponType);
+	void DisableYinYangOverwhelmEffect_Implementation(EWeaponResourceType WeaponType);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyYinYangFullEffect(EWeaponResourceType WeaponType);
+	void ApplyYinYangFullEffect_Implementation(EWeaponResourceType WeaponType);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void DisableYinYangFullEffect(EWeaponResourceType WeaponType);
+	void DisableYinYangFullEffect_Implementation(EWeaponResourceType WeaponType);
+
+	FGameplayEffectSpecHandle GetCostEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
+	FGameplayEffectSpecHandle GetStressEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
+	FGameplayEffectSpecHandle GetOverwhelmEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
+	FGameplayEffectSpecHandle GetFullEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
 
 	UFUNCTION(BlueprintPure)
-	float GetFinalCost(EWeaponResourceType resourceType, UResourceGenerationCost* costData) const;
-
+	UPxiiYinYangData* GetYinYangData();
+	
 protected:
 
 	UFUNCTION(BlueprintPure)
@@ -37,5 +66,13 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UPxiiAbilitySystemComponent> ASC;
-	
+
+	UPROPERTY()
+	FActiveGameplayEffectHandle StressGEHandle;
+
+	UPROPERTY()
+	FActiveGameplayEffectHandle OverwhelmGEHandle;
+
+	UPROPERTY()
+	FActiveGameplayEffectHandle FullGEHandle;
 };
