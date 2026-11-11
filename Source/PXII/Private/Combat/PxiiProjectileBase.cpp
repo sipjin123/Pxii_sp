@@ -9,6 +9,7 @@
 #include "Components/PxiiAimComponent.h"
 #include "Components/PxiiCombatComponent.h"
 #include "Components/PxiiPlayerCombatComponent.h"
+#include "Components/PxiiYinYangComponent.h"
 #include "Components/SphereComponent.h"
 #include "HUD/PxiiHUDBase.h"
 #include "Interface/PxiiDamageableInterface.h"
@@ -242,7 +243,7 @@ void APxiiProjectileBase::InitializeProjectile_Implementation(float BaseDamage, 
 void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* TargetActor, const FHitResult& result)
 {
 	//PXII_LOG(ELogCategory::Projectile, Log, TEXT("XXX Hit Damage to %s %s %f"), *GetNameSafe(TargetActor), *GetNameSafe(result.GetActor()), BaseDMG);
-
+	
 	auto NewHitActor = TargetActor;
 	if (NewHitActor && NewHitActor->GetClass()->ImplementsInterface(UPxiiDamageableInterface::StaticClass()))
 	{
@@ -300,6 +301,15 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 		if(SpecHandle.IsValid())
 		{
 			InstigatorASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+		}
+	}
+
+	if(WeaponOwner && ImpactCost != nullptr)
+	{
+		UPxiiYinYangComponent* yinyangComp = WeaponOwner->GetComponentByClass<UPxiiYinYangComponent>();
+		if(yinyangComp)
+		{
+			yinyangComp->ApplyCost(ImpactCost->CostType, ImpactCost->CostValue);	
 		}
 	}
 

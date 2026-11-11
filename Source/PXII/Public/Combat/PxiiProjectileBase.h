@@ -14,6 +14,7 @@
 #include "Data/PxiiHitFeedbackData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Data/ImpactData.h"
+#include "Data/PxiiYinYangData.h"
 #include "PxiiProjectileBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnReturnToPool, APxiiProjectileBase*);
@@ -41,6 +42,9 @@ public:
 
 	FOnReturnToPool OnReturnToPool;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UResourceGenerationCost> ImpactCost;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Projectile")
 	AActor* InstigatorActor;
 

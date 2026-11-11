@@ -6,6 +6,41 @@
 #include "GameplayEffect.h"
 #include "PxiiGameplayEffectBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EEffectTextColor : uint8
+{
+	Custom,
+	Buff,
+	Debuff,
+};
+
+USTRUCT(BlueprintType)
+struct FEffectTextCustomization
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText EffectDisplayText;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EEffectTextColor EffectColorType;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FSlateColor EffectColor;
+};
+
+USTRUCT(BlueprintType)
+struct FEffectDetails
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool ShowDisplayText;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FEffectTextCustomization> EffectDisplayText;
+};
+
 /**
  * 
  */
@@ -19,4 +54,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bShowFloatingText = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FEffectDetails EffectDetails;
 };

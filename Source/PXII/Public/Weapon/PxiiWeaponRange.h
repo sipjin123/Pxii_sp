@@ -61,7 +61,7 @@ public:
 	void ResetVent_Implementation();
 
 	UFUNCTION(BlueprintPure)
-	float GetDamage(float hitDistance, float bulletBonusDamage = 0.0f, bool isCritical = false);
+	float GetDamage(float hitDistance, float bulletBonusDamage = 0.0f, float blasterMult = 1.0f, bool isCritical = false);
 
 	virtual void PlayWeaponSfx_Implementation();
 

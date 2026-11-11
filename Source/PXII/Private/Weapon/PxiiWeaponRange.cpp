@@ -112,13 +112,12 @@ void APxiiWeaponRange::ResetVent_Implementation()
 	
 }
 
-float APxiiWeaponRange::GetDamage(float hitDistance, float bulletBonusDamage, bool isCritical)
+float APxiiWeaponRange::GetDamage(float hitDistance, float bulletBonusDamage, float blasterMult, bool isCritical)
 {
 	if(BlasterData == nullptr)
 	{
 		return 1.0f;
 	}
-	
 	float critMult = isCritical ? BlasterData->CriticalMultiplier : 1.0f;
 	if(BlasterData->EnableDistanceFalloff)
 	{
@@ -127,10 +126,10 @@ float APxiiWeaponRange::GetDamage(float hitDistance, float bulletBonusDamage, bo
 		float fallOffDistance = (hitDistance - startDist) / FMath::Max(endDist - startDist, 1);
 		float alpha = FMath::Clamp(fallOffDistance, 0, 1);
 		float Damage = FMath::Lerp(BlasterData->MinimumDamage + bulletBonusDamage, BlasterData->BaseDamage + bulletBonusDamage, 1.0f - alpha);
-		return Damage * critMult; 
+		return Damage * blasterMult * critMult; 
 	}
 
-	return (BlasterData->BaseDamage + bulletBonusDamage) * critMult;
+	return (BlasterData->BaseDamage + bulletBonusDamage) * blasterMult * critMult;
 }
 
 void APxiiWeaponRange::PlayWeaponSfx_Implementation()

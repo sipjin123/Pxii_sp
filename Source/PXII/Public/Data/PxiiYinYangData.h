@@ -24,20 +24,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float CostValue;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EWeaponResourceType GenerateType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float GenerateValue;
-
 	bool IsValid()
 	{
-		if(CostType == EWeaponResourceType::Invalid || GenerateType == EWeaponResourceType::Invalid)
+		if(CostType == EWeaponResourceType::Invalid)
 		{
 			return false;
 		}
 		
-		return CostType != GenerateType;
+		return true;
 	}
 	
 };
@@ -53,36 +47,36 @@ public:
 	float YinStress;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YinStressGE;
+	TSubclassOf<UGameplayEffect> YinStressGE;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YinOverwhelm;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YinOverwhelmGE;
+	TSubclassOf<UGameplayEffect> YinOverwhelmGE;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YinFull;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YinFullGE;
+	TSubclassOf<UGameplayEffect> YinFullGE;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YangStress;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YangStressGE;
+	TSubclassOf<UGameplayEffect> YangStressGE;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YangOverwhelm;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YangOverwhelmGE;
+	TSubclassOf<UGameplayEffect> YangOverwhelmGE;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YangFull;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UGameplayEffect> YangFullGE;
+	TSubclassOf<UGameplayEffect> YangFullGE;
 	
 };

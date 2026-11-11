@@ -145,5 +145,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Attributes | Utility")
 	FGameplayAttributeData MaxChargeBonusPrc;
 	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, MaxChargeBonusPrc);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Secondary")
+	FGameplayAttributeData BlasterMultiplier;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, BlasterMultiplier);
+
+	UPROPERTY(BlueprintReadOnly, Category="Attributes | Secondary")
+	FGameplayAttributeData ArmbladeMultiplier;
+	ATTRIBUTE_ASSESSORS(UPxiiAttributeSet, ArmbladeMultiplier);
 	
 };

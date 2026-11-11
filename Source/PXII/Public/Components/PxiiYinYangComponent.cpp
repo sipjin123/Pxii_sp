@@ -53,7 +53,7 @@ void UPxiiYinYangComponent::ApplyYinYangStressEffect_Implementation(EWeaponResou
 
 	if (!SpecHandle.IsValid())
 	{
-		PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: INVALID SPEC"));
+		PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: INVALID Stress SPEC"));
 		return;
 	}
 
@@ -158,10 +158,10 @@ FGameplayEffectSpecHandle UPxiiYinYangComponent::GetStressEffect(EWeaponResource
 
 	if(WeaponType == EWeaponResourceType::Yang)
 	{
-		return ASC->MakeOutgoingSpec(YinYangData->YangStressGE->StaticClass(), 1.0f, context);
+		return ASC->MakeOutgoingSpec(YinYangData->YangStressGE, 1.0f, context);
 	}
-
-	return ASC->MakeOutgoingSpec(YinYangData->YinStressGE->StaticClass(), 1.0f, context);
+	
+	return ASC->MakeOutgoingSpec(YinYangData->YinStressGE, 1.0f, context);
 }
 
 FGameplayEffectSpecHandle UPxiiYinYangComponent::GetOverwhelmEffect(EWeaponResourceType WeaponType,
@@ -174,10 +174,10 @@ FGameplayEffectSpecHandle UPxiiYinYangComponent::GetOverwhelmEffect(EWeaponResou
 	
 	if(WeaponType == EWeaponResourceType::Yang)
 	{
-		return ASC->MakeOutgoingSpec(YinYangData->YangOverwhelmGE->StaticClass(), 1.0f, context);
+		return ASC->MakeOutgoingSpec(YinYangData->YangOverwhelmGE, 1.0f, context);
 	}
 
-	return ASC->MakeOutgoingSpec(YinYangData->YinOverwhelmGE->StaticClass(), 1.0f, context);
+	return ASC->MakeOutgoingSpec(YinYangData->YinOverwhelmGE, 1.0f, context);
 }
 
 FGameplayEffectSpecHandle UPxiiYinYangComponent::GetFullEffect(EWeaponResourceType WeaponType,
@@ -190,10 +190,10 @@ FGameplayEffectSpecHandle UPxiiYinYangComponent::GetFullEffect(EWeaponResourceTy
 	
 	if(WeaponType == EWeaponResourceType::Yang)
 	{
-		return ASC->MakeOutgoingSpec(YinYangData->YangFullGE->StaticClass(), 1.0f, context);
+		return ASC->MakeOutgoingSpec(YinYangData->YangFullGE, 1.0f, context);
 	}
 
-	return ASC->MakeOutgoingSpec(YinYangData->YinFullGE->StaticClass(), 1.0f, context);
+	return ASC->MakeOutgoingSpec(YinYangData->YinFullGE, 1.0f, context);
 }
 
 UPxiiYinYangData* UPxiiYinYangComponent::GetYinYangData()

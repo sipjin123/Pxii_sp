@@ -135,7 +135,8 @@ float APxiiCharacter::GetRangeWeaponDamage(float hitDistance, float bulletBonusD
 
 	float playerDMG = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageAttribute());
 	float dmgMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageMultiplierAttribute());
-	
-	return (playerDMG * dmgMultiplier) + CurrentWeaponRanged->GetDamage(hitDistance, bulletBonusDamage, isCritical);
+	float blasterMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetBlasterMultiplierAttribute());
+
+	return (playerDMG * dmgMultiplier) + CurrentWeaponRanged->GetDamage(hitDistance, bulletBonusDamage, blasterMultiplier, isCritical);
 }
 
