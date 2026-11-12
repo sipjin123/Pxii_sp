@@ -3,6 +3,7 @@
 
 #include "Weapon/PxiiWeaponMelee.h"
 
+#include "Components/PxiiYinYangComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 void APxiiWeaponMelee::PlaySlashSFX_Implementation()
@@ -45,6 +46,25 @@ void APxiiWeaponMelee::PlaySlashSFX_Implementation()
 		PitchMult       // Pitch multiplier
 	);
 	
+}
+
+void APxiiWeaponMelee::ApplyCost_Implementation()
+{
+	if(!Cost)
+	{
+		return;
+	}
+
+	if(!GetOwner())
+	{
+		return;
+	}
+
+	UPxiiYinYangComponent* yinyangComp = GetOwner()->GetComponentByClass<UPxiiYinYangComponent>();
+	if(yinyangComp)
+	{
+		yinyangComp->ApplyCost(Cost->CostType, Cost->CostValue);
+	}
 }
 
 void APxiiWeaponMelee::PlaySlashImpact_Implementation(EPhysicalSurface SurfaceType, const FVector& impactLocation)

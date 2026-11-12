@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PxiiArmbladeComponent.h"
 #include "PxiiHitFeedbackComponent.h"
+#include "PxiiYinYangComponent.h"
 #include "Components/ActorComponent.h"
 #include "Character/PxiiCharacter.h"
 #include "Character/PxiiCharacterBase.h"
@@ -47,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitializeHitTrace(FVector SocketLoc, float LengthOverride, EHitEffectType NewHitEffectType, EHitDirection HitDirection, EHitImpact HitImpact, EHitImpact CameraImpact);
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCost(bool useWeaponCost, UResourceGenerationCost* GenerationCost);
+	
 	UPROPERTY(BlueprintReadWrite)
 	EHitEffectType HitEffectType;
 
@@ -74,6 +78,12 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool HasPreviousTrace;
 	
+	UPROPERTY(BlueprintReadOnly)
+	bool UseWeaponCost;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UResourceGenerationCost> CustomHitCost;
+	
 	UFUNCTION(BlueprintCallable)
 	void ProcessHitTrace(FVector SocketLoc);
 
@@ -100,6 +110,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UPxiiArmbladeComponent* GetArmbladeComponent();
+
+	UFUNCTION(BlueprintPure)
+	UPxiiYinYangComponent* GetYinYangComponent();
 	
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> HitTracedActors;
@@ -160,4 +173,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPxiiArmbladeComponent> ArmbladeComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPxiiYinYangComponent> YinYangComponent;
 };

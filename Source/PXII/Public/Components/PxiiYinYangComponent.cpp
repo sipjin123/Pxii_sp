@@ -7,6 +7,11 @@
 #include "GAS/PxiiGameplayEffectYinYangCost.h"
 #include "Utility/PXIILogUtility.h"
 
+void UPxiiYinYangComponent::ApplyArmbladeCost_Implementation()
+{
+	
+}
+
 void UPxiiYinYangComponent::ApplyCost_Implementation(EWeaponResourceType WeaponType, float cost)
 {
 	if (!IsValid(GetASC()))

@@ -4,6 +4,7 @@
 #include "Components/PxiiCombatComponent.h"
 #include "AbilitySystemComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Components/PxiiYinYangComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Data/PxiiTags.h"
 #include "Enum/PxiiDamageType.h"
@@ -81,6 +82,12 @@ void UPxiiCombatComponent::InitializeHitTrace(FVector SocketLoc, float LengthOve
 		IPxiiCombatInterface::Execute_EnableAttackState(CharacterRef);
 	}
 	//CharacterRef->SetIsWeaponMeleeEquipped(true);
+}
+
+void UPxiiCombatComponent::SetWeaponCost(bool useWeaponCost, UResourceGenerationCost* GenerationCost)
+{
+	UseWeaponCost = useWeaponCost;
+	CustomHitCost = GenerationCost;
 }
 
 void UPxiiCombatComponent::ProcessHitTrace(FVector SocketLoc)
@@ -313,6 +320,25 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 					ArmbladeComponent->ShowImpactVfx(OutHitParam.ImpactPoint, hitDirection);
 					ArmbladeComponent->PlayCameraShake(CameraImpactType);
 				}
+
+				UPxiiYinYangComponent* yingYangcomp = GetYinYangComponent();
+				if(yingYangcomp)
+				{
+					if(UseWeaponCost)
+					{
+						yingYangcomp->ApplyArmbladeCost();
+					}
+					else
+					{
+						if(CustomHitCost)
+						{
+							if(CustomHitCost->IsValid())
+							{
+								yingYangcomp->ApplyCost(CustomHitCost->CostType, CustomHitCost->CostValue);
+							}							
+						}
+					}
+				}
 				
 				if (IsBossUnit)
 				{
@@ -464,4 +490,16 @@ UPxiiArmbladeComponent* UPxiiCombatComponent::GetArmbladeComponent()
 	ArmbladeComponent = GetOwner()->GetComponentByClass<UPxiiArmbladeComponent>();
 	
 	return ArmbladeComponent;
+}
+
+UPxiiYinYangComponent* UPxiiCombatComponent::GetYinYangComponent()
+{
+	if(YinYangComponent)
+	{
+		return YinYangComponent;
+	}
+
+	YinYangComponent = GetOwner()->GetComponentByClass<UPxiiYinYangComponent>();
+	
+	return YinYangComponent;
 }

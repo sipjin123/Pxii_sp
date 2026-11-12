@@ -13,6 +13,10 @@ class PXII_API UPxiiYinYangComponent : public UActorComponent
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyArmbladeCost();
+	void ApplyArmbladeCost_Implementation();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ApplyCost(EWeaponResourceType WeaponType, float cost);
 	void ApplyCost_Implementation(EWeaponResourceType WeaponType, float cost);
 

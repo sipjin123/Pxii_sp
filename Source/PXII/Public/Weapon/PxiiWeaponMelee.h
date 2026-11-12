@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Data/PxiiArmbladeEffectData.h"
+#include "Data/PxiiYinYangData.h"
 #include "Weapon/PxiiWeaponBase.h"
 #include "PxiiWeaponMelee.generated.h"
 
@@ -16,6 +17,9 @@ class PXII_API APxiiWeaponMelee : public APxiiWeaponBase
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UResourceGenerationCost> Cost;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UPxiiArmbladeEffectData> ArmbladeEffectData;
@@ -24,6 +28,10 @@ public:
 	void PlaySlashSFX();
 
 	void PlaySlashSFX_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyCost();
+	void ApplyCost_Implementation();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlaySlashImpact(EPhysicalSurface SurfaceType, const FVector& impactLocation);
