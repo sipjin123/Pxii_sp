@@ -109,6 +109,9 @@ public:
 	void ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, const FDpsData& Damage, EDamageSource DamageSource);
 
 	UFUNCTION(BlueprintPure)
+	APxiiCharacter* GetOwnerCasted();
+	
+	UFUNCTION(BlueprintPure)
 	UPxiiArmbladeComponent* GetArmbladeComponent();
 
 	UFUNCTION(BlueprintPure)

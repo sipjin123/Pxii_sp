@@ -27,7 +27,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void ApplyHitStop(EHitImpact hitImpact);
-
 	void ApplyHitStop_Implementation( EHitImpact hitImpact);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

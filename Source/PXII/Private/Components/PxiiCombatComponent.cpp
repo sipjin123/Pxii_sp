@@ -349,9 +349,14 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 					HitTracedActors.Add(CurrHitActor);
 					if (CharRef)
 					{
+						float playerDamage = 10.0f;
+						if(GetOwnerCasted())
+						{
+							playerDamage = GetOwnerCasted()->GetArmbladeDamage(0.0f);
+						}
 						const float RandomOffset=50.f;
 						FVector NewImpactPoint = CurrHitActor->GetActorLocation()+FVector(FMath::RandRange(-RandomOffset,RandomOffset),FMath::RandRange(-RandomOffset,RandomOffset),0.f);
-						ProcessUnitDamage(CurrHitActor, NewImpactPoint, 10.f, EDamageSource::Melee);
+						ProcessUnitDamage(CurrHitActor, NewImpactPoint, playerDamage, EDamageSource::Melee);
 						//ProcessUnitDamage(CurrHitActor, ImpactPoint, 10.f, EDamageSource::Melee);
 						//UE_LOG(LogTemp, Warning, TEXT("%s ProcessUnitDamage -> Actor: %s"), *UPXIINetworkBPLibrary::GetNetworkType(this), *GetNameSafe(CurrHitActor));
 					}
@@ -478,6 +483,11 @@ void UPxiiCombatComponent::ProcessDPSDamage(AActor* TargetUnit, FVector HitLoc, 
 			}
 		}
 	}
+}
+
+APxiiCharacter* UPxiiCombatComponent::GetOwnerCasted()
+{
+	return Cast<APxiiCharacter>(GetOwner());
 }
 
 UPxiiArmbladeComponent* UPxiiCombatComponent::GetArmbladeComponent()

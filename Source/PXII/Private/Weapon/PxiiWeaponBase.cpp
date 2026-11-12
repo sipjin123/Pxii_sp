@@ -27,3 +27,13 @@ void APxiiWeaponBase::Tick(float DeltaTime)
 
 }
 
+void APxiiWeaponBase::ShowWeapon_Implementation()
+{
+	isShowing = true;
+}
+
+void APxiiWeaponBase::HideWeapon_Implementation()
+{
+	isShowing = false;
+}
+

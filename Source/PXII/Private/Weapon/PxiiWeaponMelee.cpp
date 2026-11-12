@@ -5,6 +5,7 @@
 
 #include "Components/PxiiYinYangComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utility/PXIILogUtility.h"
 
 void APxiiWeaponMelee::PlaySlashSFX_Implementation()
 {
@@ -162,5 +163,22 @@ UCameraShakeAsset* APxiiWeaponMelee::GetCameraShakeImpact(EHitImpact hitImpact)
 	}
 
 	return CameraShake[hitImpact];
+}
+
+float APxiiWeaponMelee::GetArmbladeDamage(float bonusDamage, float armbladeMult)
+{
+	if(ArmbladeData == nullptr)
+	{
+		return 1.0f;
+	}
+
+	PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG: BASE: %f, Bonus: %f, player bonus: %f, armbladeMult: %f, critMult: %f"),
+		ArmbladeData->BaseDamage,
+		ArmbladeData->BonusDamage,
+		bonusDamage,
+		armbladeMult,
+		ArmbladeData->CriticalMultiplier);
+	
+	return (ArmbladeData->BaseDamage + ArmbladeData->BonusDamage + bonusDamage) * armbladeMult * ArmbladeData->CriticalMultiplier;  
 }
 

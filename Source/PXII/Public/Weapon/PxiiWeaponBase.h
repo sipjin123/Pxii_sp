@@ -30,4 +30,15 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapons")
 	TObjectPtr<USkeletalMeshComponent> SKWeapon;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isShowing = false;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ShowWeapon();
+	void ShowWeapon_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HideWeapon();
+	void HideWeapon_Implementation();
 };

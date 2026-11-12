@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/PxiiArmbladeData.h"
 #include "Data/PxiiArmbladeEffectData.h"
 #include "Data/PxiiYinYangData.h"
 #include "Weapon/PxiiWeaponBase.h"
@@ -17,9 +18,6 @@ class PXII_API APxiiWeaponMelee : public APxiiWeaponBase
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UResourceGenerationCost> Cost;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UPxiiArmbladeEffectData> ArmbladeEffectData;
@@ -45,5 +43,15 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UCameraShakeAsset* GetCameraShakeImpact(EHitImpact hitImpact);
+
+	UFUNCTION(BlueprintPure)
+	float GetArmbladeDamage(float bonusDamage, float armbladeMult);
+
+private:
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UResourceGenerationCost> Cost;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UPxiiArmbladeData> ArmbladeData;
 };

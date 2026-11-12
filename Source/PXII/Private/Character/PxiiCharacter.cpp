@@ -10,6 +10,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "DefaultMovementSet/InstantMovementEffects/BasicInstantMovementEffects.h"
 #include "GAS/PxiiAbilitySystemComponent.h"
+#include "Utility/PXIILogUtility.h"
 
 DEFINE_LOG_CATEGORY(LogTempCharacter);
 // Called when the game starts or when spawned
@@ -120,9 +121,6 @@ void APxiiCharacter::Tick(float DeltaSeconds)
 void APxiiCharacter::ProcessDamageData_Implementation(AActor* SourceActor, float Damage, float DamageSource)
 {
 	EDamageSource DamageSourceType = static_cast<EDamageSource>(FMath::RoundToInt(DamageSource));
-	EPxiiYinYangType YinYangType = DamageSourceType == EDamageSource::Melee ? EPxiiYinYangType::Yin : EPxiiYinYangType::Yang;//static_cast<EPxiiYinYangType>(FMath::RoundToInt(DamageSource));
-	//UE_LOG(LogTempCharacter, Log, TEXT("Dmg_LOG:: DMG: %f"), Damage);
-	Cast<UPxiiPlayerCombatComponent>(CombatComponent)->GrantYinYang(YinYangType, Damage, false);
 	Super::ProcessDamageData_Implementation(SourceActor, Damage, DamageSource);
 }
 
@@ -138,5 +136,20 @@ float APxiiCharacter::GetRangeWeaponDamage(float hitDistance, float bulletBonusD
 	float blasterMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetBlasterMultiplierAttribute());
 
 	return (playerDMG * dmgMultiplier) + CurrentWeaponRanged->GetDamage(hitDistance, bulletBonusDamage, blasterMultiplier, isCritical);
+}
+
+float APxiiCharacter::GetArmbladeDamage(float bonusDamage)
+{
+	if(!CurrentWeaponMelee)
+	{
+		return 0.0f;
+	}
+
+	float playerDMG = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageAttribute());
+	float dmgMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetAttackDamageMultiplierAttribute());
+	float armbladeMultiplier = AbilitySystemComponent->GetNumericAttribute(UPxiiAttributeSet::GetArmbladeMultiplierAttribute());
+
+	PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: playerDMG : %f, dmgMult: %f armbladeMult: %f"), playerDMG, dmgMultiplier, armbladeMultiplier);
+	return (playerDMG * dmgMultiplier) + CurrentWeaponMelee->GetArmbladeDamage(bonusDamage, armbladeMultiplier);
 }
 

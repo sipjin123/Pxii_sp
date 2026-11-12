@@ -107,4 +107,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual float GetRangeWeaponDamage(float hitDistance, float bulletBonusDamage = 0.0f, bool isCritical = false);
+
+	UFUNCTION(BlueprintPure)
+	virtual float GetArmbladeDamage(float bonusDamage = 0.0f);
 };

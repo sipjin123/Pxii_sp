@@ -31,10 +31,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UFUNCTION(BlueprintCallable)
-	void GrantYinYang(EPxiiYinYangType Type, float Amount, bool bIsPercent);
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat|Gameplay Effects")
-	TSubclassOf<UGameplayEffect> GE_YinYang;
 };
