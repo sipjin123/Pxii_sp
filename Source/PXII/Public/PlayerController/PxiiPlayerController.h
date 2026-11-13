@@ -9,12 +9,17 @@
 #include "Subsystem/PlayerInputSubsystem.h"
 #include "PxiiPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveInitiated);
+
 UCLASS(Blueprintable)
 class PXII_API APxiiPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnMoveInitiated OnMoveInitiated;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -35,6 +40,7 @@ public:
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 
+	virtual void MoveStarted(const FInputActionValue& InputActionValue);
 	virtual void Move(const FInputActionValue& InputActionValue);
 	virtual void Look(const FInputActionValue& InputActionValue);
 

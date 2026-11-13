@@ -39,7 +39,8 @@ void APxiiPlayerController::SetupInputComponent()
 	if (UPxiiPlayerInputComponent* EnhancedInputComponent = Cast<UPxiiPlayerInputComponent>(InputComponent))
 	{
 		PXII_LOG(ELogCategory::Controls, Log, TEXT("DZ_LOG:: Binding Input"));
-		
+
+		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Started, this, &APxiiPlayerController::MoveStarted);
 		// Moving
 		EnhancedInputComponent->BindAction(MoveInput, ETriggerEvent::Triggered, this, &APxiiPlayerController::Move);
 		// Looking
@@ -74,9 +75,13 @@ void APxiiPlayerController::OnPossess(APawn* InPawn)
 	OnControlMappingUpdate();
 }
 
+void APxiiPlayerController::MoveStarted(const FInputActionValue& InputActionValue)
+{
+	OnMoveInitiated.Broadcast();
+}
+
 void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-	
 	if (IsMovementBlocked)
 	{
 		CachedMovementInput = FVector2D::ZeroVector;
@@ -95,6 +100,7 @@ void APxiiPlayerController::Move(const FInputActionValue& InputActionValue)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	
+	OnMoveInitiated.Broadcast();
 
 	if(LedgeComp->GetState() == ELedgeHangState::Hanging || LedgeComp->GetState() == ELedgeHangState::Shimmying)
 	{
