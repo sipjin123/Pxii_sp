@@ -306,10 +306,13 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 
 	if(WeaponOwner && ImpactCost != nullptr)
 	{
-		UPxiiYinYangComponent* yinyangComp = WeaponOwner->GetComponentByClass<UPxiiYinYangComponent>();
-		if(yinyangComp)
+		if(TargetActor && TargetActor->GetClass()->IsChildOf(APxiiNPC::StaticClass()))
 		{
-			yinyangComp->ApplyCost(ImpactCost->CostType, ImpactCost->CostValue);	
+			UPxiiYinYangComponent* yinyangComp = WeaponOwner->GetComponentByClass<UPxiiYinYangComponent>();
+			if(yinyangComp)
+			{
+				yinyangComp->ApplyCost(ImpactCost->CostType, ImpactCost->CostValue);	
+			}			
 		}
 	}
 

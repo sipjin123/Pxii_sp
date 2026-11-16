@@ -5,7 +5,6 @@
 #include "AbilitySystemComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Data/PxiiTags.h"
-#include "Enum/PxiiDamageType.h"
 #include "Utility/PXIILogUtility.h"
 
 UPxiiPlayerCombatComponent::UPxiiPlayerCombatComponent()
@@ -34,8 +33,6 @@ void UPxiiPlayerCombatComponent::BeginPlay()
 
 void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedAbility)
 {
-	PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: ABILITY ACTIVATED %s"), *ActivatedAbility->GetClass()->GetDisplayNameText().ToString());
-
 	bool isAttackClass = false;
 	
 	for(auto attackClass : MeleeAttackClasses)
