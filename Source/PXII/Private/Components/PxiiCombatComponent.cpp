@@ -388,6 +388,57 @@ void UPxiiCombatComponent::FinalizeHitTraceLogic()
 	}
 }
 
+void UPxiiCombatComponent::PlayRangeImpact_Implementation(EHitImpact impactType)
+{
+	if(ImpactMapData == nullptr)
+	{
+		return;
+	}
+
+	if(ImpactMapData->BulletImpactMap.IsEmpty())
+	{
+		PlayHitStop(ImpactMapData->DefaultImpactData);
+		return;
+	}
+
+	if(!ImpactMapData->BulletImpactMap.Contains(impactType))
+	{
+		PlayHitStop(ImpactMapData->DefaultImpactData);
+		return;
+	}
+
+	FHitStopData hitstop = ImpactMapData->BulletImpactMap[impactType];
+	PlayHitStop(hitstop);	
+}
+
+void UPxiiCombatComponent::PlayAbilityImpact_Implementation(EHitImpact impactType)
+{
+	if(ImpactMapData == nullptr)
+	{
+		return;
+	}
+
+	if(ImpactMapData->AbilityHitstopMap.IsEmpty())
+	{
+		PlayHitStop(ImpactMapData->DefaultImpactData);
+		return;
+	}
+
+	if(!ImpactMapData->AbilityHitstopMap.Contains(impactType))
+	{
+		PlayHitStop(ImpactMapData->DefaultImpactData);
+		return;
+	}
+
+	FHitStopData hitstop = ImpactMapData->AbilityHitstopMap[impactType];
+	PlayHitStop(hitstop);
+}
+
+void UPxiiCombatComponent::PlayHitStop_Implementation(FHitStopData hitstopData, bool ResetAtStop)
+{
+	
+}
+
 void UPxiiCombatComponent::ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, EDamageSource DamageSource)
 {
 	if (TargetUnit == nullptr || GetOwner() == nullptr)

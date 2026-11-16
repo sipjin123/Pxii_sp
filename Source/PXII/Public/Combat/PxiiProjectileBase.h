@@ -14,6 +14,7 @@
 #include "Data/PxiiHitFeedbackData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Data/ImpactData.h"
+#include "Data/PxiiImpactMapData.h"
 #include "Data/PxiiYinYangData.h"
 #include "PxiiProjectileBase.generated.h"
 
@@ -39,6 +40,9 @@ class PXII_API APxiiProjectileBase : public AActor
 public:	
 
 	APxiiProjectileBase();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FHitstopEffect HitstopEffect;
 
 	FOnReturnToPool OnReturnToPool;
 
@@ -74,6 +78,8 @@ public:
 
 	bool GetIsInUse();
 
+	bool CanApplyHitStop = true;
+
 	virtual void BeginPlay() override;
 	
 	void SetIsInUse(bool InIsInUse);
@@ -94,8 +100,11 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void ApplyDamage(AActor* HitActor, const FHitResult& Hit);
-	
 	virtual void ApplyDamage_Implementation(AActor* HitActor, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
+	void PlayHitstop(AActor* TargetActor);
+	virtual void PlayHitstop_Implementation(AActor* TargetActor);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Projectile")
 	void SpawnHitEffect(const FHitResult& HitResult);

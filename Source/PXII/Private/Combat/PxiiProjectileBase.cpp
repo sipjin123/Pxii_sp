@@ -90,6 +90,39 @@ void APxiiProjectileBase::ApplyDamage_Implementation(AActor* HitActor, const FHi
 	}
 }
 
+void APxiiProjectileBase::PlayHitstop_Implementation(AActor* TargetActor)
+{
+	if(!HitstopEffect.ApplyHitStop)
+	{
+		return;
+	}
+	
+	if(!CanApplyHitStop)
+	{
+		return;
+	}
+	
+	if(WeaponOwner)
+	{
+		if(TargetActor && TargetActor->GetClass()->IsChildOf(APxiiNPC::StaticClass()))
+		{
+			UPxiiPlayerCombatComponent* combatComp = WeaponOwner->GetComponentByClass<UPxiiPlayerCombatComponent>();
+			if(combatComp)
+			{
+				CanApplyHitStop = false;
+				if(HitstopEffect.UseCustom)
+				{
+					combatComp->PlayHitStop(HitstopEffect.CustomHitStop);
+				}
+				else
+				{
+					combatComp->PlayRangeImpact(HitstopEffect.ImpactType);	
+				}
+			}			
+		}
+	}
+}
+
 void APxiiProjectileBase::SpawnHitEffect_Implementation(const FHitResult& HitResult)
 {
 	if(!HitFeedback)
@@ -304,6 +337,8 @@ void APxiiProjectileBase::ApplyDamageEffectToActor_Implementation(AActor* Target
 		}
 	}
 
+	PlayHitstop(TargetActor);
+	
 	if(WeaponOwner && ImpactCost != nullptr)
 	{
 		if(TargetActor && TargetActor->GetClass()->IsChildOf(APxiiNPC::StaticClass()))
@@ -530,6 +565,7 @@ void APxiiProjectileBase::SetIsInUse(bool InIsInUse)
 	}
 	else
 	{
+		CanApplyHitStop = true;
 		ProjectileMovement->SetUpdatedComponent(CollisionComponent);
 		ProjectileMovement->SetComponentTickEnabled(true);
 		ProjectileMovement->SetActive(true);

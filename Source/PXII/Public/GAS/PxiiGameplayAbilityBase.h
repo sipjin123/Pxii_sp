@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "MoverComponent.h"
+#include "Data/PxiiImpactMapData.h"
 #include "PxiiGameplayAbilityBase.generated.h"
 
 USTRUCT(BlueprintType)
@@ -77,6 +78,9 @@ protected:
 	
 	UPxiiGameplayAbilityBase(const FObjectInitializer& ObjectInitializer);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FHitstopEffect HitstopEffect;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
 	FAbilityCost AbilityCost;
 
@@ -101,6 +105,10 @@ protected:
 
 	virtual void ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyAbilityHitStop();
+	void ApplyAbilityHitStop_Implementation();
+	
 	float GetFinalCost(const FCostData& costData, float currentValue) const;
 
 private:

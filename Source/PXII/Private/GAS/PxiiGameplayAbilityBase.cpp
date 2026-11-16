@@ -3,6 +3,7 @@
 
 #include "GAS/PxiiGameplayAbilityBase.h"
 #include "AbilitySystemComponent.h"
+#include "Components/PxiiCombatComponent.h"
 #include "GAS/PxiiAttributeSet.h"
 #include "GAS/PxiiGameplayEffectCooldown.h"
 #include "GAS/PxiiGameplayEffectCost.h"
@@ -179,6 +180,27 @@ void UPxiiGameplayAbilityBase::ApplyCost(const FGameplayAbilitySpecHandle Handle
 		if (!SpecHandle.IsValid())
 		{
 			ApplyGameplayEffectSpecToOwner(Handle,	ActorInfo,	ActivationInfo,	SpecHandle);
+		}
+	}
+}
+
+void UPxiiGameplayAbilityBase::ApplyAbilityHitStop_Implementation()
+{
+	if(!HitstopEffect.ApplyHitStop)
+	{
+		return;
+	}
+
+	UPxiiCombatComponent* combatComp = GetOwningActorFromActorInfo()->GetComponentByClass<UPxiiCombatComponent>();
+	if(combatComp)
+	{
+		if(HitstopEffect.UseCustom)
+		{
+			combatComp->PlayHitStop(HitstopEffect.CustomHitStop);
+		}
+		else
+		{
+			combatComp->PlayAbilityImpact(HitstopEffect.ImpactType);
 		}
 	}
 }

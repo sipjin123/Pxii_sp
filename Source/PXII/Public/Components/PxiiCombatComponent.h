@@ -10,6 +10,7 @@
 #include "Character/PxiiCharacter.h"
 #include "Character/PxiiCharacterBase.h"
 #include "Combat/PxiiDpsProjectile.h"
+#include "Data/PxiiImpactMapData.h"
 #include "Enum/PxiiDamageType.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PxiiCombatComponent.generated.h"
@@ -102,6 +103,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ProcessDepthSlash(FVector EndLoc);
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayRangeImpact(EHitImpact impactType);
+	void PlayRangeImpact_Implementation(EHitImpact impactType);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayAbilityImpact(EHitImpact impactType);
+	void PlayAbilityImpact_Implementation(EHitImpact impactType);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayHitStop(FHitStopData hitstopData, bool ResetAtStop = true);
+	void PlayHitStop_Implementation(FHitStopData hitstopData, bool ResetAtStop = true);
+
 	UFUNCTION(BlueprintCallable)
 	void ProcessUnitDamage(AActor* TargetUnit, FVector HitLoc, float Damage, EDamageSource DamageSource);
 
@@ -173,6 +186,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName SocketTarget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPxiiImpactMapData> ImpactMapData;
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPxiiArmbladeComponent> ArmbladeComponent;
