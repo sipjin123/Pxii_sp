@@ -84,6 +84,9 @@ public:
 
 	UFUNCTION(BlueprintPure,Category="PXII|Combat")
 	static TArray<int32> GenerateSquadAttackTypes(int32 AttackerCount);
+	
+	UFUNCTION(BlueprintPure, Category="PXII|Combat")
+	static bool IsValidBlock(AActor* Attacker, AActor* Defender);
 
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat",meta=(WorldContext="WorldContextObject"))
 	static AActor* GetBestPillarInRadius(UObject* WorldContextObject,FVector Origin,float Radius,bool bLowestHealth,bool bFurthest);

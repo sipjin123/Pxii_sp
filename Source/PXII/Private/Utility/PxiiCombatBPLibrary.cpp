@@ -2,7 +2,6 @@
 
 
 #include "Utility/PxiiCombatBPLibrary.h"
-
 #include "Character/PxiiNPC.h"
 #include "Combat/PxiiPillarActor.h"
 #include "Settings/CombatDeveloperSettings.h"
@@ -65,8 +64,9 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
         {
             const EFactionType SourceFaction = IPxiiCombatInterface::Execute_GetFaction(SourceActor);
             const EFactionType TargetFaction = IPxiiCombatInterface::Execute_GetFaction(TargetActor);
-
-            if (SourceFaction != TargetFaction){
+            
+            if (SourceFaction != TargetFaction)
+            {
                 FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(Spawner->GetGenericDamageEffect(), 1.0f, ContextHandle);
                 if(SpecHandle.IsValid())
                 {
@@ -90,6 +90,34 @@ void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AAct
 {
     if (true)//if(HitEffectType != EHitEffectType::Default)
     {
+        // Block check
+        IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(TargetActor);
+        UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+        bool bIsValidBlock = false;
+        bool bIsTargetBlocking = TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Combat.State.Blocking")));
+                
+        if (bIsTargetBlocking)
+        {
+            bIsValidBlock = IsValidBlock(SourceActor, TargetActor);
+        }
+        
+        // If the hit effect is flinch and the block is valid, don't register hit
+        if (HitEffectType == EHitEffectType::Flinch && bIsValidBlock)
+        {
+            return;
+        }
+        
+        if (bIsTargetBlocking && HitEffectType == EHitEffectType::Knockback)
+        {
+            FGameplayEventData Payload;
+            Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Combat.State.BlockBreach"));
+            Payload.Instigator = SourceActor;
+            Payload.Target = TargetActor;
+                
+            UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, Payload.EventTag, Payload);
+            return;
+        }
+        
         //UE_LOG(LogTemp, Warning, TEXT("Should Apply Infliction: %s"), *StaticEnum<EHitEffectType>()->GetNameStringByValue(static_cast<int64>(HitEffectType)));
         FHitResult HitResult;
         HitResult.ImpactPoint = result.ImpactPoint;
@@ -676,6 +704,19 @@ TArray<int32> UPxiiCombatBPLibrary::GenerateSquadAttackTypes(int32 AttackerCount
         }
     }
     return AttackTypes;
+}
+
+bool UPxiiCombatBPLibrary::IsValidBlock(AActor* Attacker, AActor* Defender)
+{
+    if (!Attacker || !Defender)
+    {
+        PXII_LOG(ELogCategory::Combat, Error, TEXT("Attacker || Defender is null!"));
+        return false;
+    }
+    
+    const float Result = FVector::DotProduct(Attacker->GetActorForwardVector(), Defender->GetActorForwardVector());
+    
+    return Result < -0.1f ? true : false;
 }
 
 AActor* UPxiiCombatBPLibrary::GetBestPillarInRadius(UObject* WorldContextObject, FVector Origin, float Radius,

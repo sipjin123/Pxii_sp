@@ -10,6 +10,7 @@
 #include "Interface/PxiiCombatInterface.h"
 #include "Subsystem/PxiiCombatRegistrySubsystem.h"
 #include "Subsystem/WorldSpawnerSubsystem.h"
+#include "Utility/PxiiCombatBPLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogGEECDamage);
 struct CombatStatCapture
@@ -89,18 +90,59 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	static const FGameplayTag ParryTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.ParryWindow"));
 
 	const bool bIsTargetBlocking = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(BlockingTag);
-	const bool bIsTargetParry = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(ParryTag);
+	bool bIsTargetParry = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(ParryTag);
 	const bool bIsTargetDodge = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(PerfectDodgeTag);
 	
 	bool isCritical = false;
 	UE_LOG(LogGEECDamage, Warning, TEXT("------------------ STATE: %d %d %d"), !bIsTargetBlocking ? 0 : 1, !bIsTargetParry ? 0 : 1,  !bIsTargetDodge ? 0 : 1);
 
 	if (bIsTargetBlocking)
-		IncomingDamage *= .5f;
+	{
+		// IncomingDamage *= .5f;
+		
+		// Block check
+		bool bIsValidBlock = UPxiiCombatBPLibrary::IsValidBlock(SourceActor, TargetActor);
+		
+		if (bIsValidBlock)
+		{
+			FGameplayEventData Payload;
+			Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Combat.State.BlockSuccess"));
+			Payload.Instigator = SourceActor;
+			Payload.Target = TargetActor;
+                
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, Payload.EventTag, Payload);
+			
+			IncomingDamage *= .5f;
+		}
+		else
+		{
+			FGameplayEventData Payload;
+			Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Combat.State.BlockBreach"));
+			Payload.Instigator = SourceActor;
+			Payload.Target = TargetActor;
+                
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetActor, Payload.EventTag, Payload);
+		}
+	}
 	if (bIsTargetParry)
 	{
-		BlockDamageProcessing = true;
-		IncomingDamage = 0;
+		if (bIsTargetBlocking)
+		{
+			// Block check
+			bool bIsValidBlock = UPxiiCombatBPLibrary::IsValidBlock(SourceActor, TargetActor);
+			
+			if (bIsValidBlock)
+			{
+				BlockDamageProcessing = true;
+				IncomingDamage = 0;
+			}
+			else
+			{
+				bIsTargetParry = false;
+				ExecutionParams.GetTargetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(TEXT("Combat.State.PerfectDodgeWindow"))));
+			}
+		}
+
 	}
 	if (bIsTargetDodge)
 	{
