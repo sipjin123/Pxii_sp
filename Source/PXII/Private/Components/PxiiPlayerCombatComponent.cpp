@@ -67,11 +67,20 @@ void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedA
 
 void UPxiiPlayerCombatComponent::OnAbilityEnded(UGameplayAbility* ActivatedAbility)
 {
+	float waitTime = 5.0f;
+	if(ActiveWeapon == EWeaponType::Armblade)
+	{
+		waitTime = ArmbladeWeaponTimer;
+	}
+	else
+	{
+		waitTime = BlasterWeaponTimer;
+	}
 	GetWorld()->GetTimerManager().SetTimer(
 		LastAttackTimer,
 		this,
 		&UPxiiPlayerCombatComponent::HideActiveWeapon,
-		ShowWeaponTimer,
+		waitTime,
 		false
 	);
 }

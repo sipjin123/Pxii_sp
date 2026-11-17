@@ -64,8 +64,11 @@ private:
 	TObjectPtr<APxiiCharacter> OwnerCharacter;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float ShowWeaponTimer = 5.0f;
-
+	float ArmbladeWeaponTimer = 5.0f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float BlasterWeaponTimer = 2.0f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	EWeaponType ActiveWeapon = EWeaponType::Invalid;
 	
