@@ -765,3 +765,51 @@ AActor* UPxiiCombatBPLibrary::GetBestPillarInRadius(UObject* WorldContextObject,
     return BestPillar;
 }
 
+TArray<FVector> UPxiiCombatBPLibrary::GenerateQuadraticCurvePointsByActorFacing(const FVector& OriginPoint, const FVector& EndPoint, 
+    AActor* ReferencingActor, int32 NumberOfPointsToGenerate, float CurveHeight,  bool bIsVertical, bool bIgnoreZ)
+{
+    TArray<FVector> GeneratedPoints;
+    
+    if (NumberOfPointsToGenerate < 2)
+    {
+        GeneratedPoints.AddUnique(OriginPoint);
+        GeneratedPoints.AddUnique(EndPoint);
+        return GeneratedPoints;
+    }
+    
+    GeneratedPoints.Reserve(NumberOfPointsToGenerate);
+    
+    FVector Start = FVector::Zero();
+    FVector End = FVector::Zero();
+    
+    if (bIgnoreZ && !bIsVertical)
+    {
+        Start = FVector(OriginPoint.X, OriginPoint.Y, 0);
+        End = FVector(EndPoint.X, EndPoint.Y, 0);
+    }
+    else if ((!bIgnoreZ && !bIsVertical) || (bIgnoreZ && bIsVertical))
+    {
+        Start = OriginPoint;
+        End = EndPoint;
+    }
+    
+    const FVector MidPoint = (Start + End) * 0.5f;
+    
+    const FVector ControlPoint = MidPoint + 
+        ((bIsVertical ? 
+            (ReferencingActor ? ReferencingActor->GetActorForwardVector() : FVector::ForwardVector) :  
+            (ReferencingActor ? ReferencingActor->GetActorRightVector() : FVector::RightVector)) * CurveHeight);
+    
+    for (int32 i = 0; i < NumberOfPointsToGenerate; i++)
+    {
+        const float T = static_cast<float>(i) / static_cast<float>(NumberOfPointsToGenerate - 1);
+        const float OneMinusT = 1.f - T;
+        
+        const FVector Point = (OneMinusT * OneMinusT * Start) + (2.f * OneMinusT * T * ControlPoint) + (T * T * End);
+        
+        GeneratedPoints.AddUnique(Point);
+    }
+    
+    return GeneratedPoints;
+}
+

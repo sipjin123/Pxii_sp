@@ -90,4 +90,7 @@ public:
 
 	UFUNCTION(BlueprintCallable,Category="PXII|Combat",meta=(WorldContext="WorldContextObject"))
 	static AActor* GetBestPillarInRadius(UObject* WorldContextObject,FVector Origin,float Radius,bool bLowestHealth,bool bFurthest);
+	
+	UFUNCTION(BlueprintPure, Category="PXII|Combat", meta = (ToolTip = "Referencing Actor to get correct facing, -ve height to get opposite curve"))
+	static TArray<FVector> GenerateQuadraticCurvePointsByActorFacing(const FVector& OriginPoint, const FVector& EndPoint, AActor* ReferencingActor, int32 NumberOfPointsToGenerate, float CurveHeight, bool bIsVertical, bool bIgnoreZ);
 };
