@@ -39,7 +39,9 @@ void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedA
 	{
 		if(ActivatedAbility->GetClass()->IsChildOf(attackClass))
 		{
+			ActiveMeleeAbility += 1;
 			isAttackClass = true;
+			PendingAbilitiesToEnd.Add(ActivatedAbility);
 			CheckActiveWeapon(EWeaponType::Armblade);
 			break;
 		}
@@ -51,6 +53,9 @@ void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedA
 		{
 			if(ActivatedAbility->GetClass()->IsChildOf(attackClass))
 			{
+				ActiveRangeAbility += 1;
+				PendingAbilitiesToEnd.Add(ActivatedAbility);
+				PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: ACTIVE ABILITY: %d"), ActiveRangeAbility);
 				isAttackClass = true;
 				CheckActiveWeapon(EWeaponType::Blaster);
 				break;
@@ -67,15 +72,35 @@ void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedA
 
 void UPxiiPlayerCombatComponent::OnAbilityEnded(UGameplayAbility* ActivatedAbility)
 {
+	int reduction = 0;
+	if(PendingAbilitiesToEnd.Contains(ActivatedAbility))
+	{
+		reduction = 1;
+		PendingAbilitiesToEnd.Remove(ActivatedAbility);
+	}
+	
 	float waitTime = 5.0f;
 	if(ActiveWeapon == EWeaponType::Armblade)
 	{
+		
+		ActiveMeleeAbility -= reduction;
+		if(ActiveMeleeAbility > 0)
+		{
+			return;
+		}
 		waitTime = ArmbladeWeaponTimer;
 	}
 	else
 	{
+		ActiveRangeAbility -= reduction;
+		PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: ACTIVE ABILITY: %d"), ActiveRangeAbility);
+		if(ActiveRangeAbility > 0)
+		{
+			return;
+		}
 		waitTime = BlasterWeaponTimer;
 	}
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		LastAttackTimer,
 		this,

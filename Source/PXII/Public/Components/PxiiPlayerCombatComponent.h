@@ -71,6 +71,15 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	EWeaponType ActiveWeapon = EWeaponType::Invalid;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TArray<TObjectPtr<UGameplayAbility>>PendingAbilitiesToEnd;
 	
 	FTimerHandle LastAttackTimer;
+
+	UPROPERTY(BlueprintReadOnly,  meta = (AllowPrivateAccess = true))
+	int32 ActiveRangeAbility;
+
+	UPROPERTY(BlueprintReadOnly,  meta = (AllowPrivateAccess = true))
+	int32 ActiveMeleeAbility;
 };
