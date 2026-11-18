@@ -35,34 +35,3 @@ void UPxiiCharSimulatorComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	// ...
 }
 
-void UPxiiCharSimulatorComponent::SetCharacterState_Implementation(ECharacterState state)
-{
-	CurrentState = state;
-	UWorld* World = GetWorld();
-
-	if(!World)
-	{
-		return;
-	}
-
-	World->GetTimerManager().ClearTimer(StateHandler);
-
-	if(CurrentState == ECharacterState::Exploration)
-	{
-		return;	
-	}
-
-	World->GetTimerManager().SetTimer(StateHandler,	this, 	&UPxiiCharSimulatorComponent::ResetToExploration_Implementation,
-	ResetTimer,false);
-}
-
-void UPxiiCharSimulatorComponent::ResetToExploration_Implementation()
-{
-	CurrentState = ECharacterState::Exploration;
-}
-
-ECharacterState UPxiiCharSimulatorComponent::GetCharacterState()
-{
-	return CurrentState;
-}
-

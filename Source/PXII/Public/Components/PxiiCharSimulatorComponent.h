@@ -39,26 +39,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SetCharacterState(ECharacterState state);
-
-	void SetCharacterState_Implementation(ECharacterState state);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void ResetToExploration();
-
-	void ResetToExploration_Implementation();
-
-	UFUNCTION(BlueprintPure)
-	ECharacterState GetCharacterState();
-
 private:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
-	float ResetTimer = 5.0f;
-	
-	FTimerHandle StateHandler;
-
-	ECharacterState CurrentState = ECharacterState::Exploration;
 	
 };
