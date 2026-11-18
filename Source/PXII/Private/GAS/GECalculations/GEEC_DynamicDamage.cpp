@@ -85,10 +85,12 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 	const EHitEffectType HitEffectType = static_cast<EHitEffectType>(static_cast<uint8>(HitTypeValue));
 	
 	bool BlockDamageProcessing = false;
+	static const FGameplayTag InvulnerableTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.Status.ActionInvulnerable"));
 	static const FGameplayTag BlockingTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.Blocking"));
 	static const FGameplayTag PerfectDodgeTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.PerfectDodgeWindow"));
 	static const FGameplayTag ParryTag = FGameplayTag::RequestGameplayTag(TEXT("Combat.State.ParryWindow"));
 
+	const bool bIsInvulnerable = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(InvulnerableTag);
 	const bool bIsTargetBlocking = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(BlockingTag);
 	bool bIsTargetParry = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(ParryTag);
 	const bool bIsTargetDodge = ExecutionParams.GetTargetAbilitySystemComponent()->HasMatchingGameplayTag(PerfectDodgeTag);
@@ -144,7 +146,7 @@ void UGEEC_DynamicDamage::Execute_Implementation(const FGameplayEffectCustomExec
 		}
 
 	}
-	if (bIsTargetDodge)
+	if (bIsTargetDodge || bIsInvulnerable)
 	{
 		BlockDamageProcessing = true;
 		IncomingDamage = 0;
