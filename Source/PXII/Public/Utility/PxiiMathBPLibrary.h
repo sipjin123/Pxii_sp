@@ -113,4 +113,7 @@ public:
 	
 	UFUNCTION(BlueprintPure,Category="PXII|Combat")
 	static bool IsActorBetween(AActor* Source,AActor* InBetweenActor,AActor* Target,float MaxDistance);
+
+	UFUNCTION(BlueprintPure,Category="PXII|Math",meta=(WorldContext="WorldContextObject"))
+	static void GetGameTimeDifference(const UObject* WorldContextObject,float LastTimeRegistered,float& CurrentGameTime,float& TimeDifference);
 };

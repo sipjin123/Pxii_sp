@@ -700,3 +700,17 @@ bool UPxiiMathBPLibrary::IsActorBetween(AActor* Source, AActor* InBetweenActor, 
 	const float AlongDirection=FVector::DotProduct(ToSource.GetSafeNormal2D(),Direction);
 	return Distance<=MaxDistance&&AlongDirection<0.f;
 }
+
+void UPxiiMathBPLibrary::GetGameTimeDifference(const UObject* WorldContextObject, float LastTimeRegistered,
+	float& CurrentGameTime, float& TimeDifference)
+{
+	const UWorld* World=GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::ReturnNull);
+	if (!World)
+	{
+		CurrentGameTime=0.f;
+		TimeDifference=0.f;
+		return;
+	}
+	CurrentGameTime=World->GetTimeSeconds();
+	TimeDifference=CurrentGameTime-LastTimeRegistered;
+}
