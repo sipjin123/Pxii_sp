@@ -93,6 +93,12 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	AActor* SpecialActionTarget;
 	
+	UPROPERTY(BlueprintReadWrite)
+	AActor* CurrentAggroTarget;
+
+	UPROPERTY(BlueprintReadWrite)
+	float LastAggroTargetHitTime;
+	
 	UPROPERTY(EditAnywhere)
 	bool LogAggro = true;
 	

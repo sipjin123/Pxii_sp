@@ -36,7 +36,7 @@ bool UPxiiCombatBPLibrary::GetWeaponSocketTransform(APxiiCharacter* character, F
     return false;
 }
 
-void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection)
+void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* TargetActor, const FHitResult& result, float Magnitude, EHitEffectType HitEffectType, EHitDirection HitDirection, bool selfInflict)
 {
     UAbilitySystemComponent* InstigatorASC = nullptr;
     if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(SourceActor))
@@ -65,7 +65,7 @@ void UPxiiCombatBPLibrary::RegisterHitEffect(AActor* SourceActor, AActor* Target
             const EFactionType SourceFaction = IPxiiCombatInterface::Execute_GetFaction(SourceActor);
             const EFactionType TargetFaction = IPxiiCombatInterface::Execute_GetFaction(TargetActor);
             
-            if (SourceFaction != TargetFaction)
+            if (SourceFaction != TargetFaction || selfInflict)
             {
                 FGameplayEffectSpecHandle SpecHandle = InstigatorASC->MakeOutgoingSpec(Spawner->GetGenericDamageEffect(), 1.0f, ContextHandle);
                 if(SpecHandle.IsValid())

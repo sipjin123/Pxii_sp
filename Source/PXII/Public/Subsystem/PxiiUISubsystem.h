@@ -54,6 +54,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAbilityIconSlotUpdated, FGamep
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAbilityCooldownBegin, FGameplayTag, AbilityInputTag, float, CooldownDuration, float, CooldownRemaining);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityEnable, FGameplayTag, AbilityInputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityDisabled, FGameplayTag, AbilityInputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityClicked, TSubclassOf<UPxiiGameplayAbilityBase>, ClickedAbility);
 
 /**
  * 
@@ -83,6 +84,9 @@ public:
 	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
 	FOnAbilityDisabled OnAbilityDisabled;
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
+	FOnAbilityClicked OnAbilityClicked;
 
 	//~ Begin USubsystem Interface
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
