@@ -36,6 +36,11 @@ public:
 
 	void PlaySlashImpact_Implementation(EPhysicalSurface SurfaceType, const FVector& impactLocation);
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnSuccessfulHit();
+
+	void OnSuccessfulHit_Implementation();
+	
 	FImpactSoundEffect GetImpactSoundEffect(EPhysicalSurface SurfaceType);
 
 	UFUNCTION(BlueprintPure)

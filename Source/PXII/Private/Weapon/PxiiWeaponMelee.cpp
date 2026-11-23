@@ -109,6 +109,11 @@ void APxiiWeaponMelee::PlaySlashImpact_Implementation(EPhysicalSurface SurfaceTy
 	);
 }
 
+void APxiiWeaponMelee::OnSuccessfulHit_Implementation()
+{
+	
+}
+
 FImpactSoundEffect APxiiWeaponMelee::GetImpactSoundEffect(EPhysicalSurface SurfaceType)
 {
 	if (const FImpactSoundEffect* Found = ArmbladeEffectData->ArmbladeImpactSFX.Find(SurfaceType))

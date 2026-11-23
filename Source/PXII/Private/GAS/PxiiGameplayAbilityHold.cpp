@@ -2,6 +2,7 @@
 
 #include "Async/ParkingLot.h"
 #include "Character/PxiiCharacter.h"
+#include "Components/PxiiPlayerCombatComponent.h"
 
 void UPxiiGameplayAbilityHold::ActivateAbility(const FGameplayAbilitySpecHandle Handle,	const FGameplayAbilityActorInfo* OwnerInfo,
                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -44,4 +45,20 @@ void UPxiiGameplayAbilityHold::InputReleased(const FGameplayAbilitySpecHandle Ha
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 	}
+}
+
+void UPxiiGameplayAbilityHold::ApplyYinyang()
+{
+	if(YinyangCost == nullptr)
+	{
+		return;
+	}
+	
+	UPxiiYinYangComponent* combatComp = GetOwningActorFromActorInfo()->GetComponentByClass<UPxiiYinYangComponent>();
+	if(combatComp == nullptr)
+	{
+		return;
+	}
+
+	combatComp->ApplyCost(YinyangCost->CostType, YinyangCost->CostValue);
 }

@@ -19,6 +19,7 @@ void UPxiiHitFeedbackComponent::PlayHitFlash_Implementation()
 
 void UPxiiHitFeedbackComponent::CreateDynamicMaterial(UMeshComponent* mesh)
 {
+	isPlayer = false;
 	for (int32 index = 0; index < mesh->GetNumMaterials(); index++)
 	{
 		UMaterialInstanceDynamic* MID =	mesh->CreateAndSetMaterialInstanceDynamic(index);
@@ -33,6 +34,22 @@ void UPxiiHitFeedbackComponent::CreateDynamicMaterial(UMeshComponent* mesh)
 	}
 }
 
+void UPxiiHitFeedbackComponent::CreatePlayerDynamicMaterial(UMeshComponent* mesh)
+{
+	isPlayer = true;
+	for (int32 index = 0; index < mesh->GetNumMaterials(); index++)
+	{
+		UMaterialInstanceDynamic* MID =	mesh->CreateAndSetMaterialInstanceDynamic(index);
+
+		if (MID)
+		{
+			DynamicMaterials.Add(MID);
+			MID->SetVectorParameterValue(TEXT("System--Color"), HitFlashColor);
+			MID->SetScalarParameterValue(TEXT("System--Strength"),0.0f);
+		}
+	}
+}
+
 void UPxiiHitFeedbackComponent::UpdateHitFlash_Implementation()
 {
 	HitFlashElapsed += 0.016f;
@@ -43,14 +60,26 @@ void UPxiiHitFeedbackComponent::UpdateHitFlash_Implementation()
 		MaxOpacity
 	);
 
+	int32 intensity = 1.0f;
+	if(isPlayer)
+	{
+		intensity = HitFlashIntensity;
+	}
 	// Flash in, then fade out.
-	const float FlashAmount = MaxOpacity - Alpha;
+	const float FlashAmount = intensity * (MaxOpacity - Alpha);
 
 	for (UMaterialInstanceDynamic* MID : DynamicMaterials)
 	{
 		if (MID)
 		{
-			MID->SetScalarParameterValue(TEXT("HitFlashAmount"), FlashAmount);
+			if(isPlayer)
+			{
+				MID->SetScalarParameterValue(TEXT("System--Strength"),FlashAmount);
+			}
+			else
+			{
+				MID->SetScalarParameterValue(TEXT("HitFlashAmount"), FlashAmount);
+			}
 		}
 	}
 

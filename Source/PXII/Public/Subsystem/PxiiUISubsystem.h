@@ -50,6 +50,10 @@ public:
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnButtonDescriptionTextUpdated, UPxiiButtonBase*, BroadcastingButton, FText, DescriptionText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAbilityIconSlotUpdated, FGameplayTag, AbilityInputTag, TSoftObjectPtr<UTexture>, SoftAbilityIcon, TSubclassOf<UPxiiGameplayAbilityBase>, GameplayAbility);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAbilityCooldownBegin, FGameplayTag, AbilityInputTag, float, CooldownDuration, float, CooldownRemaining);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityEnable, FGameplayTag, AbilityInputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityDisabled, FGameplayTag, AbilityInputTag);
 
 /**
  * 
@@ -65,8 +69,20 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPxiiUIClassesMapping> DataMap;
 	
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category = "UISubsystem")
 	FOnButtonDescriptionTextUpdated OnButtonTextDescriptionUpdated;
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
+	FOnAbilityIconSlotUpdated OnAbilityIconSlotUpdated;
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
+	FOnAbilityCooldownBegin OnAbilityCooldownBegin;
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
+	FOnAbilityEnable OnAbilityEnable;	
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "UISubsystem")
+	FOnAbilityDisabled OnAbilityDisabled;
 
 	//~ Begin USubsystem Interface
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;

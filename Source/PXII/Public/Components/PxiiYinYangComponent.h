@@ -44,6 +44,14 @@ public:
 	void DisableYinYangFullEffect(EWeaponResourceType WeaponType);
 	void DisableYinYangFullEffect_Implementation(EWeaponResourceType WeaponType);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ApplyHarmonyEffect();
+	void ApplyHarmonyEffect_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void DisableHarmonyEffect();
+	void DisableHarmonyEffect_Implementation();
+
 	FGameplayEffectSpecHandle GetCostEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
 	FGameplayEffectSpecHandle GetStressEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
 	FGameplayEffectSpecHandle GetOverwhelmEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context);
@@ -79,4 +87,7 @@ private:
 
 	UPROPERTY()
 	FActiveGameplayEffectHandle FullGEHandle;
+
+	UPROPERTY()
+	FActiveGameplayEffectHandle HarmonyGEHandle;
 };

@@ -27,6 +27,10 @@ public:
 	virtual void ShowEffectText_Implementation(FActiveGameplayEffectHandle Handle, FEffectDetails GEDetails, bool isInstant);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowAbilityText(FEffectDetails GEDetails, bool isInstant);
+	virtual void ShowAbilityText_Implementation(FEffectDetails GEDetails, bool isInstant);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void RemoveEffectText(FActiveGameplayEffectHandle handle);
 	virtual void RemoveEffectText_Implementation(FActiveGameplayEffectHandle handle);
 

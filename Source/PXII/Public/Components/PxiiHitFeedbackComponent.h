@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CreateDynamicMaterial(UMeshComponent* mesh);
 
+	UFUNCTION(BlueprintCallable)
+	void CreatePlayerDynamicMaterial(UMeshComponent* mesh);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void UpdateHitFlash();
 
@@ -58,8 +61,13 @@ public:
 private:
 	
 
+	UPROPERTY()
+	bool isPlayer = false;
+
+	UPROPERTY()
 	FTimerHandle HitFlashTimerHandle;
 
+	UPROPERTY()
 	float HitFlashElapsed = 0.0f;
 
 };

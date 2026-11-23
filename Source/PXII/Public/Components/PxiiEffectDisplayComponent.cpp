@@ -74,6 +74,10 @@ void UPxiiEffectDisplayComponent::ShowEffectText_Implementation(FActiveGameplayE
 	
 }
 
+void UPxiiEffectDisplayComponent::ShowAbilityText_Implementation(FEffectDetails GEDetails, bool isInstant)
+{
+}
+
 void UPxiiEffectDisplayComponent::RemoveEffectText_Implementation(FActiveGameplayEffectHandle handle)
 {
 }

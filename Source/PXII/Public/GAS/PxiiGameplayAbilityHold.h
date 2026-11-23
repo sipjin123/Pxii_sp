@@ -11,6 +11,9 @@ class PXII_API UPxiiGameplayAbilityHold : public UPxiiGameplayAbilityBase
 	
 public:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UResourceGenerationCost> YinyangCost;
+	
 	UPROPERTY(EditDefaultsOnly)
 	bool EndAbilityOnRelease = true;
 	
@@ -20,6 +23,9 @@ public:
 
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyYinyang();
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void OnHoldReleased(float TimeHeld);
 	virtual void OnHoldReleased_Implementation(float TimeHeld);

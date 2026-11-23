@@ -4,7 +4,9 @@
 #include "Components/PxiiPlayerCombatComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Data/PxiiPlayerImpactData.h"
 #include "Data/PxiiTags.h"
+#include "GAS/PxiiGameplayAbilityBase.h"
 #include "Utility/PXIILogUtility.h"
 
 UPxiiPlayerCombatComponent::UPxiiPlayerCombatComponent()
@@ -34,6 +36,18 @@ void UPxiiPlayerCombatComponent::BeginPlay()
 void UPxiiPlayerCombatComponent::OnAbilityActivated(UGameplayAbility* ActivatedAbility)
 {
 	bool isAttackClass = false;
+
+	UPxiiGameplayAbilityBase* base = Cast<UPxiiGameplayAbilityBase>(ActivatedAbility);
+	if(base)
+	{
+		if(GetEffectDisplayComp())
+		{
+			if(base->EffectDetails.ShowDisplayText)
+			{
+				EffectDisplayComp->ShowAbilityText(base->EffectDetails, true);
+			}
+		}
+	}
 	
 	for(auto attackClass : MeleeAttackClasses)
 	{
@@ -110,6 +124,37 @@ void UPxiiPlayerCombatComponent::OnAbilityEnded(UGameplayAbility* ActivatedAbili
 	);
 }
 
+UPxiiEffectDisplayComponent* UPxiiPlayerCombatComponent::GetEffectDisplayComp()
+{
+	if(EffectDisplayComp)
+	{
+		return EffectDisplayComp;
+	}
+	EffectDisplayComp = GetOwner()->GetComponentByClass<UPxiiEffectDisplayComponent>();
+	return EffectDisplayComp;
+}
+
+UCameraShakeAsset* UPxiiPlayerCombatComponent::GetCameraShakeImpact(EHitImpact hitImpact)
+{
+	if(PlayerImpactData == nullptr)
+	{
+		return nullptr;
+	}
+
+	auto CameraShake = PlayerImpactData->ImpactCameraShake;
+	if(CameraShake.IsEmpty())
+	{
+		return nullptr;
+	}
+
+	if(!CameraShake.Contains(hitImpact))
+	{
+		return nullptr;
+	}
+
+	return CameraShake[hitImpact];
+}
+
 // Called every frame
 void UPxiiPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -129,6 +174,7 @@ void UPxiiPlayerCombatComponent::HideActiveWeapon_Implementation()
 	OwnerCharacter->CurrentWeaponRanged->HideWeapon();
 	
 	ActiveWeapon = EWeaponType::Invalid;
+	OnWeaponActiveUpdated.Broadcast();
 }
 
 void UPxiiPlayerCombatComponent::CheckActiveWeapon(EWeaponType weaponType)
@@ -154,4 +200,5 @@ void UPxiiPlayerCombatComponent::CheckActiveWeapon(EWeaponType weaponType)
 		OwnerCharacter->CurrentWeaponMelee->HideWeapon();
 		OwnerCharacter->CurrentWeaponRanged->ShowWeapon();
 	}
+	OnWeaponActiveUpdated.Broadcast();
 }

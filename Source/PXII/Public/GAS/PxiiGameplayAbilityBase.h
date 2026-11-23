@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "MoverComponent.h"
+#include "PxiiGameplayEffectBase.h"
 #include "Data/PxiiImpactMapData.h"
 #include "PxiiGameplayAbilityBase.generated.h"
 
@@ -87,7 +88,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
 	FGameplayTag CooldownTag;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cooldown")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Cooldown")
 	float CooldownDuration = 1.5f;
 	
 	UFUNCTION(BlueprintPure)
@@ -112,8 +113,17 @@ protected:
 	float GetFinalCost(const FCostData& costData, float currentValue) const;
 
 private:
+
 	mutable FGameplayTagContainer TempCooldownTags;
+	
 public:
+	
 	UPROPERTY(EditAnywhere)
 	bool LogData;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FEffectDetails EffectDetails;
+	
+	FGameplayTagContainer GetActivationBlockedTags() const { return ActivationBlockedTags; };
+	FGameplayTagContainer GetActivationRequiredTags() const { return ActivationRequiredTags; };
 };

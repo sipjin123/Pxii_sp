@@ -143,6 +143,40 @@ void UPxiiYinYangComponent::DisableYinYangFullEffect_Implementation(EWeaponResou
 	}
 }
 
+void UPxiiYinYangComponent::ApplyHarmonyEffect_Implementation()
+{
+	if (!IsValid(GetASC()))
+	{
+		PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: INVALID ASC"));
+		return;
+	}
+
+	// Create Gameplay Effect Context
+	FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	// Create Gameplay Effect Spec
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(YinYangData->HarmonyGE, 1.0f, EffectContext);
+
+	if (!SpecHandle.IsValid())
+	{
+		PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: INVALID SPEC"));
+		return;
+	}
+
+	// Apply to self
+	HarmonyGEHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+}
+
+void UPxiiYinYangComponent::DisableHarmonyEffect_Implementation()
+{
+	if (HarmonyGEHandle.IsValid())
+	{
+		ASC->RemoveActiveGameplayEffect(HarmonyGEHandle);
+		HarmonyGEHandle.Invalidate();
+	}
+}
+
 FGameplayEffectSpecHandle UPxiiYinYangComponent::GetCostEffect(EWeaponResourceType WeaponType, FGameplayEffectContextHandle context)
 {
 	if(WeaponType == EWeaponResourceType::Yang)

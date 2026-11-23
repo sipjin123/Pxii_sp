@@ -44,6 +44,9 @@ class PXII_API UPxiiYinYangData : public UPrimaryDataAsset
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> HarmonyGE;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float YinStress;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
