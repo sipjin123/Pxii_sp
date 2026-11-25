@@ -628,7 +628,7 @@ TArray<AActor*> UPxiiCombatBPLibrary::MultiSphereTraceTargetChain(UObject* World
 }
 
 APawn* UPxiiCombatBPLibrary::GetPawnInFrontByBoxTrace(UObject* WorldContextObject, AActor* SourceActor,
-    FVector BoxExtent, FVector Offset, float Distance, ETraceTypeQuery TraceChannel, bool bDrawDebug)
+    FVector BoxExtent, FVector Offset, float Distance, ETraceTypeQuery TraceChannel, bool bDrawDebug, bool bCameraDir)
 {
     if (!SourceActor||Distance<=0.f)
     {
@@ -639,17 +639,45 @@ APawn* UPxiiCombatBPLibrary::GetPawnInFrontByBoxTrace(UObject* WorldContextObjec
     {
         return nullptr;
     }
-    const FVector Start=SourceActor->GetActorLocation() + Offset;
-    const FVector Direction=SourceActor->GetActorForwardVector().GetSafeNormal();
+    
+    FVector Start = FVector::ZeroVector;
+    FVector Direction = FVector::ZeroVector;
+    
+    if (!bCameraDir)
+    {
+        Start = SourceActor->GetActorLocation() + Offset;
+        Direction = SourceActor->GetActorForwardVector().GetSafeNormal();
+    }
+    else
+    {
+        Start = SourceActor->GetActorLocation() + Offset;
+        Direction = Cast<APawn>(SourceActor)->GetController()->GetControlRotation().Vector().GetSafeNormal();
+    }
+    
     if (Direction.IsNearlyZero())
     {
         return nullptr;
     }
-    const FVector End=Start+Direction*Distance;
+    
+    const FVector End = Start + Direction * Distance;
+    const FVector Final = FVector(End.X, End.Y, Start.Z);
+    
     FHitResult Hit;
     TArray<AActor*> ActorsToIgnore;
     ActorsToIgnore.Add(SourceActor);
-    const bool bHit=UKismetSystemLibrary::BoxTraceSingle(World,Start,End,BoxExtent,SourceActor->GetActorRotation(),
+    FRotator BoxOrientation = FRotator::ZeroRotator;
+    
+    if (bCameraDir)
+    {
+        FRotator ControlRotation = Cast<APawn>(SourceActor)->GetController()->GetControlRotation();
+        BoxOrientation = FRotator(SourceActor->GetActorRotation().Pitch, ControlRotation.Yaw, ControlRotation.Roll);
+    }
+    else
+    {
+        BoxOrientation = SourceActor->GetActorRotation();
+    }
+    
+    const bool bHit = UKismetSystemLibrary::BoxTraceSingle(World,Start,Final,BoxExtent, BoxOrientation,
         TraceChannel,false,ActorsToIgnore,bDrawDebug?EDrawDebugTrace::ForDuration:EDrawDebugTrace::None,Hit,true, FLinearColor::Green, FLinearColor::Red, 1.f);
     if (!bHit)
     {

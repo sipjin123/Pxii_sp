@@ -189,16 +189,16 @@ void UPxiiPlayerCombatComponent::CheckActiveWeapon(EWeaponType weaponType)
 		PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Showing armblade"));
 
 		ActiveWeapon = weaponType;
-		OwnerCharacter->CurrentWeaponMelee->ShowWeapon();
-		OwnerCharacter->CurrentWeaponRanged->HideWeapon();
+		OwnerCharacter->CurrentWeaponMelee->ShowWeapon(5.0f);
+		OwnerCharacter->CurrentWeaponRanged->HideWeapon(5.0f);
 	}
 	else if(weaponType == EWeaponType::Blaster)
 	{
 		PXII_LOG(ELogCategory::Ability, Log, TEXT("DZ_LOG:: Showing Blaster"));
 
 		ActiveWeapon = weaponType;
-		OwnerCharacter->CurrentWeaponMelee->HideWeapon();
-		OwnerCharacter->CurrentWeaponRanged->ShowWeapon();
+		OwnerCharacter->CurrentWeaponMelee->HideWeapon(5.0f);
+		OwnerCharacter->CurrentWeaponRanged->ShowWeapon(5.0f);
 	}
 	OnWeaponActiveUpdated.Broadcast();
 }

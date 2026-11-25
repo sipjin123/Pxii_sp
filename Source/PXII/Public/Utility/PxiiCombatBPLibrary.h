@@ -80,7 +80,7 @@ public:
 		float SphereRadius, int32 MaxTraces, TSubclassOf<AActor> TargetActorClass, ETraceTypeQuery TraceChannel, bool bDrawDebug=false, bool bErrorLog=false);
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = WorldContextObject), Category="PXII|Trace")
-	static APawn* GetPawnInFrontByBoxTrace(UObject * WorldContextObject, AActor* SourceActor,FVector BoxExtent, FVector Offset, float Distance,ETraceTypeQuery TraceChannel,bool bDrawDebug=false);
+	static APawn* GetPawnInFrontByBoxTrace(UObject * WorldContextObject, AActor* SourceActor,FVector BoxExtent, FVector Offset, float Distance,ETraceTypeQuery TraceChannel,bool bDrawDebug = false, bool bCameraDir = false);
 
 	UFUNCTION(BlueprintPure,Category="PXII|Combat")
 	static TArray<int32> GenerateSquadAttackTypes(int32 AttackerCount);

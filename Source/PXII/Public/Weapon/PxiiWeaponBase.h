@@ -35,10 +35,10 @@ public:
 	bool isShowing = false;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void ShowWeapon();
-	void ShowWeapon_Implementation();
+	void ShowWeapon(float showSpeed = 1.0f);
+	void ShowWeapon_Implementation(float showSpeed = 1.0f);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void HideWeapon();
-	void HideWeapon_Implementation();
+	void HideWeapon(float hideSpeed = 1.0f);
+	void HideWeapon_Implementation(float hideSpeed = 1.0f);
 };
