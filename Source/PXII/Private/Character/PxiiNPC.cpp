@@ -214,6 +214,11 @@ void APxiiNPC::OnHealthChanged(const FOnAttributeChangeData& Data)
 	//UE_LOG(LogTemp, Log, TEXT("Health: %f -> %f"), Data.OldValue, Data.NewValue);
 }
 
+void APxiiNPC::PauseAnimation()
+{
+	GetMesh()->bPauseAnims = true;
+}
+
 void APxiiNPC::IncrementHitTracker(FPxiiHitTracker& HitTracker,AActor* Target, bool IsRangedAtk)
 {
 	if (!IsValid(Target))

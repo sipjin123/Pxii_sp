@@ -88,3 +88,56 @@ void UPxiiHitFeedbackComponent::UpdateHitFlash_Implementation()
 		GetWorld()->GetTimerManager().ClearTimer(HitFlashTimerHandle);
 	}
 }
+
+void UPxiiHitFeedbackComponent::PlayDissolve_Implementation()
+{
+	if(!CanDissolve)
+	{
+		return;
+	}
+	DissolveElapsed = 0.0f;
+
+	GetWorld()->GetTimerManager().ClearTimer(
+	DissolveTimerHandle
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		DissolveTimerHandle,
+		this,
+		&UPxiiHitFeedbackComponent::UpdateDissolve,
+		0.016f,
+		true
+	);
+}
+
+void UPxiiHitFeedbackComponent::UpdateDissolve_Implementation()
+{
+	
+	DissolveElapsed += 0.016f;
+
+	float alpha = FMath::Clamp(DissolveElapsed / DissolveDuration, 0.0f, 1.0f);
+
+	const float currentDissolve = FMath::Lerp(
+		StartDissolve,
+		EndDissolve,
+		alpha
+	);
+
+	for (UMaterialInstanceDynamic* MID : DynamicMaterials)
+	{
+		if (MID)
+		{
+			MID->SetScalarParameterValue(TEXT("System--Dissolve"), currentDissolve);
+		}
+	}
+
+	if (alpha >= 1.0f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(DissolveTimerHandle);
+		OnDissolveDone();
+	}
+}
+
+void UPxiiHitFeedbackComponent::OnDissolveDone_Implementation()
+{
+}

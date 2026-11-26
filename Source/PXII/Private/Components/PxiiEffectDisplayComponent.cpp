@@ -63,8 +63,6 @@ void UPxiiEffectDisplayComponent::HandleEffectRemoved(const FActiveGameplayEffec
 		return;
 	}
 
-	PXII_LOG(ELogCategory::Combat, Log, TEXT("DZ_LOG:: REMOVING EFFECT"));
-
 	RemoveEffectText(ActiveEffect.Handle);
 }
 

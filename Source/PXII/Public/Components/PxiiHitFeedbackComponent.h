@@ -36,10 +36,22 @@ public:
 	UPROPERTY(EditAnywhere, Category="Hit Feedback")
 	float HitFlashDuration = 0.2f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Hit Feedback")
+	float DissolveDuration = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category="Hit Feedback")
+	float StartDissolve = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category="Hit Feedback")
+	float EndDissolve = 0.2f;
+
 	UPROPERTY(EditAnywhere, Category="Hit Feedback")
 	float MaxOpacity = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category="Hit Feedback")
+	bool CanDissolve = false;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<UMaterialInstanceDynamic>> DynamicMaterials;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
@@ -57,6 +69,21 @@ public:
 	void UpdateHitFlash();
 
 	void UpdateHitFlash_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayDissolve();
+
+	void PlayDissolve_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void UpdateDissolve();
+
+	void UpdateDissolve_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnDissolveDone();
+
+	void OnDissolveDone_Implementation();
 	
 private:
 	
@@ -68,6 +95,12 @@ private:
 	FTimerHandle HitFlashTimerHandle;
 
 	UPROPERTY()
+	FTimerHandle DissolveTimerHandle;
+
+	UPROPERTY()
 	float HitFlashElapsed = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float DissolveElapsed = 0.0f;
 
 };

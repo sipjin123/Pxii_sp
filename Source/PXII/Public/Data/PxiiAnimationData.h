@@ -11,4 +11,11 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<EHitDirection, TObjectPtr<UAnimMontage>> FlinchMap;
+
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<TObjectPtr<UAnimMontage>> BlockFlinch;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> DeathMontage;
 };

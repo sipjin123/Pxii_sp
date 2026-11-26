@@ -204,6 +204,10 @@ protected:
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	void PauseAnimation();
+	
 	UFUNCTION(BlueprintCallable)
 	void IncrementHitTracker(FPxiiHitTracker& HitTracker,AActor* Target, bool IsRangedAtk);
 	

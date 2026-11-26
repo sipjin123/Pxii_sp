@@ -14,4 +14,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UAnimMontage* GetFlinchAnimation(EHitDirection HitDirection);
+
+	UFUNCTION(BlueprintPure)
+	UAnimMontage* GetBlockFlinchAnimation();
+	
+	UFUNCTION(BlueprintPure)
+    UAnimMontage* GetDeathAnimation();
 };
