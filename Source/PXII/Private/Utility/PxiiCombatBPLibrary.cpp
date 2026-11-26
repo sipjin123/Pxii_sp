@@ -102,12 +102,12 @@ void UPxiiCombatBPLibrary::RegisterHitStatusEffectOnly(AActor* SourceActor, AAct
         }
         
         // If the hit effect is flinch and the block is valid, don't register hit
-        if (HitEffectType == EHitEffectType::Flinch && bIsValidBlock)
+        if ((HitEffectType == EHitEffectType::Flinch || HitEffectType == EHitEffectType::Knockback) && bIsValidBlock)
         {
             return;
         }
         
-        if (bIsTargetBlocking && HitEffectType == EHitEffectType::Knockback)
+        if (bIsTargetBlocking && HitEffectType == EHitEffectType::Knockdown)
         {
             FGameplayEventData Payload;
             Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Combat.State.BlockBreach"));
